@@ -1,0 +1,93 @@
+{
+    "kvdb": {
+        "bili": {
+            "uid": 0,
+            "buvid3": "",
+            "sessdata": "",
+            "jct": ""
+        },
+        "isFirstTimeToLogin": true
+    },
+    "engine": {
+        "bili": {
+            "liveID": 21654925
+        }
+    },
+    "keyboard_hotkey": {
+        "handleFlush": "ctrl+alt+f5",
+        "handleGetDelay": "alt+f6",
+        "handleTTSRatePlus": "ctrl+alt+[",
+        "handleTTSRateMinus": "ctrl+alt+]",
+        "handleTTSVolumePlus": "ctrl+alt+=",
+        "handleTTSVolumeMinus": "ctrl+alt+-",
+        "handleTTSVoicePlus": "ctrl+alt+m",
+        "handleReadNextGiftMessages": "alt+f7",
+        "handleReadNextHistoryDanmu": "alt+f8",
+        "handleReadLastGiftMessages": "alt+t",
+        "handleReadLastHistoryDanmu": "alt+y",
+        "handleReadNewestMessages": "alt+f9"
+    },
+    "dynamic": {
+        "system": {
+            "alertWhenMessagesQueueLonger": {
+                "enable": true,
+                "threshold": 50,
+                "interval": 30
+            }
+        },
+        "tts": {
+            "engine": "",
+            "language": "",
+            "rate": 1.0,
+            "pitch": 1.0,
+            "volume": 1.0
+        },
+        "filter": {
+            "danmu": {
+                "enable": true,
+                "symbolEnable": true,
+                "emojiEnable": true,
+                "deduplicate": false,
+                "readfansMedalName": false,
+                "readfansMedalGuardLevel": true,
+                "isFansMedalBelongToLive": false,
+                "fansMedalGuardLevelBigger": 0,
+                "fansMedalLevelBigger": 0,
+                "lengthShorter": 0,
+                "blacklistKeywords": [],
+                "blacklistUsers": [],
+                "whitelistUsers": [],
+                "whitelistKeywords": []
+            },
+            "gift": {
+                "enable": true,
+                "freeGiftEnable": true,
+                "deduplicateTime": 10,
+                "freeGiftCountBigger": 0,
+                "moneyGiftPriceBigger": 0
+            },
+            "guardBuy": {
+                "enable": true
+            },
+            "like": {
+                "enable": true,
+                "deduplicate": true
+            },
+            "welcome": {
+                "enable": true,
+                "isFansMedalBelongToLive": false,
+                "fansMedalGuardLevelBigger": 0,
+                "fansMedalLevelBigger": 0
+            },
+            "subscribe": {
+                "enable": true
+            },
+            "superChat": {
+                "enable": true
+            },
+            "warning": {
+                "enable": true
+            }
+        }
+    }
+}
