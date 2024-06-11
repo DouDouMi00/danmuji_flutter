@@ -91,7 +91,7 @@ class DanmakuReceiver {
     http
         .get(
             Uri.parse(
-                'https://api.live.bilibili.com/room/v1/Room/room_init?id=${roomId}'),
+                'https://api.live.bilibili.com/room/v1/Room/room_init?id=$roomId'),
             headers: headers)
         .then((value) async {
       final dataJSON = jsonDecode(value.body);
@@ -122,8 +122,8 @@ class DanmakuReceiver {
           final payload = data.getRange(16, totalLength);
           switch (type) {
             case DanmakuType.authReply:
-              print('认证通过，已连接到弹幕服务器 ${roomId}');
-              Timer.periodic(Duration(seconds: 30), (timer) {
+              print('认证通过，已连接到弹幕服务器 $roomId');
+              Timer.periodic(const Duration(seconds: 30), (timer) {
                 ws?.sink.add(packetEncode(1, 2, "[object Object]"));
               });
               break;

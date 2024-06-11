@@ -138,7 +138,7 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
   }
 
   Widget _enginesDropDownSection(List<dynamic> engines) => Container(
-        padding: EdgeInsets.only(top: 50.0),
+        padding: const EdgeInsets.only(top: 50.0),
         child: DropdownButton(
           value: engine,
           items: getEnginesDropDownMenuItems(engines),
@@ -146,7 +146,7 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
         ),
       );
   Widget _languageDropDownSection(List<dynamic> languages) => Container(
-      padding: EdgeInsets.only(top: 10.0),
+      padding: const EdgeInsets.only(top: 10.0),
       child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
         DropdownButton(
           value: language,
@@ -165,9 +165,9 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
         if (snapshot.hasData) {
           return _languageDropDownSection(snapshot.data as List<dynamic>);
         } else if (snapshot.hasError) {
-          return Text('Error loading languages...');
+          return const Text('Error loading languages...');
         } else
-          return Text('Loading Languages...');
+          return const Text('Loading Languages...');
       });
   Widget _engineSection() {
     if (isAndroid) {
@@ -177,12 +177,13 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
             if (snapshot.hasData) {
               return _enginesDropDownSection(snapshot.data as List<dynamic>);
             } else if (snapshot.hasError) {
-              return Text('Error loading engines...');
+              return const Text('Error loading engines...');
             } else
-              return Text('Loading engines...');
+              return const Text('Loading engines...');
           });
-    } else
-      return Container(width: 0, height: 0);
+    } else {
+      return const SizedBox(width: 0, height: 0);
+    }
   }
 
   Widget _buildSliders() {
@@ -326,7 +327,7 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
                     break;
                   } else {
                     // 需要延迟
-                    await Future.delayed(Duration(seconds: 1));
+                    await Future.delayed(const Duration(seconds: 1));
                   }
                 }
               });

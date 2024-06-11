@@ -202,7 +202,7 @@ class _MyAppState extends State<TtsEditPage> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: Text('Flutter TTS'),
+          title: const Text('Flutter TTS'),
         ),
         body: SingleChildScrollView(
           scrollDirection: Axis.vertical,
@@ -229,12 +229,13 @@ class _MyAppState extends State<TtsEditPage> {
             if (snapshot.hasData) {
               return _enginesDropDownSection(snapshot.data as List<dynamic>);
             } else if (snapshot.hasError) {
-              return Text('Error loading engines...');
+              return const Text('Error loading engines...');
             } else
-              return Text('Loading engines...');
+              return const Text('Loading engines...');
           });
-    } else
-      return Container(width: 0, height: 0);
+    } else {
+      return const SizedBox(width: 0, height: 0);
+    }
   }
 
   Widget _futureBuilder() => FutureBuilder<dynamic>(
@@ -243,14 +244,14 @@ class _MyAppState extends State<TtsEditPage> {
         if (snapshot.hasData) {
           return _languageDropDownSection(snapshot.data as List<dynamic>);
         } else if (snapshot.hasError) {
-          return Text('Error loading languages...');
+          return const Text('Error loading languages...');
         } else
-          return Text('Loading Languages...');
+          return const Text('Loading Languages...');
       });
 
   Widget _inputSection() => Container(
       alignment: Alignment.topCenter,
-      padding: EdgeInsets.only(top: 25.0, left: 25.0, right: 25.0),
+      padding: const EdgeInsets.only(top: 25.0, left: 25.0, right: 25.0),
       child: TextField(
         maxLines: 11,
         minLines: 6,
@@ -261,7 +262,7 @@ class _MyAppState extends State<TtsEditPage> {
 
   Widget _btnSection() {
     return Container(
-      padding: EdgeInsets.only(top: 50.0),
+      padding: const EdgeInsets.only(top: 50.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
@@ -277,7 +278,7 @@ class _MyAppState extends State<TtsEditPage> {
   }
 
   Widget _enginesDropDownSection(List<dynamic> engines) => Container(
-        padding: EdgeInsets.only(top: 50.0),
+        padding: const EdgeInsets.only(top: 50.0),
         child: DropdownButton(
           value: engine,
           items: getEnginesDropDownMenuItems(engines),
@@ -286,7 +287,7 @@ class _MyAppState extends State<TtsEditPage> {
       );
 
   Widget _languageDropDownSection(List<dynamic> languages) => Container(
-      padding: EdgeInsets.only(top: 10.0),
+      padding: const EdgeInsets.only(top: 10.0),
       child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
         DropdownButton(
           value: language,
@@ -325,7 +326,7 @@ class _MyAppState extends State<TtsEditPage> {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         ElevatedButton(
-          child: Text('Get max speech input length'),
+          child: const Text('Get max speech input length'),
           onPressed: () async {
             _inputLength = await flutterTts.getMaxSpeechInputLength;
             setState(() {});
