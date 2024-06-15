@@ -81,6 +81,8 @@ class DanmakuReceiver {
 
   WebSocketChannel? ws;
   int roomId = 0;
+  int? _anchorUid;
+  int? get anchorUid => _anchorUid;
 
   DanmakuReceiver(roomId) {
     final headers = <String, String>{
@@ -95,6 +97,7 @@ class DanmakuReceiver {
             headers: headers)
         .then((value) async {
       final dataJSON = jsonDecode(value.body);
+      _anchorUid = dataJSON['data']['uid'];
       final roomInfoJSON = jsonDecode((await http.get(
               Uri.parse(
                   'https://api.live.bilibili.com/room/v1/Danmu/getConf?room_id=${dataJSON['data']['room_id']}&platform=pc&player=web'),
@@ -218,27 +221,27 @@ class DanmakuReceiver {
     print('已断开弹幕服务器连接');
   }
 
-  void onDanmaku(Function handler) {
+  void onDanmuCallback(Function handler) {
     _DANMU_MSG.add(handler);
   }
 
-  void onGift(Function handler) {
+  void onGiftCallback(Function handler) {
     _SEND_GIFT.add(handler);
   }
 
-  void onGuard(Function handler) {
+  void onGuardBuyCallback(Function handler) {
     _USER_TOAST_MSG.add(handler);
   }
 
-  void onSuperChat(Function handler) {
+  void onSCCallback(Function handler) {
     _SUPER_CHAT_MESSAGE.add(handler);
   }
 
-  void onLiveStart(Function handler) {
+  void onInteractWordCallback(Function handler) {
     _INTERACT_WORD.add(handler);
   }
 
-  void onLiveEnd(Function handler) {
+  void onLikeCallback(Function handler) {
     _LIKE_INFO_V3_CLICK.add(handler);
   }
 

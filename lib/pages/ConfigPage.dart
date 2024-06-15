@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import '../services/config.dart';
 import '../services/blivedm.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import '../services/messages_handler.dart';
 
 class ConfigEditPage extends StatefulWidget {
   const ConfigEditPage({super.key});
@@ -33,6 +34,7 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
   bool isRunning = false;
   String buttonText = '开始';
   late DanmakuReceiver receiver;
+  late MessageHandler messageHandler;
 
   @override
   void initState() {
@@ -307,30 +309,8 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
             if (isRunning) {
               // 启动程序
               receiver = DanmakuReceiver(configMap['engine']['bili']['liveID']);
-              receiver.onDanmaku((data) async {
-                await flutterTts.awaitSpeakCompletion(true);
-                while (isRunning) {
-                  // 添加对isRunning的检查
-                  if (ttsState == TtsState.stopped) {
-                    ttsState = TtsState.playing;
-                    flutterTts.setEngine(engine!);
-                    flutterTts.setLanguage(language!);
-                    flutterTts.setVolume(volume);
-                    flutterTts.setSpeechRate(rate);
-                    flutterTts.setPitch(pitch);
-                    await flutterTts
-                        .speak("${data["info"][2][1]}说:${data["info"][1]}");
-                    flutterTts.setCompletionHandler(() {
-                      ttsState = TtsState.stopped;
-                    });
-                    print("${data["info"][2][1]}说：${data["info"][1]}");
-                    break;
-                  } else {
-                    // 需要延迟
-                    await Future.delayed(const Duration(seconds: 1));
-                  }
-                }
-              });
+              messageHandler = MessageHandler(receiver,config);
+              messageHandler.setupEventHandlers();
             } else {
               receiver.dispose();
             }
@@ -343,3 +323,27 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
     );
   }
 }
+
+
+                // await flutterTts.awaitSpeakCompletion(true);
+                // while (isRunning) {
+                //   // 添加对isRunning的检查
+                //   if (ttsState == TtsState.stopped) {
+                //     ttsState = TtsState.playing;
+                //     flutterTts.setEngine(engine!);
+                //     flutterTts.setLanguage(language!);
+                //     flutterTts.setVolume(volume);
+                //     flutterTts.setSpeechRate(rate);
+                //     flutterTts.setPitch(pitch);
+                //     await flutterTts
+                //         .speak("${data["info"][2][1]}说:${data["info"][1]}");
+                //     flutterTts.setCompletionHandler(() {
+                //       ttsState = TtsState.stopped;
+                //     });
+                //     print("${data["info"][2][1]}说：${data["info"][1]}");
+                //     break;
+                //   } else {
+                //     // 需要延迟
+                //     await Future.delayed(const Duration(seconds: 1));
+                //   }
+                // }
