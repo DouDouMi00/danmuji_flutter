@@ -1,10 +1,13 @@
+import '../services/tts.dart';
 import 'package:flutter/material.dart';
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
-import '../services/config.dart';
+import '../services/config.dart' show config;
 import '../services/blivedm.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-import '../services/messages_handler.dart';
+import '../services/live.dart';
+
+
 
 class ConfigEditPage extends StatefulWidget {
   const ConfigEditPage({super.key});
@@ -18,7 +21,6 @@ enum TtsState { playing, stopped, paused, continued }
 
 class _ConfigEditPageState extends State<ConfigEditPage> {
   late Future<Map<String, dynamic>> _configFuture;
-  Config config = Config();
   String dmtext = '';
 
   FlutterTts flutterTts = FlutterTts();
@@ -61,7 +63,9 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
           future: _configFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const CircularProgressIndicator();
+              return Center(
+                child: const CircularProgressIndicator(),
+              );
             } else if (snapshot.hasError) {
               return Text('Error: ${snapshot.error}');
             } else {
@@ -309,8 +313,9 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
             if (isRunning) {
               // 启动程序
               receiver = DanmakuReceiver(configMap['engine']['bili']['liveID']);
-              messageHandler = MessageHandler(receiver,config);
+              messageHandler = MessageHandler(receiver);
               messageHandler.setupEventHandlers();
+              ttsTask();
             } else {
               receiver.dispose();
             }

@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import './pages/ConfigPage.dart';
 import './pages/TtsPage.dart';
+import './services/messages_handler.dart'; 
 
-void main() => runApp(const MyApp());
+void main() {
+  // 在运行应用前设置事件监听器
+  setupEventListeners();
+  runApp(const MyApp());
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

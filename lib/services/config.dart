@@ -52,3 +52,4 @@ class Config {
     return _configMap;
   }
 }
+Config config = Config();

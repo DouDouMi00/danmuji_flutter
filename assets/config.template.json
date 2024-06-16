@@ -38,9 +38,9 @@
         "tts": {
             "engine": "",
             "language": "",
-            "rate": 1.0,
-            "pitch": 1.0,
-            "volume": 1.0
+            "volume": 1.0,
+            "rate": 2.0,
+            "pitch": 1.0
         },
         "filter": {
             "danmu": {
