@@ -21,6 +21,28 @@ void setupEventListeners() {
       case 'danmu':
         onDanmu(data);
         break;
+      case 'gift':
+        onGift(data);
+        break;
+      case 'guardBuy':
+        onGuardBuy(data);
+        break;
+      case 'like':
+        onLike(data);
+        break;
+      case 'welcome':
+        onWelcome(data);
+        break;
+      case 'subscribe':
+        onSubscribe(data);
+        break;
+      case 'superChat':
+        onSuperChat(data);
+        break;
+      case 'warning':
+        onWarning(data);
+        break;
+
       default:
         print('Unhandled event type: $eventType');
         break;
@@ -56,22 +78,6 @@ void messagesQueueAppendAtStart(dynamic data) {
 }
 
 void onDanmu(dynamic command) {
-  //   'data': {
-  //   'uid': uid,
-  //   'uname': uname,
-  //   'isFansMedalBelongToLive': isFansMedalBelongToLive,
-  //   'authorType': authorType,
-  //   'authorTypeText': authorTypeText,
-  //   'fansMedalName': fansMedalName,
-  //   'fansMedalLevel': fansMedalLevel,
-  //   'fansMedalGuardLevelName': fansMedalGuardLevelName,
-  //   'fansMedalGuardLevel': fansMedalGuardLevel,
-  //   'liveRoomGuardLevelName': liveRoomGuardLevelName,
-  //   'liveRoomGuardLevel': liveRoomGuardLevel,
-  //   'msg': msg,
-  //   'faceImg': faceImg,
-  //   'isEmoji': isEmoji,
-  // }
   if (filterDanmu(
       command['uid'],
       command['uname'],
@@ -82,7 +88,7 @@ void onDanmu(dynamic command) {
       command['isEmoji'])) {
     messagesQueueAppend({
       "type": "danmu",
-      "time": DateTime.now().millisecondsSinceEpoch,
+      "time": DateTime.now(),
       "uid": command['uid'],
       "uname": command['uname'],
       "msg": command['msg'],
@@ -101,10 +107,178 @@ void onDanmu(dynamic command) {
   }
 }
 
+void onGift(dynamic command) async {
+  // void deduplicateCallback(Map<String, dynamic> userInfo, String giftName) {
+  //   Map<String, dynamic> giftInfo = userInfo['gifts'][giftName];
+  //   messagesQueueAppend({
+  //     "type": "gift",
+  //     "time": DateTime.now().millisecondsSinceEpoch.toDouble(),
+  //     "uid": userInfo["uid"],
+  //     "uname": userInfo["uname"],
+  //     "giftName": giftName,
+  //     "num": giftInfo["count"],
+  //   });
+  // }
+
+  // bool? result = await filterGift(
+  //     command['uid'],
+  //     command['uname'],
+  //     command['price'],
+  //     command['giftName'],
+  //     command['num'],
+  //     deduplicateCallback);
+  // if (result == true) {
+  messagesQueueAppend({
+    "type": "gift",
+    "time": DateTime.now(),
+    "uid": command['uid'],
+    "uname": command['uname'],
+    "giftName": command['giftName'],
+    "num": command['num'],
+  });
+  // }
+}
+
+// @liveEvent.on("guardBuy")
+// async def onGuardBuy(
+//     uid,
+//     uname,
+//     unamePronunciation,
+//     liveRoomGuardLevel,
+//     newGuard,
+//     faceImg,
+//     giftName,
+//     num,
+//     title,
+// ):
+//     if filterGuardBuy(uid, uname, newGuard, giftName, num):
+//         appendGuardBuyFilteredStats(
+//             uid=uid,
+//             uname=uname,
+//             unamePronunciation=unamePronunciation,
+//             time=int(time.time()),
+//             liveRoomGuardLevel=liveRoomGuardLevel,
+//             newGuard=newGuard,
+//             faceImg=faceImg,
+//             giftName=giftName,
+//             num=num,
+//             title=title,
+//             filterd=False,
+//         )
+//         messagesQueueAppend(
+//             {
+//                 "type": "guardBuy",
+//                 "time": time.time(),
+//                 "uid": uid,
+//                 "uname": uname,
+//                 "newGuard": newGuard,
+//                 "giftName": giftName,
+//                 "num": num,
+//             }
+//         )
+//     else:
+//         appendGuardBuyFilteredStats(
+//             uid=uid,
+//             uname=uname,
+//             unamePronunciation=unamePronunciation,
+//             time=int(time.time()),
+//             liveRoomGuardLevel=liveRoomGuardLevel,
+//             newGuard=newGuard,
+//             faceImg=faceImg,
+//             giftName=giftName,
+//             num=num,
+//             title=title,
+//             filterd=True,
+//         )
+
+void onGuardBuy(dynamic command) {
+  if (filterGuardBuy(command['uid'], command['uname'], command['newGuard'],
+      command['giftName'], command['num'])) {
+    messagesQueueAppend({
+      "type": "guardBuy",
+      "time": DateTime.now(),
+      "uid": command['uid'],
+      "uname": command['uname'],
+      "newGuard": command['newGuard'],
+      "giftName": command['giftName'],
+      "num": command['num'],
+    });
+  }
+}
+
+void onLike(dynamic command) {
+  if (filterLike(command['uid'], command['uname'])) {
+    messagesQueueAppend({
+      "type": "like",
+      "time": DateTime.now(),
+      "uid": command['uid'],
+      "uname": command['uname'],
+    });
+  }
+}
+
+void onSuperChat(dynamic command) {
+  if (filterSuperChat(
+      command['uid'], command['uname'], command['price'], command['msg'])) {
+    messagesQueueAppend({
+      "type": "superChat",
+      "time": DateTime.now(),
+      "uid": command['uid'],
+      "uname": command['uname'],
+      "price": command['price'],
+      "msg": command['msg'],
+    });
+  }
+}
+
+void onSubscribe(dynamic command) {
+  if (filterSubscribe(
+      command['uid'],
+      command['uname'],
+      command['isFansMedalBelongToLive'],
+      command['fansMedalLevel'],
+      command['fansMedalGuardLevel'])) {
+    messagesQueueAppend({
+      "type": "subscribe",
+      "time": DateTime.now(),
+      "uid": command['uid'],
+      "uname": command['uname'],
+    });
+  }
+}
+
+void onWelcome(dynamic command) {
+  if (filterWelcome(command['uid'], command['uname'],
+      command['isFansMedalBelongToLive'], command['fansMedalLevel'],
+      command['fansMedalGuardLevel'])) {
+    messagesQueueAppend({
+      "type": "welcome",
+      "time": DateTime.now(),
+      "uid": command['uid'],
+      "uname": command['uname'],
+    });
+  }
+}
+
+void onWarning(dynamic command) {
+  if (filterWarning(command['msg'], command['isCutOff'])) {
+      messagesQueueAppend({
+    "type": "warning",
+    "time": DateTime.now(),
+    "msg": command['msg'],
+    "isCutOff": command['isCutOff'],
+  });
+  }
+
+}
 
 Future<void> markAllMessagesInvalid() async {
   messagesQueue = [
-    {"type": "system", "time": DateTime.now().millisecondsSinceEpoch ~/ 1000, "msg": "已清空弹幕列表"}
+    {
+      "type": "system",
+      "time": DateTime.now(),
+      "msg": "已清空弹幕列表"
+    }
   ];
   // setOutputMessagesLength(messagesQueue.length);
 }

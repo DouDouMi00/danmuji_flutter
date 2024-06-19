@@ -55,8 +55,6 @@ class _MyHomePageState extends State<MyHomePage> {
       // 使用安全访问方法
       return indexFromInt(_currentIndex);
     } catch (e) {
-      // 在无法获取有效页面索引时处理异常，例如打印日志或返回默认值
-      print(e);
       return PageIndex.config; // 假设config是默认页
     }
   }

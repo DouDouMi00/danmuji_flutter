@@ -66,8 +66,8 @@ class MessageHandler {
     bool isEmoji;
 
     if (command['info'][3].length != 0) {
-      isFansMedalBelongToLive = command['info'][3][3] ==
-          getConfigMap()['engine']['bili']['liveID'];
+      isFansMedalBelongToLive =
+          command['info'][3][3] == getConfigMap()['engine']['bili']['liveID'];
       fansMedalLevel = command['info'][3][0];
       fansMedalName = command['info'][3][1];
       fansMedalGuardLevel = guardLevelMap[command['info'][3][10]];
@@ -134,6 +134,18 @@ class MessageHandler {
 
     // liveEvent.emit(
     // "gift", uid, uname, unamePronunciation, price, faceImg, giftName, num);
+    emitter.emitEvent(jsonEncode({
+      'eventType': 'gift',
+      'data': {
+        'uid': uid,
+        'uname': uname,
+        'unamePronunciation': unamePronunciation,
+        'price': price,
+        'faceImg': faceImg,
+        'giftName': giftName,
+        'num': num,
+      }
+    }));
   }
 
   void _handleGuardBuy(command) {
@@ -170,6 +182,20 @@ class MessageHandler {
     //   num,
     //   title,
     // );
+    emitter.emitEvent(jsonEncode({
+      'eventType': 'guardBuy',
+      'data': {
+        'uid': uid,
+        'uname': uname,
+        'unamePronunciation': unamePronunciation,
+        'liveRoomGuardLevel': liveRoomGuardLevel,
+        'newGuard': newGuard,
+        'faceImg': faceImg,
+        'giftName': giftName,
+        'num': num,
+        'title': title,
+      }
+    }));
   }
 
   void _handleSC(command) {
@@ -183,6 +209,17 @@ class MessageHandler {
     // timeLog(f"[SuperChat] {uname} bought {price}元的SC: {msg}");
     print("[SC] $uname bought ${price.toStringAsFixed(2)}元SC: $msg");
     // liveEvent.emit("superChat", uid, faceImg, uname, unamePronunciation, price, msg);
+    emitter.emitEvent(jsonEncode({
+      'eventType': 'superChat',
+      'data': {
+        'uid': uid,
+        'uname': uname,
+        'unamePronunciation': unamePronunciation,
+        'price': price,
+        'msg': msg,
+        'faceImg': faceImg,
+      }
+    }));
   }
 
   void _handleInteractWord(command) {
@@ -229,6 +266,29 @@ class MessageHandler {
 //     fansMedalGuardLevel,
 //   );
 // }
+    if (isSubscribe) {
+      emitter.emitEvent(jsonEncode({
+        'eventType': 'subscribe',
+        'data': {
+          'uid': uid,
+          'uname': uname,
+          'isFansMedalBelongToLive': isFansMedalBelongToLive,
+          'fansMedalLevel': fansMedalLevel,
+          'fansMedalGuardLevel': fansMedalGuardLevel,
+        }
+      }));
+    } else {
+      emitter.emitEvent(jsonEncode({
+        'eventType': 'welcome',
+        'data': {
+          'uid': uid,
+          'uname': uname,
+          'isFansMedalBelongToLive': isFansMedalBelongToLive,
+          'fansMedalLevel': fansMedalLevel,
+          'fansMedalGuardLevel': fansMedalGuardLevel,
+        }
+      }));
+    }
   }
 
   void _handleLike(command) {
@@ -238,6 +298,13 @@ class MessageHandler {
     // timeLog(f"[Like] {uname} liked the stream.");
     print("[Like] $uname liked the stream.");
     // liveEvent.emit("like", uid, uname);
+    emitter.emitEvent(jsonEncode({
+      'eventType': 'like',
+      'data': {
+        'uid': uid,
+        'uname': uname,
+      }
+    }));
   }
 
   void _handleWarning(command) {
@@ -246,6 +313,13 @@ class MessageHandler {
     // timeLog(f"[Warning] {msg}");
     print("[Warning] $msg");
     // liveEvent.emit("warning", msg, False);
+    emitter.emitEvent(jsonEncode({
+      'eventType': 'warning',
+      'data': {
+        'msg': msg,
+        'bool': false,
+      }
+    }));
   }
 
   void _handleCutOff(command) {
@@ -256,5 +330,12 @@ class MessageHandler {
     print("Cut Off, $msg");
     //       liveEvent.emit("warning", msg, True);
     // }
+    emitter.emitEvent(jsonEncode({
+      'eventType': 'warning',
+      'data': {
+        'msg': msg,
+        'bool': true,
+      }
+    }));
   }
 }
