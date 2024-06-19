@@ -1,10 +1,10 @@
-import '../services/config.dart' show config;
+import '../services/config.dart';
 
 List<String> lastDanmuMessages = [];
 
 bool filterDanmu(int uid, String uname, bool isFansMedalBelongToLive,
     int fansMedalLevel, int fansMedalGuardLevel, String msg, bool isEmoji) {
-  var dynamicConfig = config.getConfigMap()['dynamic'];
+  var dynamicConfig = getConfigMap()['dynamic'];
   if (!dynamicConfig['filter']['danmu']['enable']) return false;
   if (dynamicConfig['filter']['danmu']['whitelistUsers'].contains(uid)) return true;
   if (dynamicConfig['filter']['danmu']['whitelistKeywords'].isNotEmpty) {

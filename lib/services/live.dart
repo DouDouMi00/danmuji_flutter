@@ -6,7 +6,6 @@ import '../services/config.dart';
 import '../services/tool.dart';
 import 'package:pinyin/pinyin.dart';
 import 'event_emitter.dart';
-import '../services/config.dart' show config;
 
 EventEmitter emitter = EventEmitter();
 
@@ -57,18 +56,18 @@ class MessageHandler {
     var liveRoomGuardLevel = command['info'][7];
     var liveRoomGuardLevelName = guardLevelMap_name_raw[liveRoomGuardLevel];
 
-    var isFansMedalBelongToLive;
+    bool isFansMedalBelongToLive;
     var fansMedalLevel;
     var fansMedalName;
     var fansMedalGuardLevel;
     var fansMedalGuardLevelName;
-    var authorType;
+    int authorType;
     var authorTypeText;
-    var isEmoji;
+    bool isEmoji;
 
     if (command['info'][3].length != 0) {
       isFansMedalBelongToLive = command['info'][3][3] ==
-          config.getConfigMap()['engine']['bili']['liveID'];
+          getConfigMap()['engine']['bili']['liveID'];
       fansMedalLevel = command['info'][3][0];
       fansMedalName = command['info'][3][1];
       fansMedalGuardLevel = guardLevelMap[command['info'][3][10]];
@@ -96,7 +95,7 @@ class MessageHandler {
     }
     isEmoji = command['info'][0][12] == 1 || isStringAllEmojis(msg);
     print(
-        '[Danmu] [${authorTypeText}] [${liveRoomGuardLevelName}] [[${fansMedalGuardLevelName}]${fansMedalName}:${fansMedalLevel}] ${uname}: ${msg}');
+        '[Danmu] [$authorTypeText] [$liveRoomGuardLevelName] [[$fansMedalGuardLevelName]$fansMedalName:$fansMedalLevel] $uname: $msg');
     emitter.emitEvent(jsonEncode({
       'eventType': 'danmu',
       'data': {
@@ -157,7 +156,7 @@ class MessageHandler {
     var faceImg = 'static.hdslb.com/images/member/noface.gif';
 
     print(
-        '[GuardBuy] ${uname} bought ${newGuard ? 'New ' : ''}$giftName x $num.');
+        '[GuardBuy] $uname bought ${newGuard ? 'New ' : ''}$giftName x $num.');
 
     // liveEvent.emit(
     //   'guardBuy',
@@ -182,14 +181,14 @@ class MessageHandler {
     var msg = command["data"]["message"];
     var faceImg = command["data"]["user_info"]["face"];
     // timeLog(f"[SuperChat] {uname} bought {price}元的SC: {msg}");
-    print("[SC] ${uname} bought ${price.toStringAsFixed(2)}元SC: ${msg}");
+    print("[SC] $uname bought ${price.toStringAsFixed(2)}元SC: $msg");
     // liveEvent.emit("superChat", uid, faceImg, uname, unamePronunciation, price, msg);
   }
 
   void _handleInteractWord(command) {
     // 处理互动词逻辑
     if (command['data']['roomid'] !=
-        config.getConfigMap()['engine']['bili']['liveID']) {
+        getConfigMap()['engine']['bili']['liveID']) {
       return;
     }
     var uid = command['data']['uid'];
@@ -201,7 +200,7 @@ class MessageHandler {
 
     if (fansMedalData != null) {
       isFansMedalBelongToLive = fansMedalData['anchor_roomid'] ==
-          config.getConfigMap()['engine']['bili']['liveID'];
+          getConfigMap()['engine']['bili']['liveID'];
       fansMedalLevel = fansMedalData['medal_level'];
       fansMedalGuardLevel = guardLevelMap[fansMedalData['guard_level']];
     }
@@ -209,7 +208,7 @@ class MessageHandler {
     var isSubscribe = command['data']['msg_type'] == 2;
 // timeLog("[Interact] ${uname} ${isSubscribe ? 'subscribe' : 'enter'} the stream.");
     print(
-        "[Interact] ${uname} ${isSubscribe ? 'subscribe' : 'enter'} the stream.");
+        "[Interact] $uname ${isSubscribe ? 'subscribe' : 'enter'} the stream.");
 
 // if (isSubscribe) {
 //   liveEvent.emit(
@@ -237,7 +236,7 @@ class MessageHandler {
     var uid = command["data"]["uid"];
     var uname = command["data"]["uname"];
     // timeLog(f"[Like] {uname} liked the stream.");
-    print("[Like] ${uname} liked the stream.");
+    print("[Like] $uname liked the stream.");
     // liveEvent.emit("like", uid, uname);
   }
 
@@ -245,7 +244,7 @@ class MessageHandler {
     // 处理警告逻辑
     var msg = command['msg'];
     // timeLog(f"[Warning] {msg}");
-    print("[Warning] ${msg}");
+    print("[Warning] $msg");
     // liveEvent.emit("warning", msg, False);
   }
 
@@ -254,7 +253,7 @@ class MessageHandler {
     print(command);
     var msg = command['msg'];
     //       timeLog(f"[Warning] Cut Off, {msg}");
-    print("Cut Off, ${msg}");
+    print("Cut Off, $msg");
     //       liveEvent.emit("warning", msg, True);
     // }
   }

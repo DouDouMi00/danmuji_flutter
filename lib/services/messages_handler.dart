@@ -33,7 +33,7 @@ List<dynamic> haveReadMessages = [];
 
 dynamic popMessagesQueue() {
   if (messagesQueue.isEmpty) {
-    return {'':''};
+    return null;
   }
   var data = messagesQueue.removeAt(0);
   // setOutputMessagesLength(messagesQueue.length);

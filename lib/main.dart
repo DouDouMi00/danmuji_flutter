@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import './pages/ConfigPage.dart';
 import './pages/TtsPage.dart';
-import './services/messages_handler.dart'; 
+import './services/messages_handler.dart';
+import '../services/config.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   // 在运行应用前设置事件监听器
   setupEventListeners();
+  await initConfig();
   runApp(const MyApp());
 }
 

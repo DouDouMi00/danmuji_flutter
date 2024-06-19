@@ -21,7 +21,7 @@
 //   }
 // }
 import 'package:flutter_tts/flutter_tts.dart';
-import '../services/config.dart' show config;
+import '../services/config.dart';
 import '../services/messages_handler.dart' show popMessagesQueue;
 
 late FlutterTts flutterTts;
@@ -34,7 +34,7 @@ Future<void> _setAwaitOptions() async {
 }
 
 String messagesToText(Map<String, dynamic> msg) {
-  final filterConfig = config.getConfigMap()['dynamic']['filter'];
+  final filterConfig = getConfigMap()['dynamic']['filter'];
   if (msg['type'] == 'danmu') {
     String liveRoomGuardLeveltxt = filterConfig['danmu']
                 ['readfansMedalGuardLevel'] &&
@@ -89,12 +89,13 @@ Future<void> tts(String text) async {
 
 void init() async {
   flutterTts = FlutterTts();
+  final ttsConfig = getConfigMap()["dynamic"]["tts"];
   // 设置引擎和语言 音量 语速 音高
-  flutterTts.setEngine(config.getConfigMap()["dynamic"]["tts"]["engine"]);
-  flutterTts.setLanguage(config.getConfigMap()["dynamic"]["tts"]["language"]);
-  flutterTts.setVolume(config.getConfigMap()["dynamic"]["tts"]["volume"]);
-  flutterTts.setSpeechRate(config.getConfigMap()["dynamic"]["tts"]["rate"]);
-  flutterTts.setPitch(config.getConfigMap()["dynamic"]["tts"]["pitch"]);
+  flutterTts.setEngine(ttsConfig["engine"]);
+  flutterTts.setLanguage(ttsConfig["language"]);
+  flutterTts.setVolume(ttsConfig["volume"]);
+  flutterTts.setSpeechRate(ttsConfig["rate"]);
+  flutterTts.setPitch(ttsConfig["pitch"]);
   _setAwaitOptions();
   await tts("tts 初始化完成");
 }
@@ -102,8 +103,8 @@ void init() async {
 Future<void> ttsTask() async {
   init();
   while (true) {
-    Map<String, dynamic> msg = popMessagesQueue();
-    if (msg == {'': ''}) {
+    Map<String, dynamic>? msg = popMessagesQueue();
+    if (msg == null) {
       await Future.delayed(const Duration(milliseconds: 100));
       continue;
     }

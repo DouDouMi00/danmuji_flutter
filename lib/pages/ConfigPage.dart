@@ -2,7 +2,7 @@ import '../services/tts.dart';
 import 'package:flutter/material.dart';
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
-import '../services/config.dart' show config;
+import '../services/config.dart';
 import '../services/blivedm.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import '../services/live.dart';
@@ -49,8 +49,7 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
   }
 
   Future<Map<String, dynamic>> loadConfig() async {
-    await config.initConfig();
-    return config.getConfigMap();
+    return getConfigMap();
   }
 
   @override
@@ -63,8 +62,8 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
           future: _configFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(
-                child: const CircularProgressIndicator(),
+              return const Center(
+                child: CircularProgressIndicator(),
               );
             } else if (snapshot.hasError) {
               return Text('Error: ${snapshot.error}');
@@ -297,7 +296,7 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
               }
             };
             configMap = newInputConfig;
-            config.updateConfigMap(newInputConfig);
+            updateConfigMap(newInputConfig);
           },
           child: const Text('保存'),
         ),
