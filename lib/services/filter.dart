@@ -18,7 +18,8 @@ bool filterDanmu(int uid, String uname, bool isFansMedalBelongToLive,
   if (dynamicConfig['filter']['danmu']['isFansMedalBelongToLive'] &&
       !isFansMedalBelongToLive) return false;
   if (dynamicConfig['filter']['danmu']['fansMedalLevelBigger'] != 0 &&
-      fansMedalLevel < dynamicConfig['filter']['danmu']['fansMedalLevelBigger']) {
+      fansMedalLevel <
+          dynamicConfig['filter']['danmu']['fansMedalLevelBigger']) {
     return false;
   }
   if (dynamicConfig['filter']['danmu']['fansMedalGuardLevelBigger'] != 0 &&
@@ -80,7 +81,8 @@ Future<bool?> filterGift(int uid, String uname, int price, String giftName,
   }
 
   if (filterConfig['deduplicateTime'] != 0) {
-    giftUids.putIfAbsent(uid.toString(), () => {'uid': uid, 'uname': uname, 'gifts': {}});
+    giftUids.putIfAbsent(
+        uid.toString(), () => {'uid': uid, 'uname': uname, 'gifts': {}});
 
     if (giftUids[uid]['gifts'].containsKey(giftName)) {
       giftUids[uid]['gifts'][giftName]['task'].cancel();
@@ -123,7 +125,7 @@ bool filterWelcome(int uid, String uname, bool isFansMedalBelongToLive,
 }
 
 bool filterGuardBuy(
-    int uid, String uname, String newGuard, String giftName, int num) {
+    int uid, String uname, bool newGuard, String giftName, int num) {
   final dynamicConfig = getConfigMap()['dynamic'];
 
   if (!dynamicConfig["filter"]["guardBuy"]["enable"]) return false;
