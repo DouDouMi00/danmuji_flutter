@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import './pages/ConfigPage.dart';
+import 'pages/ConfigPage/index.dart';
 import './pages/TtsPage.dart';
 import './services/messages_handler.dart';
 import '../services/config.dart';

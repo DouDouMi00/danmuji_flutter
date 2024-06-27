@@ -1,11 +1,11 @@
-import '../services/tts.dart';
+import '../../services/tts.dart';
 import 'package:flutter/material.dart';
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
-import '../services/config.dart';
-import '../services/blivedm.dart';
+import '../../services/config.dart';
+import '../../services/blivedm.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-import '../services/live.dart';
+import '../../services/live.dart';
 
 class ConfigEditPage extends StatefulWidget {
   const ConfigEditPage({super.key});
