@@ -19,9 +19,9 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
   late Future<Map<String, dynamic>> _configFuture;
 
   FlutterTts flutterTts = FlutterTts();
-  double volume = 1.0;
-  double pitch = 1.0;
-  double rate = 2.0;
+  late double volume;
+  late double pitch;
+  late double rate;
   bool isCurrentLanguageInstalled = false;
   bool get isAndroid => !kIsWeb && Platform.isAndroid;
   String? engine;
@@ -79,10 +79,6 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
         ),
       ),
     );
-  }
-
-  Future<void> _setAwaitOptions() async {
-    await flutterTts.awaitSpeakCompletion(true);
   }
 
   List<DropdownMenuItem<String>> getEnginesDropDownMenuItems(
@@ -209,6 +205,7 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
   }
 
   Widget _volume() {
+    volume = configMap["dynamic"]['tts']['volume'];
     return Slider(
         value: volume,
         onChanged: (newVolume) {
@@ -224,6 +221,7 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
   }
 
   Widget _pitch() {
+    pitch = configMap["dynamic"]['tts']['pitch'];
     return Slider(
       value: pitch,
       onChanged: (newPitch) {
@@ -241,6 +239,7 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
   }
 
   Widget _rate() {
+    rate = configMap["dynamic"]['tts']['rate'];
     return Slider(
       value: rate,
       onChanged: (newRate) {
