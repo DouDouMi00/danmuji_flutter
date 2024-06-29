@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'dart:async';
 import 'package:brotli/brotli.dart';
+import '../services/config.dart';
 
 final buffer = Uint8List(16);
 
@@ -80,11 +81,11 @@ class DanmakuReceiver {
   final List<Function> _CUT_OFF = [];
 
   WebSocketChannel? ws;
-  int roomId = 0;
   int? _anchorUid;
   int? get anchorUid => _anchorUid;
+  int roomId = getConfigMap()['engine']['bili']['liveID'];
 
-  DanmakuReceiver(roomId) {
+  DanmakuReceiver() {
     final headers = <String, String>{
       'Cookie': 'buvid3=' '; SESSDATA=' '; bili_jct=' ';',
       'User-Agent':

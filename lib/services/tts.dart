@@ -1,36 +1,24 @@
-// await flutterTts.awaitSpeakCompletion(true);
-// while (isRunning) {
-//   // 添加对isRunning的检查
-//   if (ttsState == TtsState.stopped) {
-//     ttsState = TtsState.playing;
-//     flutterTts.setEngine(engine!);
-//     flutterTts.setLanguage(language!);
-//     flutterTts.setVolume(volume);
-//     flutterTts.setSpeechRate(rate);
-//     flutterTts.setPitch(pitch);
-//     await flutterTts
-//         .speak("${data["info"][2][1]}说:${data["info"][1]}");
-//     flutterTts.setCompletionHandler(() {
-//       ttsState = TtsState.stopped;
-//     });
-//     print("${data["info"][2][1]}说：${data["info"][1]}");
-//     break;
-//   } else {
-//     // 需要延迟
-//     await Future.delayed(const Duration(seconds: 1));
-//   }
-// }
 import 'package:flutter_tts/flutter_tts.dart';
 import '../services/config.dart';
-import '../services/messages_handler.dart' show popMessagesQueue;
+import '../services/messages_handler.dart'
+    show popMessagesQueue, getHaveReadMessages;
 
 late FlutterTts flutterTts;
 TtsState ttsState = TtsState.stopped;
+bool prepareDisableTTSTask = false;
+bool disableTTSTask = false;
+int? readHistoryIndex;
+bool initalized = false;
+bool _shouldExitTtsTask = true;
 
 enum TtsState { playing, stopped, paused, continued }
 
 Future<void> _setAwaitOptions() async {
   await flutterTts.awaitSpeakCompletion(true);
+}
+
+Future<void> stopTtsTask() async {
+  _shouldExitTtsTask = false;
 }
 
 String messagesToText(Map<String, dynamic> msg) {
@@ -72,7 +60,21 @@ String messagesToText(Map<String, dynamic> msg) {
   }
 }
 
-Future<void> tts(String text) async {
+class CustomException {
+  final Exception _exception;
+
+  CustomException([String message = '默认错误信息'])
+      : _exception = Exception(message);
+
+  @override
+  String toString() => 'CustomException: ${_exception.toString()}';
+}
+
+Future<void> tts(String text, [channel = 0, config = null]) async {
+  if (!_shouldExitTtsTask) {
+    // 抛出异常退出tts任务
+    throw CustomException('tts 任务退出');
+  }
   while (true) {
     if (ttsState == TtsState.stopped) {
       ttsState = TtsState.playing;
@@ -82,12 +84,12 @@ Future<void> tts(String text) async {
       });
       break;
     } else {
-      await Future.delayed(const Duration(milliseconds: 100));
+      await Future.delayed(const Duration(milliseconds: 10));
     }
   }
 }
 
-void init() async {
+Future<void> init() async {
   flutterTts = FlutterTts();
   final ttsConfig = getConfigMap()["dynamic"]["tts"];
   // 设置引擎和语言 音量 语速 音高
@@ -98,17 +100,112 @@ void init() async {
   flutterTts.setPitch(ttsConfig["pitch"]);
   _setAwaitOptions();
   await tts("tts 初始化完成");
+  initalized = true;
 }
 
 Future<void> ttsTask() async {
-  init();
+  await init();
   while (true) {
-    Map<String, dynamic>? msg = popMessagesQueue();
-    if (msg == null) {
+    try {
+      if (prepareDisableTTSTask) {
+        disableTTSTask = true;
+        await Future.delayed(const Duration(milliseconds: 10));
+        continue;
+      } else {
+        disableTTSTask = false;
+      }
+      Map<String, dynamic>? msg = popMessagesQueue();
+      if (msg == null) {
+        await Future.delayed(const Duration(milliseconds: 10));
+        continue;
+      }
+      String text = messagesToText(msg);
+      await tts(text);
+    } on CustomException catch (e) {
+      print(e);
+      break;
+    } catch (e) {
+      print(e);
       await Future.delayed(const Duration(milliseconds: 100));
-      continue;
     }
-    String text = messagesToText(msg);
-    await tts(text);
   }
+}
+
+Future<void> setDisableTTSTask(bool mode, {bool waiting = true}) async {
+  if (prepareDisableTTSTask == false && mode == true) {
+    prepareDisableTTSTask = mode;
+    while (!disableTTSTask && waiting) {
+      await Future.delayed(const Duration(milliseconds: 10));
+    }
+  } else if (prepareDisableTTSTask == true && mode == false) {
+    prepareDisableTTSTask = mode;
+    while (disableTTSTask && waiting) {
+      await Future.delayed(const Duration(milliseconds: 10));
+    }
+  }
+}
+
+int ttsSystemCallerID = 0;
+
+Future<void> ttsSystem(msg) async {
+  while (!initalized) {
+    await Future.delayed(const Duration(milliseconds: 10));
+  }
+  ttsSystemCallerID += 1;
+  final myCallerID = ttsSystemCallerID;
+  await setDisableTTSTask(true, waiting: false);
+  await tts(messagesToText({'type': 'system', 'msg': msg}));
+  if (ttsSystemCallerID != myCallerID) {
+    return;
+  }
+  await setDisableTTSTask(false, waiting: false);
+}
+
+Future<void> readHistoryByType(List<String> types,
+    [bool revert = false]) async {
+  readHistoryIndex ??= getHaveReadMessages().length;
+  readHistoryIndex = revert ? (readHistoryIndex! + 1) : (readHistoryIndex! - 1);
+  List messages = getHaveReadMessages();
+  bool found = false;
+  int start = revert ? 0 : getHaveReadMessages().length;
+  int end = revert ? messages.length : -1;
+  int step = revert ? 1 : -1;
+
+  for (int i = start; i != end; i += step) {
+    for (String type in types) {
+      if (messages[i]['type'] == type) {
+        readHistoryIndex = i;
+        found = true;
+        break;
+      }
+    }
+    if (found) break;
+  }
+
+  if ((!revert && readHistoryIndex == -1) ||
+      (revert && readHistoryIndex! > getHaveReadMessages().length) ||
+      !found) {
+    if (!revert) {
+      readHistoryIndex = getHaveReadMessages().length;
+      await tts(
+          messagesToText({"type": "system", "msg": "已到达最后一条,继续翻页将从第一条开始"}),
+          1,
+          getConfigMap()['dynamic']['tts']['history']);
+    } else {
+      readHistoryIndex = 0;
+      await tts(
+          messagesToText({"type": "system", "msg": "已到达第一条,继续翻页将从最后一条开始"}),
+          1,
+          getConfigMap()['dynamic']['tts']['history']);
+    }
+    return;
+  }
+  await tts(messagesToText(messages[readHistoryIndex!]), 1,
+      getConfigMap()['dynamic']['tts']['history']);
+}
+
+Future<void> resetHistoryIndex() async {
+  readHistoryIndex = getHaveReadMessages().length;
+  await tts(messagesToText({"type": "system", "msg": "焦点已回到最新"}), 1,
+      getConfigMap()['dynamic']['tts']['history']);
 }

@@ -19,7 +19,14 @@
             "language": "",
             "volume": 1.0,
             "rate": 2.0,
-            "pitch": 1.0
+            "pitch": 1.0,
+            "history": {
+                "engine": "",
+                "language": "",
+                "volume": 1.0,
+                "rate": 2.0,
+                "pitch": 1.0
+            }
         },
         "filter": {
             "danmu": {

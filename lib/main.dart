@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'pages/ConfigPage/index.dart';
-import './pages/TtsPage.dart';
+import 'pages/controlPage.dart';
 import './services/messages_handler.dart';
 import '../services/config.dart';
 
@@ -38,7 +38,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   final List<Widget> _pages = [
     const ConfigEditPage(),
-    const TtsEditPage(),
+    const ControlPage(),
   ];
 
   // 优化1: 提供从int到PageIndex的安全访问方法

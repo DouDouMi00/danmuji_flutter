@@ -1,11 +1,8 @@
-import '../../services/tts.dart';
 import 'package:flutter/material.dart';
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import '../../services/config.dart';
-import '../../services/blivedm.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-import '../../services/live.dart';
 
 class ConfigEditPage extends StatefulWidget {
   const ConfigEditPage({super.key});
@@ -27,10 +24,6 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
   String? engine;
   String? language;
 
-  bool isRunning = false;
-  String buttonText = '开始';
-  late DanmakuReceiver receiver;
-  late MessageHandler messageHandler;
   late Map<String, dynamic> configMap;
 
   @override
@@ -249,8 +242,8 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
         });
       },
       min: 0.0,
-      max: 4.0,
-      divisions: 10,
+      max: 5.0,
+      divisions: 25,
       label: "Rate: $rate",
       activeColor: Colors.green,
     );
@@ -276,29 +269,6 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
                   updateConfigMap(configMap);
                 },
                 child: const Text('保存'),
-              ),
-            ),
-            Expanded(
-              child: ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    // 切换运行状态
-                    isRunning = !isRunning;
-                    // 根据状态决定按钮文本
-                    buttonText = isRunning ? '停止' : '开始';
-                  });
-                  if (isRunning) {
-                    // 启动程序
-                    receiver =
-                        DanmakuReceiver(configMap['engine']['bili']['liveID']);
-                    messageHandler = MessageHandler(receiver);
-                    messageHandler.setupEventHandlers();
-                    ttsTask();
-                  } else {
-                    receiver.dispose();
-                  }
-                },
-                child: Text(buttonText), // 使用buttonText动态显示按钮文本
               ),
             ),
           ],
