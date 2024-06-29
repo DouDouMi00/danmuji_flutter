@@ -1,5 +1,6 @@
 import 'package:flutter_tts/flutter_tts.dart';
 import '../services/config.dart';
+import 'dart:math';
 import '../services/messages_handler.dart'
     show popMessagesQueue, getHaveReadMessages;
 
@@ -71,11 +72,8 @@ class CustomException {
 }
 
 Future<void> tts(String text, [channel = 0, config = null]) async {
-  if (!_shouldExitTtsTask) {
-    // 抛出异常退出tts任务
-    throw CustomException('tts 任务退出');
-  }
-  while (true) {
+
+  while (_shouldExitTtsTask) {
     if (ttsState == TtsState.stopped) {
       ttsState = TtsState.playing;
       await flutterTts.speak(text);
@@ -90,6 +88,7 @@ Future<void> tts(String text, [channel = 0, config = null]) async {
 }
 
 Future<void> init() async {
+  _shouldExitTtsTask = true;
   flutterTts = FlutterTts();
   final ttsConfig = getConfigMap()["dynamic"]["tts"];
   // 设置引擎和语言 音量 语速 音高
@@ -105,7 +104,7 @@ Future<void> init() async {
 
 Future<void> ttsTask() async {
   await init();
-  while (true) {
+  while (_shouldExitTtsTask) {
     try {
       if (prepareDisableTTSTask) {
         disableTTSTask = true;
@@ -121,9 +120,6 @@ Future<void> ttsTask() async {
       }
       String text = messagesToText(msg);
       await tts(text);
-    } on CustomException catch (e) {
-      print(e);
-      break;
     } catch (e) {
       print(e);
       await Future.delayed(const Duration(milliseconds: 100));
@@ -163,18 +159,24 @@ Future<void> ttsSystem(msg) async {
 
 Future<void> readHistoryByType(List<String> types,
     [bool revert = false]) async {
-  readHistoryIndex ??= getHaveReadMessages().length;
-  readHistoryIndex = revert ? (readHistoryIndex! + 1) : (readHistoryIndex! - 1);
-  List messages = getHaveReadMessages();
+  int readHistoryIndex = getHaveReadMessages().length;
+
+  readHistoryIndex = revert
+      ? (readHistoryIndex + 1) % (getHaveReadMessages().length + 1)
+      : max(0, readHistoryIndex - 1);
+
+  List<dynamic> messages = getHaveReadMessages();
   bool found = false;
-  int start = revert ? 0 : getHaveReadMessages().length;
-  int end = revert ? messages.length : -1;
+
+  // Determine the iteration direction
   int step = revert ? 1 : -1;
+  int start = revert ? 0 : readHistoryIndex;
+  int end = revert ? messages.length : -1;
 
   for (int i = start; i != end; i += step) {
     for (String type in types) {
-      if (messages[i]['type'] == type) {
-        readHistoryIndex = i;
+      if (messages[(i + messages.length) % messages.length]["type"] == type) {
+        readHistoryIndex = (i + messages.length) % messages.length;
         found = true;
         break;
       }
@@ -182,26 +184,19 @@ Future<void> readHistoryByType(List<String> types,
     if (found) break;
   }
 
+  // Handle boundary conditions and provide feedback
   if ((!revert && readHistoryIndex == -1) ||
-      (revert && readHistoryIndex! > getHaveReadMessages().length) ||
+      (revert && readHistoryIndex == messages.length) ||
       !found) {
-    if (!revert) {
-      readHistoryIndex = getHaveReadMessages().length;
-      await tts(
-          messagesToText({"type": "system", "msg": "已到达最后一条,继续翻页将从第一条开始"}),
-          1,
-          getConfigMap()['dynamic']['tts']['history']);
-    } else {
-      readHistoryIndex = 0;
-      await tts(
-          messagesToText({"type": "system", "msg": "已到达第一条,继续翻页将从最后一条开始"}),
-          1,
-          getConfigMap()['dynamic']['tts']['history']);
-    }
+    readHistoryIndex = revert ? 0 : messages.length - 1;
+    String msg = revert ? "已到达第一条,继续翻页将从最后一条开始" : "已到达最后一条,继续翻页将从第一条开始";
+    await tts(messagesToText({"type": "system", "msg": msg}), 1,
+        getConfigMap()["dynamic"]["tts"]["history"]);
     return;
   }
-  await tts(messagesToText(messages[readHistoryIndex!]), 1,
-      getConfigMap()['dynamic']['tts']['history']);
+
+  await tts(messagesToText(messages[readHistoryIndex]), 1,
+      getConfigMap()["dynamic"]["tts"]["history"]);
 }
 
 Future<void> resetHistoryIndex() async {

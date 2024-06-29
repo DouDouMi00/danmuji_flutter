@@ -53,65 +53,49 @@ class _ControlPageState extends State<ControlPage> {
             ),
             Expanded(
               child: ElevatedButton(
-                onPressed: () {
-                  handleFlush();
-                },
+                onPressed: isRunning ? handleFlush : null,
                 child: const Text('清空'),
               ),
             ),
             Expanded(
               child: ElevatedButton(
-                onPressed: () {
-                  handleTTSRatePlus();
-                },
+                onPressed: isRunning ? handleTTSRatePlus : null,
                 child: const Text('语速+1'),
               ),
             ),
             Expanded(
               child: ElevatedButton(
-                onPressed: () {
-                  handleTTSVolumeMinus();
-                },
+                onPressed: isRunning ? handleTTSVolumeMinus : null,
                 child: const Text('语速-1'),
               ),
             ),
             Expanded(
               child: ElevatedButton(
-                onPressed: () {
-                  handleReadNewestMessages();
-                },
+                onPressed: isRunning ? handleReadNewestMessages : null,
                 child: const Text('回到最新弹幕'),
               ),
             ),
             Expanded(
               child: ElevatedButton(
-                onPressed: () {
-                  handleReadNextHistoryDanmu();
-                },
+                onPressed: isRunning ? handleReadNextHistoryDanmu : null,
                 child: const Text('查看上一条弹幕'),
               ),
             ),
             Expanded(
               child: ElevatedButton(
-                onPressed: () {
-                  handleReadLastHistoryDanmu();
-                },
+                onPressed: isRunning ? handleReadLastHistoryDanmu : null,
                 child: const Text('查看下一条弹幕'),
               ),
             ),
             Expanded(
               child: ElevatedButton(
-                onPressed: () {
-                  handleReadNextGiftMessages();
-                },
+                onPressed: isRunning ? handleReadNextGiftMessages : null,
                 child: const Text('查看上一条礼物'),
               ),
             ),
             Expanded(
               child: ElevatedButton(
-                onPressed: () {
-                  handleReadLastGiftMessages();
-                },
+                onPressed: isRunning ? handleReadLastGiftMessages : null,
                 child: const Text('查看下一条礼物'),
               ),
             ),
