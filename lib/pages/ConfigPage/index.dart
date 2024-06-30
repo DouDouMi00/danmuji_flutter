@@ -347,13 +347,13 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
             });
           },
         ),
-        // 启用表情弹幕朗读
+        // 启用纯标点符号弹幕朗读
         SwitchListTile(
           title: const Text('启用纯标点符号弹幕朗读'),
-          value: configMap['dynamic']['filter']['danmu']['emojiEnable'],
+          value: configMap['dynamic']['filter']['danmu']['symbolEnable'],
           onChanged: (value) {
             setState(() {
-              configMap['dynamic']['filter']['danmu']['emojiEnable'] = value;
+              configMap['dynamic']['filter']['danmu']['symbolEnable'] = value;
             });
           },
         ),
@@ -412,8 +412,7 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
             });
           },
         ),
-
-// 大航海大于等于
+        // 大航海大于等于
         DropdownButtonFormField<int>(
           decoration: const InputDecoration(labelText: '大航海大于等于'),
           value: configMap['dynamic']['filter']["danmu"]
