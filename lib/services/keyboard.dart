@@ -16,7 +16,7 @@ Future<void> handleTTSRatePlus() async {
       min(nowJsonConfig['dynamic']['tts']['rate'] as double, 5.0);
   await updateConfigMap(nowJsonConfig);
   await ttsSystem(
-      'TTS语速增加到' + nowJsonConfig['dynamic']['tts']['rate'].toString());
+      'TTS语速增加到${nowJsonConfig['dynamic']['tts']['rate']}');
 }
 
 Future<void> handleTTSVolumeMinus() async {
@@ -28,7 +28,7 @@ Future<void> handleTTSVolumeMinus() async {
       min(nowJsonConfig['dynamic']['tts']['rate'] as double, 5.0);
   await updateConfigMap(nowJsonConfig);
   await ttsSystem(
-      'TTS语速减少到' + nowJsonConfig['dynamic']['tts']['rate'].toString());
+      'TTS语速减少到${nowJsonConfig['dynamic']['tts']['rate']}');
 }
 
 // 历史模式回到最新弹幕

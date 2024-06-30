@@ -38,7 +38,7 @@ class _ControlPageState extends State<ControlPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // 启动/停止按钮和清空按钮。
-            Container(
+            SizedBox(
               width: buttonWidth,
               child: ElevatedButton(
                 onPressed: () {
@@ -48,7 +48,7 @@ class _ControlPageState extends State<ControlPage> {
                 child: Text(buttonText),
               ),
             ),
-            Container(
+            SizedBox(
               width: buttonWidth,
               child: ElevatedButton(
                 onPressed: isRunning ? handleFlush : null,
@@ -60,14 +60,14 @@ class _ControlPageState extends State<ControlPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
+                SizedBox(
                   width: buttonWidth,
                   child: ElevatedButton(
                     onPressed: isRunning ? handleTTSRatePlus : null,
                     child: const Text('语速+1'),
                   ),
                 ),
-                Container(
+                SizedBox(
                   width: buttonWidth,
                   child: ElevatedButton(
                     onPressed: isRunning ? handleTTSVolumeMinus : null,
@@ -77,7 +77,7 @@ class _ControlPageState extends State<ControlPage> {
               ],
             ),
             // 弹幕和礼物控制按钮，用于浏览历史弹幕和礼物。
-            Container(
+            SizedBox(
               width: buttonWidth,
               child: ElevatedButton(
                 onPressed: isRunning ? handleReadNewestMessages : null,
@@ -87,14 +87,14 @@ class _ControlPageState extends State<ControlPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
+                SizedBox(
                   width: buttonWidth,
                   child: ElevatedButton(
                     onPressed: isRunning ? handleReadNextHistoryDanmu : null,
                     child: const Text('查看上一条弹幕'),
                   ),
                 ),
-                Container(
+                SizedBox(
                   width: buttonWidth,
                   child: ElevatedButton(
                     onPressed: isRunning ? handleReadLastHistoryDanmu : null,
@@ -106,14 +106,14 @@ class _ControlPageState extends State<ControlPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
+                SizedBox(
                   width: buttonWidth,
                   child: ElevatedButton(
                     onPressed: isRunning ? handleReadNextGiftMessages : null,
                     child: const Text('查看上一条礼物'),
                   ),
                 ),
-                Container(
+                SizedBox(
                   width: buttonWidth,
                   child: ElevatedButton(
                     onPressed: isRunning ? handleReadLastGiftMessages : null,

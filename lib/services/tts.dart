@@ -71,7 +71,7 @@ class CustomException {
   String toString() => 'CustomException: ${_exception.toString()}';
 }
 
-Future<void> tts(String text, [channel = 0, config = null]) async {
+Future<void> tts(String text, [channel = 0, config]) async {
 
   while (_shouldExitTtsTask) {
     if (ttsState == TtsState.stopped) {

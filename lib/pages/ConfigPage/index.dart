@@ -170,8 +170,9 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
           return _languageDropDownSection(snapshot.data as List<dynamic>);
         } else if (snapshot.hasError) {
           return const Text('Error loading languages...');
-        } else
+        } else {
           return const Text('Loading Languages...');
+        }
       });
 
   Widget _engineSection() {
@@ -183,8 +184,9 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
               return _enginesDropDownSection(snapshot.data as List<dynamic>);
             } else if (snapshot.hasError) {
               return const Text('Error loading engines...');
-            } else
+            } else {
               return const Text('Loading engines...');
+            }
           });
     } else {
       return const SizedBox(width: 0, height: 0);
