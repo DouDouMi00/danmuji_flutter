@@ -6,7 +6,6 @@ import 'package:flutter_tts/flutter_tts.dart';
 
 class ConfigEditPage extends StatefulWidget {
   const ConfigEditPage({super.key});
-
   @override
   // ignore: library_private_types_in_public_api
   _ConfigEditPageState createState() => _ConfigEditPageState();
@@ -14,7 +13,6 @@ class ConfigEditPage extends StatefulWidget {
 
 class _ConfigEditPageState extends State<ConfigEditPage> {
   late Future<Map<String, dynamic>> _configFuture;
-
   FlutterTts flutterTts = FlutterTts();
   late double volume;
   late double pitch;
@@ -23,9 +21,7 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
   bool get isAndroid => !kIsWeb && Platform.isAndroid;
   String? engine;
   String? language;
-
   late Map<String, dynamic> configMap;
-
   @override
   void initState() {
     super.initState();
@@ -118,7 +114,6 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
 
   Future<dynamic> _getLanguages() async => await flutterTts.getLanguages;
   Future<dynamic> _getEngines() async => await flutterTts.getEngines;
-
   Future<String?> _getDefaultEngine(configMap) async {
     if (configMap['dynamic']['tts']['engine'] != "") {
       engine = configMap['dynamic']['tts']['engine'];
@@ -148,7 +143,6 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
           onChanged: changedEnginesDropDownItem,
         ),
       );
-
   Widget _languageDropDownSection(List<dynamic> languages) => Container(
       padding: const EdgeInsets.only(top: 10.0),
       child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -162,7 +156,6 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
           child: Text("Is installed: $isCurrentLanguageInstalled"),
         ),
       ]));
-
   Widget _futureBuilder() => FutureBuilder<dynamic>(
       future: _getLanguages(),
       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
@@ -174,7 +167,6 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
           return const Text('Loading Languages...');
         }
       });
-
   Widget _engineSection() {
     if (isAndroid) {
       return FutureBuilder<dynamic>(
@@ -260,7 +252,6 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text('BiliBili Account Settings'),
-
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween, // 使子元素间间距相等，两端对齐
           children: [
@@ -275,7 +266,6 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
             ),
           ],
         ),
-
         TextFormField(
           controller: TextEditingController(
               text: configMap['kvdb']['bili']['uid'].toString()),
@@ -434,7 +424,6 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
             }
           },
         ),
-
 // 粉丝牌等级大于等于
         DropdownButtonFormField<int>(
           decoration: const InputDecoration(labelText: '粉丝牌等级大于等于'),
@@ -452,7 +441,6 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
             }
           },
         ),
-
         // 文本长度小于等于
         DropdownButtonFormField<int>(
           decoration: const InputDecoration(labelText: '文本长度小于等于'),
@@ -472,7 +460,6 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
             }
           },
         ),
-
         // "blacklistKeywords": [],黑名单关键词(逗号分隔)
         TextFormField(
           controller: TextEditingController(
@@ -678,7 +665,6 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
             });
           },
         ),
-
         // 粉丝牌必须为本直播间
         SwitchListTile(
           title: const Text('粉丝牌必须为本直播间'),
@@ -711,7 +697,6 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
             }
           },
         ),
-
         // 粉丝牌等级大于等于
         DropdownButtonFormField<int>(
           decoration: const InputDecoration(labelText: '粉丝牌等级大于等于'),
@@ -729,7 +714,6 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
             }
           },
         ),
-
         // 订阅过滤器 SwitchListTile
         const Text('订阅过滤器'),
         SwitchListTile(

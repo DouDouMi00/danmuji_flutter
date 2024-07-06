@@ -18,7 +18,7 @@ Future<void> _setAwaitOptions() async {
   await flutterTts.awaitSpeakCompletion(true);
 }
 
-Future<void> stopTtsTask() async {
+void stopTtsTask() async {
   _shouldExitTtsTask = false;
 }
 
@@ -61,19 +61,8 @@ String messagesToText(Map<String, dynamic> msg) {
   }
 }
 
-class CustomException {
-  final Exception _exception;
-
-  CustomException([String message = '默认错误信息'])
-      : _exception = Exception(message);
-
-  @override
-  String toString() => 'CustomException: ${_exception.toString()}';
-}
-
 Future<void> tts(String text, [channel = 0, config]) async {
-
-  while (_shouldExitTtsTask) {
+  while (true) {
     if (ttsState == TtsState.stopped) {
       ttsState = TtsState.playing;
       await flutterTts.speak(text);
@@ -105,25 +94,21 @@ Future<void> init() async {
 Future<void> ttsTask() async {
   await init();
   while (_shouldExitTtsTask) {
-    try {
-      if (prepareDisableTTSTask) {
-        disableTTSTask = true;
-        await Future.delayed(const Duration(milliseconds: 10));
-        continue;
-      } else {
-        disableTTSTask = false;
-      }
-      Map<String, dynamic>? msg = popMessagesQueue();
-      if (msg == null) {
-        await Future.delayed(const Duration(milliseconds: 10));
-        continue;
-      }
-      String text = messagesToText(msg);
-      await tts(text);
-    } catch (e) {
-      print(e);
-      await Future.delayed(const Duration(milliseconds: 100));
+    if (prepareDisableTTSTask) {
+      disableTTSTask = true;
+      await Future.delayed(const Duration(milliseconds: 10));
+      continue;
+    } else {
+      disableTTSTask = false;
     }
+    Map<String, dynamic>? msg = popMessagesQueue();
+    if (msg == null) {
+      await Future.delayed(const Duration(milliseconds: 10));
+      continue;
+    }
+    print("取出消息$msg");
+    String text = messagesToText(msg);
+    await tts(text);
   }
 }
 

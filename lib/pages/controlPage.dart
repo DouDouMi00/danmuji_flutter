@@ -9,7 +9,6 @@ import 'package:vibration/vibration.dart';
 // 控制面板页面，用于管理直播中的各种控制功能，如弹幕阅读、礼物阅读及TTS控制。
 class ControlPage extends StatefulWidget {
   const ControlPage({super.key});
-
   @override
   _ControlPageState createState() => _ControlPageState();
 }
@@ -26,10 +25,21 @@ class _ControlPageState extends State<ControlPage> {
   late MessageHandler messageHandler;
 
   @override
+  void dispose() {
+    super.dispose();
+    try {
+      receiver.dispose();
+    } catch (e) {
+      print(e);
+    } finally {
+      stopTtsTask();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width - 32;
     double buttonWidth = screenWidth / 2; // 假设每行最多两个按钮
-
     return Scaffold(
       appBar: AppBar(title: const Text('控制面板')),
       body: Padding(
@@ -37,6 +47,16 @@ class _ControlPageState extends State<ControlPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            SizedBox(
+              width: buttonWidth,
+              child: ElevatedButton(
+                onPressed: () {
+                  Vibration.vibrate(
+                      pattern: [30, 30, 30, 30], intensities: [255, 0, 255, 0]);
+                },
+                child: const Text("振动测试按钮"),
+              ),
+            ),
             // 启动/停止按钮和清空按钮。
             SizedBox(
               width: buttonWidth,
@@ -55,7 +75,6 @@ class _ControlPageState extends State<ControlPage> {
                 child: const Text('清空'),
               ),
             ),
-
             // TTS语速控制按钮。
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -129,25 +148,25 @@ class _ControlPageState extends State<ControlPage> {
   }
 
   // 切换运行状态，启动或停止弹幕接收和处理。
-  void _toggleRunningStatus() {
+  void _toggleRunningStatus() async {
     setState(() {
       isRunning = !isRunning;
     });
+
     if (isRunning) {
       receiver = DanmakuReceiver();
       messageHandler = MessageHandler(receiver);
       messageHandler.setupEventHandlers();
-      ttsTask();
+      await ttsTask();
     } else {
-      receiver.dispose();
       stopTtsTask();
+      receiver.dispose();
     }
   }
 
   // 振动设备并更新按钮文本，用于反馈用户操作。
   void _vibrateAndUpdateButtonText() {
-    Vibration.vibrate(
-        pattern: [0, 10, 1000, 50], intensities: [25, 50, 100, 200]);
+    Vibration.vibrate(pattern: [30, 30, 30, 30], intensities: [255, 0, 255, 0]);
     setState(() {
       buttonText = isRunning ? '停止' : '开始';
     });
