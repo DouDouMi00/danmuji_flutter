@@ -102,17 +102,16 @@ class _TtsEnginesSettingPageState extends State<TtsEnginesSettingPage> {
     return language;
   }
 
-  Widget _enginesDropDownSection(List<dynamic> engines) => Container(
-        padding: const EdgeInsets.only(top: 50.0),
-        child: DropdownButton(
+  Widget _enginesDropDownSection(List<dynamic> engines) =>
+      Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+        DropdownButton(
           value: engine,
           items: getEnginesDropDownMenuItems(engines),
           onChanged: changedEnginesDropDownItem,
         ),
-      );
-  Widget _languageDropDownSection(List<dynamic> languages) => Container(
-      padding: const EdgeInsets.only(top: 10.0),
-      child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+      ]);
+  Widget _languageDropDownSection(List<dynamic> languages) =>
+      Row(mainAxisAlignment: MainAxisAlignment.center, children: [
         DropdownButton(
           value: language,
           items: getLanguageDropDownMenuItems(languages),
@@ -122,7 +121,7 @@ class _TtsEnginesSettingPageState extends State<TtsEnginesSettingPage> {
           visible: isAndroid,
           child: Text("Is installed: $isCurrentLanguageInstalled"),
         ),
-      ]));
+      ]);
   Widget _futureBuilder() => FutureBuilder<dynamic>(
       future: _getLanguages(),
       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
