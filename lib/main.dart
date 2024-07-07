@@ -1,8 +1,11 @@
-import './services/messages_handler.dart';
-import './services/config.dart';
 import 'package:flutter/material.dart';
-import 'pages/ConfigPage/index.dart';
-import 'pages/controlPage.dart';
+import 'package:get/get.dart';
+import '/controllers/home_controller.dart';
+import '/services/messages_handler.dart';
+import '/services/config.dart';
+import 'pages/ConfigPage/config_page.dart';
+import 'pages/control_page.dart';
+import '/routes.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,45 +18,49 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) => const MaterialApp(
-        home: MyHomePage(),
-      );
+  Widget build(BuildContext context) {
+    return GetMaterialApp(
+      initialRoute: '/',
+      home: const MyHomePage(),
+      getPages: appRoutes,
+    );
+  }
 }
-
-enum PageIndex { config, control }
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  // ignore: library_private_types_in_public_api
+  _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _currentIndex = 0;
-
-  final List<Widget> _pages = [
-    const ConfigEditPage(),
-    const ControlPage(),
-  ];
-
-  void _onTap(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
-  }
+  final controller = Get.put(HomeController());
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        body: _pages[_currentIndex],
+  Widget build(BuildContext context) {
+    return Obx(
+      () => Scaffold(
+        body: controller.currentIndex.value == 0
+            ? const ConfigEditPage()
+            : const ControlPage(),
         bottomNavigationBar: BottomNavigationBar(
           items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.settings), label: '配置'),
+            BottomNavigationBarItem(icon: Icon(Icons.settings), label: '设置'),
             BottomNavigationBarItem(
                 icon: Icon(Icons.control_camera), label: '快捷键'),
           ],
-          currentIndex: _currentIndex,
-          onTap: _onTap,
+          currentIndex: controller.currentIndex.value,
+          onTap: controller.onTabChange,
         ),
-      );
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
 }
