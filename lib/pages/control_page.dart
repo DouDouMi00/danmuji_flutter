@@ -1,15 +1,17 @@
-// controlPage.dart
+// control_page.dart
 import 'package:flutter/material.dart';
-import '../../services/keyboard.dart';
-import '../../services/blivedm.dart';
-import '../../services/live.dart';
-import '../../services/tts.dart';
+import '/services/keyboard.dart';
+import '/services/blivedm.dart';
+import '/services/live.dart';
+import '/services/tts.dart';
 import 'package:vibration/vibration.dart';
+import '/services/logger.dart';
 
 // 控制面板页面，用于管理直播中的各种控制功能，如弹幕阅读、礼物阅读及TTS控制。
 class ControlPage extends StatefulWidget {
   const ControlPage({super.key});
   @override
+  // ignore: library_private_types_in_public_api
   _ControlPageState createState() => _ControlPageState();
 }
 
@@ -30,7 +32,7 @@ class _ControlPageState extends State<ControlPage> {
     try {
       receiver.dispose();
     } catch (e) {
-      print(e);
+      logger.info(e);
     } finally {
       stopTtsTask();
     }

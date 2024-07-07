@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'live.dart' show emitter;
-import '../services/filter.dart';
+import '/services/filter.dart';
 import 'dart:async';
+import '/services/logger.dart';
 
 void setupEventListeners() {
   emitter.onEvent.listen((eventData) async {
@@ -10,7 +11,7 @@ void setupEventListeners() {
     try {
       eventDataMap = jsonDecode(eventData);
     } on FormatException catch (_) {
-      print('Error decoding event data: $eventData');
+      logger.info('Error decoding event data: $eventData');
       return;
     }
 
@@ -44,7 +45,7 @@ void setupEventListeners() {
         break;
 
       default:
-        print('Unhandled event type: $eventType');
+        logger.info('Unhandled event type: $eventType');
         break;
     }
   });

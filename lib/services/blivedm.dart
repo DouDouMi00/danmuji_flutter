@@ -4,7 +4,8 @@ import 'dart:convert';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'dart:async';
 import 'package:brotli/brotli.dart';
-import '../services/config.dart';
+import '/services/config.dart';
+import '/services/logger.dart';
 
 final buffer = Uint8List(16);
 
@@ -71,14 +72,14 @@ class DanmakuType {
 // "CUT_OFF": onCutOff,                 // 切断连接：切断回调函数
 
 class DanmakuReceiver {
-  final List<Function> _DANMU_MSG = [];
-  final List<Function> _SEND_GIFT = [];
-  final List<Function> _USER_TOAST_MSG = [];
-  final List<Function> _SUPER_CHAT_MESSAGE = [];
-  final List<Function> _INTERACT_WORD = [];
-  final List<Function> _LIKE_INFO_V3_CLICK = [];
-  final List<Function> _WARNING = [];
-  final List<Function> _CUT_OFF = [];
+  final List<Function> _danmuMsg = [];
+  final List<Function> _sendGift = [];
+  final List<Function> _userToastMsg = [];
+  final List<Function> _superChatMessage = [];
+  final List<Function> _interactWord = [];
+  final List<Function> _likeInfoV3Click = [];
+  final List<Function> _warning = [];
+  final List<Function> _cutOff = [];
 
   WebSocketChannel? ws;
   int? _anchorUid;
@@ -126,13 +127,13 @@ class DanmakuReceiver {
           final payload = data.getRange(16, totalLength);
           switch (type) {
             case DanmakuType.authReply:
-              print('认证通过，已连接到弹幕服务器 $roomId');
+              logger.info('认证通过，已连接到弹幕服务器 $roomId');
               Timer.periodic(const Duration(seconds: 30), (timer) {
                 ws?.sink.add(packetEncode(1, 2, "[object Object]"));
               });
               break;
             case DanmakuType.data:
-              // print('totalLength: $totalLength, protocol: $protocol, type: $type, payload: $payload');
+              // logger.info('totalLength: $totalLength, protocol: $protocol, type: $type, payload: $payload');
               switch (protocol) {
                 case DanmakuProtocol.json:
                   // 系统广播一类的，这些数据没啥用
@@ -151,35 +152,35 @@ class DanmakuReceiver {
                     final cmd = dataJSON['cmd'].toString().split(':')[0];
                     switch (cmd) {
                       case 'DANMU_MSG':
-                        for (final handler in _DANMU_MSG) {
+                        for (final handler in _danmuMsg) {
                           Future.microtask(() => handler(dataJSON));
                         }
                       case 'SEND_GIFT':
-                        for (final handler in _SEND_GIFT) {
+                        for (final handler in _sendGift) {
                           Future.microtask(() => handler(dataJSON));
                         }
                       case 'USER_TOAST_MSG':
-                        for (final handler in _USER_TOAST_MSG) {
+                        for (final handler in _userToastMsg) {
                           Future.microtask(() => handler(dataJSON));
                         }
                       case 'SUPER_CHAT_MESSAGE':
-                        for (final handler in _SUPER_CHAT_MESSAGE) {
+                        for (final handler in _superChatMessage) {
                           Future.microtask(() => handler(dataJSON));
                         }
                       case 'INTERACT_WORD':
-                        for (final handler in _INTERACT_WORD) {
+                        for (final handler in _interactWord) {
                           Future.microtask(() => handler(dataJSON));
                         }
                       case 'LIKE_INFO_V3_CLICK':
-                        for (final handler in _LIKE_INFO_V3_CLICK) {
+                        for (final handler in _likeInfoV3Click) {
                           Future.microtask(() => handler(dataJSON));
                         }
                       case 'WARNING':
-                        for (final handler in _WARNING) {
+                        for (final handler in _warning) {
                           Future.microtask(() => handler(dataJSON));
                         }
                       case 'CUT_OFF':
-                        for (final handler in _CUT_OFF) {
+                        for (final handler in _cutOff) {
                           Future.microtask(() => handler(dataJSON));
                         }
                     }
@@ -211,46 +212,46 @@ class DanmakuReceiver {
   void dispose() {
     ws?.sink.close();
     ws = null;
-    _DANMU_MSG.clear();
-    _SEND_GIFT.clear();
-    _USER_TOAST_MSG.clear();
-    _SUPER_CHAT_MESSAGE.clear();
-    _INTERACT_WORD.clear();
-    _LIKE_INFO_V3_CLICK.clear();
-    _WARNING.clear();
-    _CUT_OFF.clear();
-    print('已断开弹幕服务器连接');
+    _danmuMsg.clear();
+    _sendGift.clear();
+    _userToastMsg.clear();
+    _superChatMessage.clear();
+    _interactWord.clear();
+    _likeInfoV3Click.clear();
+    _warning.clear();
+    _cutOff.clear();
+    logger.info('已断开弹幕服务器连接');
   }
 
   void onDanmuCallback(Function handler) {
-    _DANMU_MSG.add(handler);
+    _danmuMsg.add(handler);
   }
 
   void onGiftCallback(Function handler) {
-    _SEND_GIFT.add(handler);
+    _sendGift.add(handler);
   }
 
   void onGuardBuyCallback(Function handler) {
-    _USER_TOAST_MSG.add(handler);
+    _userToastMsg.add(handler);
   }
 
   void onSCCallback(Function handler) {
-    _SUPER_CHAT_MESSAGE.add(handler);
+    _superChatMessage.add(handler);
   }
 
   void onInteractWordCallback(Function handler) {
-    _INTERACT_WORD.add(handler);
+    _interactWord.add(handler);
   }
 
   void onLikeCallback(Function handler) {
-    _LIKE_INFO_V3_CLICK.add(handler);
+    _likeInfoV3Click.add(handler);
   }
 
-  void onWarning(Function handler) {
-    _WARNING.add(handler);
+  void onWarningCallback(Function handler) {
+    _warning.add(handler);
   }
 
-  void onCutOff(Function handler) {
-    _CUT_OFF.add(handler);
+  void onCutOffCallback(Function handler) {
+    _cutOff.add(handler);
   }
 }

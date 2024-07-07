@@ -1,8 +1,9 @@
 import 'package:flutter_tts/flutter_tts.dart';
-import '../services/config.dart';
+import '/services/config.dart';
 import 'dart:math';
-import '../services/messages_handler.dart'
+import '/services/messages_handler.dart'
     show popMessagesQueue, getHaveReadMessages;
+    import '/services/logger.dart';
 
 late FlutterTts flutterTts;
 TtsState ttsState = TtsState.stopped;
@@ -106,7 +107,7 @@ Future<void> ttsTask() async {
       await Future.delayed(const Duration(milliseconds: 10));
       continue;
     }
-    print("取出消息$msg");
+    logger.info("取出消息$msg");
     String text = messagesToText(msg);
     await tts(text);
   }

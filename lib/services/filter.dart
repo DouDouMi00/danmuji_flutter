@@ -1,4 +1,4 @@
-import '../services/config.dart';
+import '/services/config.dart';
 import 'dart:async';
 
 List<String> lastDanmuMessages = [];
@@ -84,17 +84,18 @@ Future<bool?> filterGift(int uid, String uname, int price, String giftName,
     giftUids.putIfAbsent(
         uid.toString(), () => {'uid': uid, 'uname': uname, 'gifts': {}});
 
-    if (giftUids[uid]['gifts'].containsKey(giftName)) {
-      giftUids[uid]['gifts'][giftName]['task'].cancel();
+    if (giftUids[uid.toString()]['gifts'].containsKey(giftName)) {
+      giftUids[uid.toString()]['gifts'][giftName]['task'].cancel();
     }
 
     Future<void> callback() async {
-      await deduplicateCallback(giftUids[uid], giftName);
-      giftUids[uid]['gifts'].remove(giftName);
+      await deduplicateCallback(giftUids[uid.toString()], giftName);
+      giftUids[uid.toString()]['gifts'].remove(giftName);
     }
 
-    giftUids[uid]['gifts'][giftName] = {
-      'count': giftUids[uid]['gifts'][giftName]['count']?.toInt() ?? 0 + num,
+    giftUids[uid.toString()]['gifts'][giftName] = {
+      'count': giftUids[uid.toString()]['gifts'][giftName]['count']?.toInt() ??
+          0 + num,
       'task':
           Timer(Duration(seconds: filterConfig['deduplicateTime']), callback),
     };
@@ -143,7 +144,7 @@ bool filterLike(int uid, String uname) {
   }
 
   if (dynamicConfig['deduplicate']) {
-    if (likedUids.containsKey(uid)) {
+    if (likedUids.containsKey(uid.toString())) {
       return false;
     }
     likedUids[uid.toString()] = true;

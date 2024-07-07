@@ -1,7 +1,7 @@
-import '../services/messages_handler.dart' show markAllMessagesInvalid;
-import '../services/config.dart';
+import '/services/messages_handler.dart' show markAllMessagesInvalid;
+import '/services/config.dart';
 import 'dart:math';
-import '../services/tts.dart';
+import '/services/tts.dart';
 
 Future<void> handleFlush() async {
   await markAllMessagesInvalid();

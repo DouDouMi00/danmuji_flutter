@@ -1,11 +1,12 @@
 // live.dart
 
 import 'dart:convert';
-import '../services/blivedm.dart';
-import '../services/config.dart';
-import '../services/tool.dart';
+import '/services/blivedm.dart';
+import '/services/config.dart';
+import '/services/tool.dart';
 import 'package:pinyin/pinyin.dart';
 import 'event_emitter.dart';
+import '/services/logger.dart';
 
 EventEmitter emitter = EventEmitter();
 
@@ -31,19 +32,19 @@ class MessageHandler {
     receiver.onSCCallback(_handleSC);
     receiver.onInteractWordCallback(_handleInteractWord);
     receiver.onLikeCallback(_handleLike);
-    receiver.onWarning(_handleWarning);
-    receiver.onCutOff(_handleCutOff);
+    receiver.onWarningCallback(_handleWarning);
+    receiver.onCutOffCallback(_handleCutOff);
   }
 
   Map guardLevelMap = {0: 0, 1: 3, 2: 2, 3: 1};
 
-  Map guardLevelMap_name = {0: "", 3: "总督", 2: "提督", 1: "舰长"};
-  Map guardLevelMap_name_raw = {0: "", 1: "总督", 2: "提督", 3: "舰长"};
-  Map author_type_map = {
+  Map guardLevelMapName = {0: "", 3: "总督", 2: "提督", 1: "舰长"};
+  Map guardLevelMapNameRaw = {0: "", 1: "总督", 2: "提督", 3: "舰长"};
+  Map authorTypeMap = {
     0: "",
-    1: "member", //舰队
+    1: "member", // 舰队
     2: "moderator", // 房管
-    3: "owner", //主播
+    3: "owner", // 主播
   };
 
   void _handleDanmaku(command) {
@@ -54,14 +55,19 @@ class MessageHandler {
     var uname = command['info'][2][1];
     var isadmin = command['info'][2][2] == 1;
     var liveRoomGuardLevel = command['info'][7];
-    var liveRoomGuardLevelName = guardLevelMap_name_raw[liveRoomGuardLevel];
+    var liveRoomGuardLevelName = guardLevelMapNameRaw[liveRoomGuardLevel];
 
     bool isFansMedalBelongToLive;
+    // ignore: prefer_typing_uninitialized_variables
     var fansMedalLevel;
+    // ignore: prefer_typing_uninitialized_variables
     var fansMedalName;
+    // ignore: prefer_typing_uninitialized_variables
     var fansMedalGuardLevel;
+    // ignore: prefer_typing_uninitialized_variables
     var fansMedalGuardLevelName;
     int authorType;
+    // ignore: prefer_typing_uninitialized_variables
     var authorTypeText;
     bool isEmoji;
 
@@ -71,7 +77,7 @@ class MessageHandler {
       fansMedalLevel = command['info'][3][0];
       fansMedalName = command['info'][3][1];
       fansMedalGuardLevel = guardLevelMap[command['info'][3][10]];
-      fansMedalGuardLevelName = guardLevelMap_name[fansMedalGuardLevel];
+      fansMedalGuardLevelName = guardLevelMapName[fansMedalGuardLevel];
 
       if (uid == receiver.anchorUid) {
         authorType = 3; // 主播
@@ -83,7 +89,7 @@ class MessageHandler {
       } else {
         authorType = 0;
       }
-      authorTypeText = author_type_map[authorType];
+      authorTypeText = authorTypeMap[authorType];
     } else {
       isFansMedalBelongToLive = false;
       fansMedalLevel = 0;
@@ -94,7 +100,7 @@ class MessageHandler {
       authorTypeText = "";
     }
     isEmoji = command['info'][0][12] == 1 || isStringAllEmojis(msg);
-    print(
+    logger.info(
         '[Danmu] [$authorTypeText] [$liveRoomGuardLevelName] [[$fansMedalGuardLevelName]$fansMedalName:$fansMedalLevel] $uname: $msg');
     emitter.emitEvent(jsonEncode({
       'eventType': 'danmu',
@@ -129,7 +135,7 @@ class MessageHandler {
     price = command['data']['coin_type'] == 'gold' ? price : 0.0;
     var faceImg = command['data']['face'];
 
-    print(
+    logger.info(
         "[Gift] $uname $unamePronunciation bought ${price.toStringAsFixed(2)}元的$giftName x $num.");
 
     // liveEvent.emit(
@@ -167,7 +173,7 @@ class MessageHandler {
 
     var faceImg = 'static.hdslb.com/images/member/noface.gif';
 
-    print(
+    logger.info(
         '[GuardBuy] $uname bought ${newGuard ? 'New ' : ''}$giftName x $num.');
 
     // liveEvent.emit(
@@ -207,7 +213,7 @@ class MessageHandler {
     var msg = command["data"]["message"];
     var faceImg = command["data"]["user_info"]["face"];
     // timeLog(f"[SuperChat] {uname} bought {price}元的SC: {msg}");
-    print("[SC] $uname bought ${price.toStringAsFixed(2)}元SC: $msg");
+    logger.info("[SC] $uname bought ${price.toStringAsFixed(2)}元SC: $msg");
     // liveEvent.emit("superChat", uid, faceImg, uname, unamePronunciation, price, msg);
     emitter.emitEvent(jsonEncode({
       'eventType': 'superChat',
@@ -244,7 +250,7 @@ class MessageHandler {
 
     var isSubscribe = command['data']['msg_type'] == 2;
 // timeLog("[Interact] ${uname} ${isSubscribe ? 'subscribe' : 'enter'} the stream.");
-    print(
+    logger.info(
         "[Interact] $uname ${isSubscribe ? 'subscribe' : 'enter'} the stream.");
 
 // if (isSubscribe) {
@@ -296,7 +302,7 @@ class MessageHandler {
     var uid = command["data"]["uid"];
     var uname = command["data"]["uname"];
     // timeLog(f"[Like] {uname} liked the stream.");
-    print("[Like] $uname liked the stream.");
+    logger.info("[Like] $uname liked the stream.");
     // liveEvent.emit("like", uid, uname);
     emitter.emitEvent(jsonEncode({
       'eventType': 'like',
@@ -311,7 +317,7 @@ class MessageHandler {
     // 处理警告逻辑
     var msg = command['msg'];
     // timeLog(f"[Warning] {msg}");
-    print("[Warning] $msg");
+    logger.info("[Warning] $msg");
     // liveEvent.emit("warning", msg, False);
     emitter.emitEvent(jsonEncode({
       'eventType': 'warning',
@@ -324,10 +330,10 @@ class MessageHandler {
 
   void _handleCutOff(command) {
     // 处理切断连接逻辑
-    print(command);
+    logger.info(command);
     var msg = command['msg'];
     //       timeLog(f"[Warning] Cut Off, {msg}");
-    print("Cut Off, $msg");
+    logger.info("Cut Off, $msg");
     //       liveEvent.emit("warning", msg, True);
     // }
     emitter.emitEvent(jsonEncode({
