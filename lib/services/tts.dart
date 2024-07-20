@@ -3,7 +3,7 @@ import '/services/config.dart';
 import 'dart:math';
 import '/services/messages_handler.dart'
     show popMessagesQueue, getHaveReadMessages;
-    import '/services/logger.dart';
+import '/services/logger.dart';
 
 late FlutterTts flutterTts;
 TtsState ttsState = TtsState.stopped;
@@ -63,18 +63,11 @@ String messagesToText(Map<String, dynamic> msg) {
 }
 
 Future<void> tts(String text, [channel = 0, config]) async {
-  while (true) {
-    if (ttsState == TtsState.stopped) {
-      ttsState = TtsState.playing;
-      await flutterTts.speak(text);
-      flutterTts.setCompletionHandler(() {
-        ttsState = TtsState.stopped;
-      });
-      break;
-    } else {
-      await Future.delayed(const Duration(milliseconds: 10));
-    }
+  while (ttsState == TtsState.playing) {
+    await Future.delayed(const Duration(milliseconds: 100));
   }
+  ttsState = TtsState.playing;
+  await flutterTts.speak(text);
 }
 
 Future<void> init() async {
@@ -88,6 +81,9 @@ Future<void> init() async {
   flutterTts.setSpeechRate(ttsConfig["rate"]);
   flutterTts.setPitch(ttsConfig["pitch"]);
   _setAwaitOptions();
+  flutterTts.setCompletionHandler(() {
+    ttsState = TtsState.stopped;
+  });
   await tts("tts 初始化完成");
   initalized = true;
 }
@@ -97,14 +93,14 @@ Future<void> ttsTask() async {
   while (_shouldExitTtsTask) {
     if (prepareDisableTTSTask) {
       disableTTSTask = true;
-      await Future.delayed(const Duration(milliseconds: 10));
+      await Future.delayed(const Duration(milliseconds: 100));
       continue;
     } else {
       disableTTSTask = false;
     }
     Map<String, dynamic>? msg = popMessagesQueue();
     if (msg == null) {
-      await Future.delayed(const Duration(milliseconds: 10));
+      await Future.delayed(const Duration(milliseconds: 100));
       continue;
     }
     logger.info("取出消息$msg");
@@ -117,12 +113,12 @@ Future<void> setDisableTTSTask(bool mode, {bool waiting = true}) async {
   if (prepareDisableTTSTask == false && mode == true) {
     prepareDisableTTSTask = mode;
     while (!disableTTSTask && waiting) {
-      await Future.delayed(const Duration(milliseconds: 10));
+      await Future.delayed(const Duration(milliseconds: 100));
     }
   } else if (prepareDisableTTSTask == true && mode == false) {
     prepareDisableTTSTask = mode;
     while (disableTTSTask && waiting) {
-      await Future.delayed(const Duration(milliseconds: 10));
+      await Future.delayed(const Duration(milliseconds: 100));
     }
   }
 }
@@ -131,7 +127,7 @@ int ttsSystemCallerID = 0;
 
 Future<void> ttsSystem(msg) async {
   while (!initalized) {
-    await Future.delayed(const Duration(milliseconds: 10));
+    await Future.delayed(const Duration(milliseconds: 100));
   }
   ttsSystemCallerID += 1;
   final myCallerID = ttsSystemCallerID;

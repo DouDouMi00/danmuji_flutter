@@ -2,7 +2,6 @@ import '/services/config.dart';
 import 'dart:async';
 
 List<String> lastDanmuMessages = [];
-
 bool filterDanmu(int uid, String uname, bool isFansMedalBelongToLive,
     int fansMedalLevel, int fansMedalGuardLevel, String msg, bool isEmoji) {
   var dynamicConfig = getConfigMap()['dynamic'];
@@ -54,61 +53,51 @@ bool filterDanmu(int uid, String uname, bool isFansMedalBelongToLive,
 }
 
 Map<String, dynamic> giftUids = {};
-
-Future<bool?> filterGift(int uid, String uname, int price, String giftName,
+Future<bool?> filterGift(String uid, String uname, int price, String giftName,
     int num, Function(Map<String, dynamic>, String) deduplicateCallback) async {
-  Map<String, dynamic> dynamicConfig = getConfigMap()['dynamic'];
-  Map<String, dynamic> filterConfig =
-      dynamicConfig['dynamic']['filter']['gift'];
-
-  if (!filterConfig['enable']) {
+  var dynamicConfig = getConfigMap()['dynamic'];
+  if (!dynamicConfig["filter"]["gift"]["enable"]) {
     return false;
   }
-
   if (price == 0) {
-    if (!filterConfig['freeGiftEnable']) {
+    if (!dynamicConfig["filter"]["gift"]["freeGiftEnable"]) {
       return false;
     }
-    if (filterConfig['freeGiftCountBigger'] != 0 &&
-        num < filterConfig['freeGiftCountBigger']) {
+    if (dynamicConfig["filter"]["gift"]["freeGiftCountBigger"] != 0 &&
+        num < dynamicConfig["filter"]["gift"]["freeGiftCountBigger"]) {
       return false;
     }
   } else {
-    if (filterConfig['moneyGiftPriceBigger'] != 0 &&
-        price < filterConfig['moneyGiftPriceBigger']) {
+    if (dynamicConfig["filter"]["gift"]["moneyGiftPriceBigger"] != 0 &&
+        price < dynamicConfig["filter"]["gift"]["moneyGiftPriceBigger"]) {
       return false;
     }
   }
-
-  if (filterConfig['deduplicateTime'] != 0) {
-    giftUids.putIfAbsent(
-        uid.toString(), () => {'uid': uid, 'uname': uname, 'gifts': {}});
-
-    if (giftUids[uid.toString()]['gifts'].containsKey(giftName)) {
-      giftUids[uid.toString()]['gifts'][giftName]['task'].cancel();
+  if (dynamicConfig["filter"]["gift"]["deduplicateTime"] != 0) {
+    if (!giftUids.containsKey(uid)) {
+      giftUids[uid] = {'uid': uid, 'uname': uname, 'gifts': {}};
     }
-
-    Future<void> callback() async {
-      await deduplicateCallback(giftUids[uid.toString()], giftName);
-      giftUids[uid.toString()]['gifts'].remove(giftName);
+    if (giftUids[uid]['gifts'].containsKey(giftName)) {
+      giftUids[uid]['gifts'][giftName]['task'].cancel();
     }
-
-    giftUids[uid.toString()]['gifts'][giftName] = {
-      'count': giftUids[uid.toString()]['gifts'][giftName]['count']?.toInt() ??
-          0 + num,
-      'task':
-          Timer(Duration(seconds: filterConfig['deduplicateTime']), callback),
+    Timer timer = Timer(
+        Duration(seconds: dynamicConfig["filter"]["gift"]["deduplicateTime"]),
+        () {
+      deduplicateCallback(giftUids[uid], giftName);
+      giftUids[uid]['gifts'].remove(giftName);
+    });
+    giftUids[uid]['gifts'][giftName] = {
+      'count': giftUids[uid]['gifts'][giftName]['count'] + num ?? num,
+      'task': timer,
     };
     return null;
   }
-
   return true;
 }
 
 bool filterWelcome(int uid, String uname, bool isFansMedalBelongToLive,
     int fansMedalLevel, int fansMedalGuardLevel) {
   final dynamicConfig = getConfigMap()['dynamic'];
-
   if (!dynamicConfig["filter"]["welcome"]["enable"]) return false;
   if (dynamicConfig["filter"]["welcome"]["isFansMedalBelongToLive"] &&
       !isFansMedalBelongToLive) return false;
@@ -128,28 +117,22 @@ bool filterWelcome(int uid, String uname, bool isFansMedalBelongToLive,
 bool filterGuardBuy(
     int uid, String uname, bool newGuard, String giftName, int num) {
   final dynamicConfig = getConfigMap()['dynamic'];
-
   if (!dynamicConfig["filter"]["guardBuy"]["enable"]) return false;
-
   return true;
 }
 
 Map<String, bool> likedUids = {};
-
 bool filterLike(int uid, String uname) {
   final dynamicConfig = getConfigMap()['dynamic']['filter']['like'];
-
   if (!dynamicConfig['enable']) {
     return false;
   }
-
   if (dynamicConfig['deduplicate']) {
     if (likedUids.containsKey(uid.toString())) {
       return false;
     }
     likedUids[uid.toString()] = true;
   }
-
   return true;
 }
 

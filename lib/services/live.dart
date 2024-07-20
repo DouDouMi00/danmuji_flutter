@@ -1,5 +1,4 @@
 // live.dart
-
 import 'dart:convert';
 import '/services/blivedm.dart';
 import '/services/config.dart';
@@ -58,17 +57,12 @@ class MessageHandler {
     var liveRoomGuardLevelName = guardLevelMapNameRaw[liveRoomGuardLevel];
 
     bool isFansMedalBelongToLive;
-    // ignore: prefer_typing_uninitialized_variables
-    var fansMedalLevel;
-    // ignore: prefer_typing_uninitialized_variables
-    var fansMedalName;
-    // ignore: prefer_typing_uninitialized_variables
-    var fansMedalGuardLevel;
-    // ignore: prefer_typing_uninitialized_variables
-    var fansMedalGuardLevelName;
+    int fansMedalLevel;
+    String fansMedalName;
+    int fansMedalGuardLevel;
+    String fansMedalGuardLevelName;
+    String authorTypeText;
     int authorType;
-    // ignore: prefer_typing_uninitialized_variables
-    var authorTypeText;
     bool isEmoji;
 
     if (command['info'][3].length != 0) {
@@ -138,8 +132,6 @@ class MessageHandler {
     logger.info(
         "[Gift] $uname $unamePronunciation bought ${price.toStringAsFixed(2)}元的$giftName x $num.");
 
-    // liveEvent.emit(
-    // "gift", uid, uname, unamePronunciation, price, faceImg, giftName, num);
     emitter.emitEvent(jsonEncode({
       'eventType': 'gift',
       'data': {
@@ -168,26 +160,11 @@ class MessageHandler {
     var giftName = command['data']['role_name'];
     var liveRoomGuardLevel = command['data']['guard_level'];
     var newGuard = command['data']['toast_msg'].endsWith('第1天');
-
     var title = '$uname 购买 $num 个月的 $giftName ';
-
     var faceImg = 'static.hdslb.com/images/member/noface.gif';
 
     logger.info(
         '[GuardBuy] $uname bought ${newGuard ? 'New ' : ''}$giftName x $num.');
-
-    // liveEvent.emit(
-    //   'guardBuy',
-    //   uid,
-    //   uname,
-    //   unamePronunciation,
-    //   liveRoomGuardLevel,
-    //   newGuard,
-    //   faceImg,
-    //   giftName,
-    //   num,
-    //   title,
-    // );
     emitter.emitEvent(jsonEncode({
       'eventType': 'guardBuy',
       'data': {
@@ -212,9 +189,7 @@ class MessageHandler {
     var price = command["data"]["price"];
     var msg = command["data"]["message"];
     var faceImg = command["data"]["user_info"]["face"];
-    // timeLog(f"[SuperChat] {uname} bought {price}元的SC: {msg}");
     logger.info("[SC] $uname bought ${price.toStringAsFixed(2)}元SC: $msg");
-    // liveEvent.emit("superChat", uid, faceImg, uname, unamePronunciation, price, msg);
     emitter.emitEvent(jsonEncode({
       'eventType': 'superChat',
       'data': {
@@ -249,29 +224,9 @@ class MessageHandler {
     }
 
     var isSubscribe = command['data']['msg_type'] == 2;
-// timeLog("[Interact] ${uname} ${isSubscribe ? 'subscribe' : 'enter'} the stream.");
     logger.info(
         "[Interact] $uname ${isSubscribe ? 'subscribe' : 'enter'} the stream.");
 
-// if (isSubscribe) {
-//   liveEvent.emit(
-//     "subscribe",
-//     uid,
-//     uname,
-//     isFansMedalBelongToLive,
-//     fansMedalLevel,
-//     fansMedalGuardLevel,
-//   );
-// } else {
-//   liveEvent.emit(
-//     "welcome",
-//     uid,
-//     uname,
-//     isFansMedalBelongToLive,
-//     fansMedalLevel,
-//     fansMedalGuardLevel,
-//   );
-// }
     if (isSubscribe) {
       emitter.emitEvent(jsonEncode({
         'eventType': 'subscribe',
@@ -301,9 +256,7 @@ class MessageHandler {
     // 处理点赞逻辑
     var uid = command["data"]["uid"];
     var uname = command["data"]["uname"];
-    // timeLog(f"[Like] {uname} liked the stream.");
     logger.info("[Like] $uname liked the stream.");
-    // liveEvent.emit("like", uid, uname);
     emitter.emitEvent(jsonEncode({
       'eventType': 'like',
       'data': {
@@ -316,9 +269,7 @@ class MessageHandler {
   void _handleWarning(command) {
     // 处理警告逻辑
     var msg = command['msg'];
-    // timeLog(f"[Warning] {msg}");
     logger.info("[Warning] $msg");
-    // liveEvent.emit("warning", msg, False);
     emitter.emitEvent(jsonEncode({
       'eventType': 'warning',
       'data': {
@@ -332,10 +283,7 @@ class MessageHandler {
     // 处理切断连接逻辑
     logger.info(command);
     var msg = command['msg'];
-    //       timeLog(f"[Warning] Cut Off, {msg}");
     logger.info("Cut Off, $msg");
-    //       liveEvent.emit("warning", msg, True);
-    // }
     emitter.emitEvent(jsonEncode({
       'eventType': 'warning',
       'data': {
