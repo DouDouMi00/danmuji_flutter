@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '/services/config.dart';
+import '/widgets/obscure_text_field.dart';
 
 class WelcomeFilterSettingPage extends StatefulWidget {
   final Map<String, dynamic> configMap;
@@ -24,8 +25,12 @@ class _WelcomeFilterSettingPageState extends State<WelcomeFilterSettingPage> {
 
   @override
   Widget build(BuildContext context) {
-    final List<int> guardLevelOptions = [0, 1, 2]; // 大航海等级选项
-    final List<int> medalLevelOptions = [0, 5, 10, 15, 20, 25]; // 粉丝牌等级选项
+    final List<Map<String, dynamic>> guardLevelOptions = [
+      {'title': '无', 'value': 0},
+      {'title': '舰长', 'value': 1},
+      {'title': '提督', 'value': 2},
+      {'title': '总督', 'value': 3},
+    ];
     return Scaffold(
       appBar: AppBar(
         // 添加AppBar并启用返回按钮
@@ -44,28 +49,14 @@ class _WelcomeFilterSettingPageState extends State<WelcomeFilterSettingPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment:
-                    MainAxisAlignment.spaceBetween, // 使子元素间间距相等，两端对齐
-                children: [
-                  Expanded(
-                    // 使按钮自适应宽度并均匀分配空间
-                    child: ElevatedButton(
-                      onPressed: () {
-                        updateConfigMap(configMap);
-                      },
-                      child: const Text('保存'),
-                    ),
-                  ),
-                ],
-              ),
               SwitchListTile(
                 title: const Text('启用进入直播间朗读'),
                 value: configMap['dynamic']['filter']['welcome']['enable'],
-                onChanged: (value) {
+                onChanged: (value) async {
                   setState(() {
                     configMap['dynamic']['filter']['welcome']['enable'] = value;
                   });
+                  await updateConfigMap(configMap);
                 },
               ),
               // 粉丝牌必须为本直播间
@@ -73,49 +64,64 @@ class _WelcomeFilterSettingPageState extends State<WelcomeFilterSettingPage> {
                 title: const Text('粉丝牌必须为本直播间'),
                 value: configMap['dynamic']['filter']['welcome']
                     ['isFansMedalBelongToLive'],
-                onChanged: (value) {
+                onChanged: (value) async {
                   setState(() {
                     configMap['dynamic']['filter']['welcome']
                         ['isFansMedalBelongToLive'] = value;
                   });
+                  await updateConfigMap(configMap);
                 },
               ),
-              // 大航海大于等于
-              DropdownButtonFormField<int>(
-                decoration: const InputDecoration(labelText: '大航海大于等于'),
-                value: configMap['dynamic']['filter']["welcome"]
-                    ['fansMedalGuardLevelBigger'],
-                items: guardLevelOptions.map((level) {
-                  return DropdownMenuItem<int>(
-                    value: level,
-                    child: Text('$level'),
+              // // 大航海大于等于
+              ListTile(
+                leading: const Icon(Icons.anchor_outlined),
+                title: Text(
+                    '大航海大于等于: ${guardLevelOptions[configMap['dynamic']['filter']["welcome"]['fansMedalGuardLevelBigger']]['title']}'),
+                trailing: const Icon(Icons.navigate_next),
+                onTap: () {
+                  showRadioDialog(
+                    RadioDialogParams(
+                      title: '大航海大于等于',
+                      initialValue: configMap['dynamic']['filter']["welcome"]
+                          ['fansMedalGuardLevelBigger'],
+                      valueOptions: guardLevelOptions,
+                      onSaved: (newValue) async {
+                        setState(() {
+                          configMap['dynamic']['filter']["welcome"]
+                              ['fansMedalGuardLevelBigger'] = newValue;
+                        });
+                        await updateConfigMap(configMap);
+                      },
+                    ),
                   );
-                }).toList(),
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() {
-                      configMap['dynamic']['filter']["welcome"]
-                          ['fansMedalGuardLevelBigger'] = value;
-                    });
-                  }
                 },
               ),
-              // 粉丝牌等级大于等于
-              DropdownButtonFormField<int>(
-                decoration: const InputDecoration(labelText: '粉丝牌等级大于等于'),
-                value: configMap['dynamic']['filter']["danmu"]
-                    ['fansMedalLevelBigger'],
-                items: medalLevelOptions.map((level) {
-                  return DropdownMenuItem<int>(
-                      value: level, child: Text('$level'));
-                }).toList(),
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() {
-                      configMap['dynamic']['filter']["danmu"]
-                          ['fansMedalLevelBigger'] = value;
-                    });
-                  }
+              // 粉丝勋章等级大于等于
+              ListTile(
+                leading: const Icon(Icons.badge_outlined),
+                title: Text(
+                    '粉丝勋章等级大于等于: ${configMap['dynamic']['filter']["danmu"]['fansMedalLevelBigger']}'),
+                trailing: const Icon(Icons.navigate_next),
+                onTap: () {
+                  showInputNumberDialog(
+                    InputDialogParams(
+                      title: '粉丝勋章等级',
+                      initialValue: configMap['dynamic']['filter']["danmu"]
+                              ['fansMedalLevelBigger']
+                          .toString(),
+                      inputType: InputType.intInputType,
+                      isObscured: false,
+                      minValue: 0,
+                      maxValue: 40,
+                      onSaved: (value) async {
+                        setState(() {
+                          configMap['dynamic']['filter']["danmu"]
+                              ['fansMedalLevelBigger'] = value;
+                        });
+                        await updateConfigMap(configMap);
+                      },
+                    ),
+                  );
                 },
               ),
             ],

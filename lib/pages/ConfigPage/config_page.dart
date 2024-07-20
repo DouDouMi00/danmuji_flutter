@@ -60,15 +60,22 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
           leading: const Icon(Icons.live_tv_outlined),
           title: Text('直播间ID: ${configMap['engine']['bili']['liveID']}'),
           trailing: const Icon(Icons.navigate_next),
-          onTap: () => showInputNumberDialog({
-            'title': '编辑直播间ID',
-            'initialValue': configMap['engine']['bili']['liveID'].toString(),
-            'onSaved': (value) {
-              configMap['engine']['bili']['liveID'] = int.parse(value);
-              updateConfigMap(configMap);
-              setState(() {});
-            },
-          }),
+          onTap: () {
+            showInputNumberDialog(
+              InputDialogParams(
+                title: '直播间ID',
+                initialValue: configMap['engine']['bili']['liveID'],
+                inputType: InputType.intInputType,
+                isObscured: false,
+                onSaved: (value) async {
+                  setState(() {
+                    configMap['engine']['bili']['liveID'] = value;
+                  });
+                  await updateConfigMap(configMap);
+                },
+              ),
+            );
+          },
         ),
         const Divider(),
         ListTile(

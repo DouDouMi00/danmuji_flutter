@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '/services/config.dart';
+import '/widgets/obscure_text_field.dart';
+import '/widgets/white_list_editor_page.dart';
 
 class DmFilterSettingPage extends StatefulWidget {
   final Map<String, dynamic> configMap;
@@ -14,9 +16,12 @@ class DmFilterSettingPage extends StatefulWidget {
 }
 
 class _DmFilterSettingPageState extends State<DmFilterSettingPage> {
-  final List<int> guardLevelOptions = [0, 1, 2]; // 大航海等级选项
-  final List<int> medalLevelOptions = [0, 5, 10, 15, 20, 25]; // 粉丝牌等级选项
-  final List<int> lengthOptions = [0, 5, 10, 15, 20]; // 文本
+  final List<Map<String, dynamic>> guardLevelOptions = [
+    {'title': '无', 'value': 0},
+    {'title': '舰长', 'value': 1},
+    {'title': '提督', 'value': 2},
+    {'title': '总督', 'value': 3},
+  ];
   late Map<String, dynamic> configMap;
   @override
   void initState() {
@@ -28,7 +33,7 @@ class _DmFilterSettingPageState extends State<DmFilterSettingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // 添加AppBar并启用返回按钮
+        // 添加AppBar并返回按钮
         title: const Text('弹幕过滤器'),
         leading: IconButton(
           // 这里是返回按钮
@@ -44,246 +49,277 @@ class _DmFilterSettingPageState extends State<DmFilterSettingPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment:
-                    MainAxisAlignment.spaceBetween, // 使子元素间间距相等，两端对齐
-                children: [
-                  Expanded(
-                    // 使按钮自适应宽度并均匀分配空间
-                    child: ElevatedButton(
-                      onPressed: () {
-                        updateConfigMap(configMap);
-                      },
-                      child: const Text('保存'),
-                    ),
-                  ),
-                ],
-              ),
-              // 启用弹幕朗读
+              // 弹幕朗读
               SwitchListTile(
-                title: const Text('启用弹幕朗读'),
+                title: const Text('弹幕朗读'),
                 value: configMap['dynamic']['filter']['danmu']['enable'],
-                onChanged: (value) {
+                onChanged: (value) async {
                   setState(() {
                     configMap['dynamic']['filter']['danmu']['enable'] = value;
                   });
+                  await updateConfigMap(configMap);
                 },
               ),
-              // 启用纯标点符号弹幕朗读
+              // 纯标点符号弹幕朗读
               SwitchListTile(
-                title: const Text('启用纯标点符号弹幕朗读'),
+                title: const Text('纯标点符号弹幕朗读'),
                 value: configMap['dynamic']['filter']['danmu']['symbolEnable'],
-                onChanged: (value) {
+                onChanged: (value) async {
                   setState(() {
                     configMap['dynamic']['filter']['danmu']['symbolEnable'] =
                         value;
                   });
+                  await updateConfigMap(configMap);
                 },
               ),
-              // 启用纯表情弹幕朗读
+              // 纯表情弹幕朗读
               SwitchListTile(
-                title: const Text('启用纯表情弹幕朗读'),
+                title: const Text('纯表情弹幕朗读'),
                 value: configMap['dynamic']['filter']['danmu']['emojiEnable'],
-                onChanged: (value) {
+                onChanged: (value) async {
                   setState(() {
                     configMap['dynamic']['filter']['danmu']['emojiEnable'] =
                         value;
                   });
+                  await updateConfigMap(configMap);
                 },
               ),
-              // 启用大航海头衔朗读
+              // 大航海头衔朗读
               SwitchListTile(
-                title: const Text('启用大航海头衔朗读'),
+                title: const Text('大航海头衔朗读'),
                 value: configMap['dynamic']['filter']['danmu']
                     ['readfansMedalGuardLevel'],
-                onChanged: (value) {
+                onChanged: (value) async {
                   setState(() {
                     configMap['dynamic']['filter']['danmu']
                         ['readfansMedalGuardLevel'] = value;
                   });
+                  await updateConfigMap(configMap);
                 },
               ),
-              // 启用粉丝勋章等级播报
+              // 粉丝勋章等级播报
               SwitchListTile(
-                title: const Text('启用粉丝勋章等级播报'),
+                title: const Text('粉丝勋章等级播报'),
                 value: configMap['dynamic']['filter']["danmu"]
                     ['readfansMedalName'],
-                onChanged: (value) {
+                onChanged: (value) async {
                   setState(() {
                     configMap['dynamic']['filter']["danmu"]
                         ['readfansMedalName'] = value;
                   });
+                  await updateConfigMap(configMap);
                 },
               ),
               // 去除短时间内重复弹幕
               SwitchListTile(
                 title: const Text('去除短时间内重复弹幕'),
                 value: configMap['dynamic']['filter']['danmu']['deduplicate'],
-                onChanged: (value) {
+                onChanged: (value) async {
                   setState(() {
                     configMap['dynamic']['filter']['danmu']['deduplicate'] =
                         value;
                   });
+                  await updateConfigMap(configMap);
                 },
               ),
-              // 粉丝牌必须为本直播间
+              // 粉丝勋章必须为本直播间
               SwitchListTile(
-                title: const Text('粉丝牌必须为本直播间'),
+                title: const Text('粉丝勋章必须为本直播间'),
                 value: configMap['dynamic']['filter']["danmu"]
                     ['isFansMedalBelongToLive'],
-                onChanged: (value) {
+                onChanged: (value) async {
                   setState(() {
                     configMap['dynamic']['filter']["danmu"]
                         ['isFansMedalBelongToLive'] = value;
                   });
+                  await updateConfigMap(configMap);
                 },
               ),
-              // 大航海大于等于
-              DropdownButtonFormField<int>(
-                decoration: const InputDecoration(labelText: '大航海大于等于'),
-                value: configMap['dynamic']['filter']["danmu"]
-                    ['fansMedalGuardLevelBigger'],
-                items: guardLevelOptions.map((level) {
-                  return DropdownMenuItem<int>(
-                    value: level,
-                    child: Text('$level'),
+              ListTile(
+                leading: const Icon(Icons.anchor_outlined),
+                title: Text(
+                    '大航海大于等于: ${guardLevelOptions[configMap['dynamic']['filter']["danmu"]['fansMedalGuardLevelBigger']]['title']}'),
+                trailing: const Icon(Icons.navigate_next),
+                onTap: () {
+                  showRadioDialog(
+                    RadioDialogParams(
+                      title: '大航海大于等于',
+                      initialValue: configMap['dynamic']['filter']["danmu"]
+                          ['fansMedalGuardLevelBigger'],
+                      valueOptions: guardLevelOptions,
+                      onSaved: (value) async {
+                        setState(() {
+                          configMap['dynamic']['filter']["danmu"]
+                              ['fansMedalGuardLevelBigger'] = value;
+                        });
+                        await updateConfigMap(configMap);
+                      },
+                    ),
                   );
-                }).toList(),
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() {
-                      configMap['dynamic']['filter']["danmu"]
-                          ['fansMedalGuardLevelBigger'] = value;
-                    });
-                  }
                 },
               ),
-              // 粉丝牌等级大于等于
-              DropdownButtonFormField<int>(
-                decoration: const InputDecoration(labelText: '粉丝牌等级大于等于'),
-                value: configMap['dynamic']['filter']["danmu"]
-                    ['fansMedalLevelBigger'],
-                items: medalLevelOptions.map((level) {
-                  return DropdownMenuItem<int>(
-                      value: level, child: Text('$level'));
-                }).toList(),
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() {
-                      configMap['dynamic']['filter']["danmu"]
-                          ['fansMedalLevelBigger'] = value;
-                    });
-                  }
+              // 粉丝勋章等级大于等于
+              ListTile(
+                leading: const Icon(Icons.badge_outlined),
+                title: Text(
+                    '粉丝勋章等级大于等于: ${configMap['dynamic']['filter']["danmu"]['fansMedalLevelBigger']}'),
+                trailing: const Icon(Icons.navigate_next),
+                onTap: () {
+                  showInputNumberDialog(
+                    InputDialogParams(
+                      title: '粉丝勋章等级',
+                      initialValue: configMap['dynamic']['filter']["danmu"]
+                              ['fansMedalLevelBigger']
+                          .toString(),
+                      inputType: InputType.intInputType,
+                      isObscured: false,
+                      minValue: 0,
+                      maxValue: 40,
+                      onSaved: (value) async {
+                        setState(() {
+                          configMap['dynamic']['filter']["danmu"]
+                              ['fansMedalLevelBigger'] = value;
+                        });
+                        await updateConfigMap(configMap);
+                      },
+                    ),
+                  );
                 },
               ),
               // 文本长度小于等于
-              DropdownButtonFormField<int>(
-                decoration: const InputDecoration(labelText: '文本长度小于等于'),
-                value: configMap['dynamic']['filter']['danmu']['lengthShorter'],
-                items: lengthOptions.map((length) {
-                  return DropdownMenuItem<int>(
-                    value: length,
-                    child: Text('$length'),
+              ListTile(
+                leading: const Icon(Icons.text_snippet_outlined),
+                title: Text(
+                    '文本长度小于等于: ${configMap['dynamic']['filter']['danmu']['lengthShorter']}'),
+                trailing: const Icon(Icons.navigate_next),
+                onTap: () {
+                  showInputNumberDialog(
+                    InputDialogParams(
+                      title: '文本长度',
+                      initialValue: configMap['dynamic']['filter']['danmu']
+                              ['lengthShorter']
+                          .toString(),
+                      inputType: InputType.intInputType,
+                      isObscured: false,
+                      minValue: 0,
+                      maxValue: 20,
+                      onSaved: (value) async {
+                        setState(() {
+                          configMap['dynamic']['filter']['danmu']
+                              ['lengthShorter'] = value;
+                        });
+                        await updateConfigMap(configMap);
+                      },
+                    ),
                   );
-                }).toList(),
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() {
-                      configMap['dynamic']['filter']['danmu']['lengthShorter'] =
-                          value;
-                    });
-                  }
                 },
               ),
-              // "blacklistKeywords": [],黑名单关键词(逗号分隔)
-              TextFormField(
-                controller: TextEditingController(
-                    text: configMap['dynamic']['filter']['danmu']
-                            ['blacklistKeywords']
-                        .toString()),
-                decoration: const InputDecoration(labelText: '黑名单用户UID(逗号分隔)'),
-                onChanged: (value) {
-                  setState(() {
-                    if (value.isEmpty) {
-                      configMap['dynamic']['filter']['danmu']
-                          ['blacklistKeywords'] = [];
-                    } else if (value.contains(',')) {
-                      configMap['dynamic']['filter']['danmu']
-                          ['blacklistKeywords'] = value.split(',');
-                    } else {
-                      configMap['dynamic']['filter']['danmu']
-                          ['blacklistKeywords'] = [value];
-                    }
-                  });
+              //黑名关键词
+              ListTile(
+                leading: const Icon(Icons.security_outlined),
+                title: const Text('黑名单关键词'),
+                subtitle: Text(
+                    '${configMap['dynamic']['filter']['danmu']['blacklistKeywords'].length} 个关键词'),
+                trailing: const Icon(Icons.navigate_next),
+                onTap: () {
+                  Get.toNamed(
+                    '/filterListEditor',
+                    arguments: EditableListParams(
+                      title: '黑名单关键词',
+                      initialValue: configMap['dynamic']['filter']['danmu']
+                          ['blacklistKeywords'],
+                      inputType: InputType.stringInputType,
+                      isObscured: false,
+                      onSaved: (value) async {
+                        setState(() {
+                          configMap['dynamic']['filter']['danmu']
+                              ['blacklistKeywords'] = value;
+                        });
+                        await updateConfigMap(configMap);
+                      },
+                    ),
+                  );
                 },
               ),
-              // "blacklistUsers": [],黑名单用户UID(逗号分隔)
-              TextFormField(
-                controller: TextEditingController(
-                    text: configMap['dynamic']['filter']['danmu']
-                            ['blacklistUsers']
-                        .toString()),
-                decoration: const InputDecoration(labelText: '黑名单用户UID(逗号分隔)'),
-                onChanged: (value) {
-                  setState(() {
-                    if (value.isEmpty) {
-                      configMap['dynamic']['filter']['danmu']
-                          ['blacklistUsers'] = [];
-                      return;
-                    } else if (value.contains(',')) {
-                      configMap['dynamic']['filter']['danmu']
-                          ['blacklistUsers'] = value.split(',');
-                    } else {
-                      configMap['dynamic']['filter']['danmu']
-                          ['blacklistUsers'] = [value];
-                    }
-                  });
+              // 黑名单用户UID
+              ListTile(
+                leading: const Icon(Icons.security_outlined),
+                title: const Text('黑名单用户UID'),
+                subtitle: Text(
+                    '${configMap['dynamic']['filter']['danmu']['blacklistUsers'].length} 个用户'),
+                trailing: const Icon(Icons.navigate_next),
+                onTap: () {
+                  Get.toNamed(
+                    '/filterListEditor',
+                    arguments: EditableListParams(
+                      title: '黑名单用户UID',
+                      initialValue: configMap['dynamic']['filter']['danmu']
+                          ['blacklistUsers'],
+                      inputType: InputType.intInputType,
+                      isObscured: false,
+                      onSaved: (value) async {
+                        setState(() {
+                          configMap['dynamic']['filter']['danmu']
+                              ['blacklistUsers'] = value;
+                        });
+                        await updateConfigMap(configMap);
+                      },
+                    ),
+                  );
                 },
               ),
-              // "whitelistKeywords": []白名单关键词(逗号分隔)
-              TextFormField(
-                controller: TextEditingController(
-                    text: configMap['dynamic']['filter']['danmu']
-                            ['whitelistKeywords']
-                        .toString()),
-                decoration: const InputDecoration(labelText: '白名单关键词(逗号分隔)'),
-                onChanged: (value) {
-                  setState(() {
-                    if (value.isEmpty) {
-                      configMap['dynamic']['filter']['danmu']
-                          ['whitelistKeywords'] = [];
-                      return;
-                    } else if (value.contains(',')) {
-                      configMap['dynamic']['filter']['danmu']
-                          ['whitelistKeywords'] = value.split(',');
-                    } else {
-                      configMap['dynamic']['filter']['danmu']
-                          ['whitelistKeywords'] = [value];
-                    }
-                  });
+              // 白名单关键词
+              ListTile(
+                leading: const Icon(Icons.security_outlined),
+                title: const Text('白名单关键词'),
+                subtitle: Text(
+                    '${configMap['dynamic']['filter']['danmu']['whitelistKeywords'].length} 个关键词'),
+                trailing: const Icon(Icons.navigate_next),
+                onTap: () {
+                  Get.toNamed(
+                    '/filterListEditor',
+                    arguments: EditableListParams(
+                      title: '白名单关键词',
+                      initialValue: configMap['dynamic']['filter']['danmu']
+                          ['whitelistKeywords'],
+                      inputType: InputType.stringInputType,
+                      isObscured: false,
+                      onSaved: (value) async {
+                        setState(() {
+                          configMap['dynamic']['filter']['danmu']
+                              ['whitelistKeywords'] = value;
+                        });
+                        await updateConfigMap(configMap);
+                      },
+                    ),
+                  );
                 },
               ),
-              // "whitelistUsers": [],白名单用户UID(逗号分隔)
-              TextFormField(
-                controller: TextEditingController(
-                    text: configMap['dynamic']['filter']['danmu']
-                            ['whitelistUsers']
-                        .toString()),
-                decoration: const InputDecoration(labelText: '白名单用户UID(逗号分隔)'),
-                onChanged: (value) {
-                  setState(() {
-                    if (value.isEmpty) {
-                      configMap['dynamic']['filter']['danmu']
-                          ['whitelistUsers'] = [];
-                      return;
-                    } else if (value.contains(',')) {
-                      configMap['dynamic']['filter']['danmu']
-                          ['whitelistUsers'] = value.split(',');
-                    } else {
-                      configMap['dynamic']['filter']['danmu']
-                          ['whitelistUsers'] = [value];
-                    }
-                  });
+              // 白名单用户UID
+              ListTile(
+                leading: const Icon(Icons.security_outlined),
+                title: const Text('白名单用户UID'),
+                subtitle: Text(
+                    '${configMap['dynamic']['filter']['danmu']['whitelistUsers'].length} 个用户'),
+                trailing: const Icon(Icons.navigate_next),
+                onTap: () {
+                  Get.toNamed(
+                    '/filterListEditor',
+                    arguments: EditableListParams(
+                      title: '白名单用户UID',
+                      initialValue: configMap['dynamic']['filter']['danmu']
+                          ['whitelistUsers'],
+                      inputType: InputType.intInputType,
+                      isObscured: false,
+                      onSaved: (value) async {
+                        setState(() {
+                          configMap['dynamic']['filter']['danmu']
+                              ['whitelistUsers'] = value;
+                        });
+                        await updateConfigMap(configMap);
+                      },
+                    ),
+                  );
                 },
               ),
             ],

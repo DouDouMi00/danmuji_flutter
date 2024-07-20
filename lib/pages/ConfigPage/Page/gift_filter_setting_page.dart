@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '/services/config.dart';
+import '/widgets/obscure_text_field.dart';
 
 class GiftFilterSettingPage extends StatefulWidget {
   final Map<String, dynamic> configMap;
@@ -41,98 +42,95 @@ class _GiftFilterSettingPageState extends State<GiftFilterSettingPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment:
-                    MainAxisAlignment.spaceBetween, // 使子元素间间距相等，两端对齐
-                children: [
-                  Expanded(
-                    // 使按钮自适应宽度并均匀分配空间
-                    child: ElevatedButton(
-                      onPressed: () {
-                        updateConfigMap(configMap);
-                      },
-                      child: const Text('保存'),
-                    ),
-                  ),
-                ],
-              ),
               SwitchListTile(
                 title: const Text('启用礼物朗读'),
                 value: configMap['dynamic']['filter']['gift']['enable'],
-                onChanged: (value) {
+                onChanged: (value) async {
                   setState(() {
                     configMap['dynamic']['filter']['gift']['enable'] = value;
                   });
+                  await updateConfigMap(configMap);
                 },
               ),
               SwitchListTile(
                 title: const Text('启用免费礼物朗读'),
                 value: configMap['dynamic']['filter']['gift']['freeGiftEnable'],
-                onChanged: (value) {
+                onChanged: (value) async {
                   setState(() {
                     configMap['dynamic']['filter']['gift']['freeGiftEnable'] =
                         value;
                   });
+                  await updateConfigMap(configMap);
                 },
               ),
-              // 几秒内礼物不重复朗读
-              TextFormField(
-                controller: TextEditingController(
-                    text: configMap['dynamic']['filter']['gift']
-                            ['deduplicateTime']
-                        .toString()),
-                decoration: const InputDecoration(labelText: '几秒内礼物不重复朗读'),
-                onFieldSubmitted: (value) {
-                  setState(() {
-                    if (value.isEmpty) {
-                      configMap['dynamic']['filter']['gift']
-                          ['deduplicateTime'] = 0;
-                      return;
-                    } else {
-                      configMap['dynamic']['filter']['gift']
-                          ['deduplicateTime'] = int.parse(value);
-                    }
-                  });
+              ListTile(
+                leading: const Icon(Icons.timer_outlined),
+                title: Text(
+                    '几秒内礼物不重复朗读 : ${configMap['dynamic']['filter']['gift']['deduplicateTime']}'),
+                trailing: const Icon(Icons.navigate_next),
+                onTap: () {
+                  showInputNumberDialog(
+                    InputDialogParams(
+                      title: '几秒内礼物不重复朗读',
+                      initialValue: configMap['dynamic']['filter']['gift']
+                          ['deduplicateTime'],
+                      inputType: InputType.intInputType,
+                      onSaved: (value) async {
+                        setState(() {
+                          configMap['dynamic']['filter']['gift']
+                              ['deduplicateTime'] = value;
+                        });
+                        await updateConfigMap(configMap);
+                      },
+                    ),
+                  );
                 },
               ),
               // 免费礼物数量大于等于
-              TextFormField(
-                controller: TextEditingController(
-                    text: configMap['dynamic']['filter']['gift']
-                            ['freeGiftCountBigger']
-                        .toString()),
-                decoration: const InputDecoration(labelText: '免费礼物数量大于等于'),
-                onFieldSubmitted: (value) {
-                  setState(() {
-                    if (value.isEmpty) {
-                      configMap['dynamic']['filter']['gift']
-                          ['freeGiftCountBigger'] = 0;
-                      return;
-                    } else {
-                      configMap['dynamic']['filter']['gift']
-                          ['freeGiftCountBigger'] = int.parse(value);
-                    }
-                  });
+              ListTile(
+                leading: const Icon(Icons.numbers_outlined),
+                title: Text(
+                    '免费礼物数量大于等于 : ${configMap['dynamic']['filter']['gift']['freeGiftCountBigger']}'),
+                trailing: const Icon(Icons.navigate_next),
+                onTap: () {
+                  showInputNumberDialog(
+                    InputDialogParams(
+                      title: '免费礼物数量大于等于',
+                      initialValue: configMap['dynamic']['filter']['gift']
+                          ['freeGiftCountBigger'],
+                      inputType: InputType.doubleInputType,
+                      onSaved: (value) async {
+                        setState(() {
+                          configMap['dynamic']['filter']['gift']
+                              ['freeGiftCountBigger'] = value;
+                        });
+                        await updateConfigMap(configMap);
+                      },
+                    ),
+                  );
                 },
               ),
-              // 付费礼物金额大于等于
-              TextFormField(
-                controller: TextEditingController(
-                    text: configMap['dynamic']['filter']['gift']
-                            ['moneyGiftPriceBigger']
-                        .toString()),
-                decoration: const InputDecoration(labelText: '付费礼物金额大于等于'),
-                onFieldSubmitted: (value) {
-                  setState(() {
-                    if (value.isEmpty) {
-                      configMap['dynamic']['filter']['gift']
-                          ['moneyGiftPriceBigger'] = 0;
-                      return;
-                    } else {
-                      configMap['dynamic']['filter']['gift']
-                          ['moneyGiftPriceBigger'] = int.parse(value);
-                    }
-                  });
+              ListTile(
+                leading: const Icon(Icons.attach_money_outlined),
+                title: Text(
+                    '付费礼物金额大于等于 : ${configMap['dynamic']['filter']['gift']['moneyGiftPriceBigger']}'),
+                trailing: const Icon(Icons.navigate_next),
+                onTap: () {
+                  showInputNumberDialog(
+                    InputDialogParams(
+                      title: '付费礼物金额大于等于',
+                      initialValue: configMap['dynamic']['filter']['gift']
+                          ['moneyGiftPriceBigger'],
+                      inputType: InputType.doubleInputType,
+                      onSaved: (value) async {
+                        setState(() {
+                          configMap['dynamic']['filter']['gift']
+                              ['moneyGiftPriceBigger'] = value;
+                        });
+                        await updateConfigMap(configMap);
+                      },
+                    ),
+                  );
                 },
               ),
             ],

@@ -15,19 +15,11 @@ class AccountSettingPage extends StatefulWidget {
 }
 
 class _AccountSettingPageState extends State<AccountSettingPage> {
-  TextEditingController uidController = TextEditingController();
-  TextEditingController buvid3Controller = TextEditingController();
-  TextEditingController sessdataController = TextEditingController();
-  TextEditingController jctController = TextEditingController();
   late Map<String, dynamic> configMap;
   @override
   void initState() {
     super.initState();
     configMap = Get.arguments as Map<String, dynamic>;
-    uidController.text = configMap['kvdb']['bili']['uid'].toString();
-    buvid3Controller.text = configMap['kvdb']['bili']['Buvid3'] ?? '';
-    sessdataController.text = configMap['kvdb']['bili']['sessdata'] ?? '';
-    jctController.text = configMap['kvdb']['bili']['jct'] ?? '';
   }
 
   @override
@@ -50,57 +42,91 @@ class _AccountSettingPageState extends State<AccountSettingPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment:
-                    MainAxisAlignment.spaceBetween, // 使子元素间间距相等，两端对齐
-                children: [
-                  Expanded(
-                    // 使按钮自适应宽度并均匀分配空间
-                    child: ElevatedButton(
-                      onPressed: () {
-                        updateConfigMap(configMap);
+              ListTile(
+                leading: const Icon(Icons.person_outline),
+                title: Text('UID ${configMap['kvdb']['bili']['uid']}'),
+                trailing: const Icon(Icons.edit),
+                onTap: () {
+                  showInputNumberDialog(
+                    InputDialogParams(
+                      title: 'UID',
+                      initialValue: configMap['kvdb']['bili']['uid'],
+                      inputType: InputType.intInputType,
+                      isObscured: false,
+                      onSaved: (value) async {
+                        setState(() {
+                          configMap['kvdb']['bili']['uid'] = value;
+                        });
+                        await updateConfigMap(configMap);
                       },
-                      child: const Text('保存'),
                     ),
-                  ),
-                ],
-              ),
-              TextFormField(
-                controller: uidController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: 'UID'),
-                onFieldSubmitted: (value) {
-                  setState(() {
-                    configMap['kvdb']['bili']['uid'] = int.parse(value);
-                  });
+                  );
                 },
               ),
-              // 使用自定义的ObscureTextField
-              ObscureTextField(
-                controller: buvid3Controller,
-                labelText: 'Buvid3',
-                onFieldSubmitted: (value) {
-                  setState(() {
-                    configMap['kvdb']['bili']['buvid3'] = value;
-                  });
+              ListTile(
+                leading: const Icon(Icons.lock_outline),
+                title: Text(
+                    'Buvid3 : ${configMap['kvdb']['bili']['buvid3'].isNotEmpty ? '****' : '未输入'}'),
+                trailing: const Icon(Icons.edit),
+                onTap: () {
+                  showInputNumberDialog(
+                    InputDialogParams(
+                      title: 'Buvid3',
+                      initialValue: configMap['kvdb']['bili']['buvid3'],
+                      inputType: InputType.stringInputType,
+                      isObscured: true,
+                      onSaved: (value) async {
+                        setState(() {
+                          configMap['kvdb']['bili']['buvid3'] = value;
+                        });
+                        await updateConfigMap(configMap);
+                      },
+                    ),
+                  );
                 },
               ),
-              ObscureTextField(
-                controller: sessdataController,
-                labelText: 'Sessdata',
-                onFieldSubmitted: (value) {
-                  setState(() {
-                    configMap['kvdb']['bili']['sessdata'] = value;
-                  });
+              ListTile(
+                leading: const Icon(Icons.lock_outline),
+                title: Text(
+                    'Sessdata : ${configMap['kvdb']['bili']['sessdata'].isNotEmpty ? '****' : '未输入'}'),
+                trailing: const Icon(Icons.edit),
+                onTap: () {
+                  showInputNumberDialog(
+                    InputDialogParams(
+                      title: 'Sessdata',
+                      initialValue: configMap['kvdb']['bili']['sessdata'],
+                      inputType: InputType.stringInputType,
+                      isObscured: true,
+                      onSaved: (value) async {
+                        setState(() {
+                          configMap['kvdb']['bili']['sessdata'] = value;
+                          });
+                        await updateConfigMap(configMap);
+                      },
+                    ),
+                  );
                 },
               ),
-              ObscureTextField(
-                controller: jctController,
-                labelText: 'JCT',
-                onFieldSubmitted: (value) {
-                  setState(() {
-                    configMap['kvdb']['bili']['jct'] = value;
-                  });
+              ListTile(
+                leading: const Icon(Icons.lock_outline),
+                title: Text(
+                    'JCT : ${configMap['kvdb']['bili']['jct'].isNotEmpty ? '****' : '未输入'}'),
+                trailing: const Icon(Icons.edit),
+                onTap: () {
+                  showInputNumberDialog(
+                    InputDialogParams(
+                      title: 'JCT',
+                      initialValue: configMap['kvdb']['bili']['jct'],
+                      inputType: InputType.stringInputType,
+                      isObscured: true,
+                      onSaved: (value)  async{
+                        setState(() {
+                          configMap['kvdb']['bili']['jct'] = value;
+                          });
+                        await updateConfigMap(configMap);
+                      },
+                    ),
+                  );
                 },
               ),
             ],

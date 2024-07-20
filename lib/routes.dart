@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
 import 'pages/ConfigPage/index.dart';
+import '/widgets/obscure_text_field.dart' show InputType;
+import '/widgets/white_list_editor_page.dart';
 
 List<GetPage<dynamic>> get appRoutes => [
       GetPage(
@@ -41,5 +43,16 @@ List<GetPage<dynamic>> get appRoutes => [
       GetPage(
         name: '/warningFilterSettings',
         page: () => const WarningFilterSettingPage(configMap: {}),
+      ),
+      GetPage(
+        name: '/filterListEditor',
+        page: () => EditableListPage(
+          params: EditableListParams(
+            title: '',
+            inputType : InputType.stringInputType,
+            initialValue: [],
+            onSaved: (value) {}, 
+          ),
+        ),
       ),
     ];

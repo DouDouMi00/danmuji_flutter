@@ -5,6 +5,7 @@ import 'dart:io' show Platform;
 import 'package:get/get.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import '/services/config.dart';
+import '/widgets/obscure_text_field.dart';
 
 class TtsEnginesSettingPage extends StatefulWidget {
   final Map<String, dynamic> configMap;
@@ -37,50 +38,58 @@ class _TtsEnginesSettingPageState extends State<TtsEnginesSettingPage> {
     }
   }
 
-  List<DropdownMenuItem<String>> getEnginesDropDownMenuItems(
-      List<dynamic> engines) {
-    var items = <DropdownMenuItem<String>>[];
-    for (dynamic type in engines) {
-      items.add(DropdownMenuItem(
-          value: type as String?, child: Text((type as String))));
+  // 添加一个方法来重置滑块到默认值
+  void resetSlidersToDefaults() async {
+    // 更新configMap
+    if (isAndroid) {
+      await _getresetEngineVoice();
     }
-    return items;
-  }
-
-  List<DropdownMenuItem<String>> getLanguageDropDownMenuItems(
-      List<dynamic> languages) {
-    var items = <DropdownMenuItem<String>>[];
-    for (dynamic type in languages) {
-      items.add(DropdownMenuItem(
-          value: type as String?, child: Text((type as String))));
-    }
-    return items;
-  }
-
-  void changedEnginesDropDownItem(String? selectedEngine) async {
-    await flutterTts.setEngine(selectedEngine!);
-    language = null;
     setState(() {
-      engine = selectedEngine;
-      configMap["dynamic"]['tts']['engine'] = engine;
-    });
-  }
-
-  void changedLanguageDropDownItem(String? selectedType) {
-    setState(() {
-      language = selectedType;
+      volume = 1.0; // 假设这是volume的默认值
+      pitch = 1.0; // 假设这是pitch的默认值
+      rate = 1.0; // 假设这是rate的默认值
+      configMap['dynamic']['tts']['engine'] = engine;
       configMap["dynamic"]['tts']['language'] = language;
-      flutterTts.setLanguage(language!);
-      if (isAndroid) {
-        flutterTts
-            .isLanguageInstalled(language!)
-            .then((value) => isCurrentLanguageInstalled = (value as bool));
-      }
+      configMap["dynamic"]['tts']['volume'] = volume;
+      configMap["dynamic"]['tts']['pitch'] = pitch;
+      configMap["dynamic"]['tts']['rate'] = rate;
     });
+    await updateConfigMap(configMap);
+  }
+
+  Future _getresetEngineVoice() async {
+    engine = await flutterTts.getDefaultEngine;
+    Map? voice = await flutterTts.getDefaultVoice;
+    if (voice != null) {
+      language = voice["locale"];
+    }
+  }
+
+  List<Map<String, dynamic>> getEnginesDropDownMenuItems(
+      List<dynamic> engines) {
+    var items = <Map<String, dynamic>>[];
+    for (dynamic type in engines) {
+      if (type is String) {
+        items.add({"title": type, "value": type});
+      }
+    }
+    return items;
+  }
+
+  List<Map<String, dynamic>> getLanguageDropDownMenuItems(
+      List<dynamic> languages) {
+    var items = <Map<String, dynamic>>[];
+    for (dynamic type in languages) {
+      if (type is String) {
+        items.add({"title": type, "value": type});
+      }
+    }
+    return items;
   }
 
   Future<dynamic> _getLanguages() async => await flutterTts.getLanguages;
   Future<dynamic> _getEngines() async => await flutterTts.getEngines;
+
   Future<String?> _getDefaultEngine(configMap) async {
     if (configMap['dynamic']['tts']['engine'] != "") {
       engine = configMap['dynamic']['tts']['engine'];
@@ -102,37 +111,51 @@ class _TtsEnginesSettingPageState extends State<TtsEnginesSettingPage> {
     return language;
   }
 
-  Widget _enginesDropDownSection(List<dynamic> engines) =>
-      Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-        DropdownButton(
-          value: engine,
-          items: getEnginesDropDownMenuItems(engines),
-          onChanged: changedEnginesDropDownItem,
-        ),
-      ]);
+  Widget _enginesDropDownSection(List<dynamic> engines) => ListTile(
+        leading: const Icon(Icons.anchor_outlined),
+        title: Text('TTS 引擎: ${configMap['dynamic']['tts']['engine']}'),
+        trailing: const Icon(Icons.navigate_next),
+        onTap: () {
+          showRadioDialog(
+            RadioDialogParams(
+              title: 'TTS 引擎',
+              initialValue: engine,
+              valueOptions: getEnginesDropDownMenuItems(engines),
+              onSaved: (value) async {
+                setState(() {
+                  configMap['dynamic']['tts']['engine'] = value;
+                });
+                await updateConfigMap(configMap);
+              },
+            ),
+          );
+        },
+      );
+
   Widget _languageDropDownSection(List<dynamic> languages) =>
-      Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-        DropdownButton(
-          value: language,
-          items: getLanguageDropDownMenuItems(languages),
-          onChanged: changedLanguageDropDownItem,
-        ),
-        Visibility(
-          visible: isAndroid,
-          child: Text("Is installed: $isCurrentLanguageInstalled"),
+      Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        ListTile(
+          leading: const Icon(Icons.anchor_outlined),
+          title: Text('TTS 语言: ${configMap['dynamic']['tts']['language']}'),
+          trailing: const Icon(Icons.navigate_next),
+          onTap: () {
+            showRadioDialog(
+              RadioDialogParams(
+                title: 'TTS 语言',
+                initialValue: language,
+                valueOptions: getLanguageDropDownMenuItems(languages),
+                onSaved: (value) async {
+                  setState(() {
+                    configMap['dynamic']['tts']['language'] = value;
+                  });
+                  await updateConfigMap(configMap);
+                },
+              ),
+            );
+          },
         ),
       ]);
-  Widget _futureBuilder() => FutureBuilder<dynamic>(
-      future: _getLanguages(),
-      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-        if (snapshot.hasData) {
-          return _languageDropDownSection(snapshot.data as List<dynamic>);
-        } else if (snapshot.hasError) {
-          return const Text('Error loading languages...');
-        } else {
-          return const Text('Loading Languages...');
-        }
-      });
+
   Widget _engineSection() {
     if (isAndroid) {
       return FutureBuilder<dynamic>(
@@ -151,63 +174,113 @@ class _TtsEnginesSettingPageState extends State<TtsEnginesSettingPage> {
     }
   }
 
+  Widget _futureBuilder() => FutureBuilder<dynamic>(
+      future: _getLanguages(),
+      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+        if (snapshot.hasData) {
+          return _languageDropDownSection(snapshot.data as List<dynamic>);
+        } else if (snapshot.hasError) {
+          return const Text('Error loading languages...');
+        } else {
+          return const Text('Loading Languages...');
+        }
+      });
+
   Widget _buildSliders() {
     return Column(
-      children: [_volume(), _pitch(), _rate()],
+      children: [
+        _volume(),
+        _pitch(),
+        _rate(),
+      ],
     );
   }
 
   Widget _volume() {
     volume = configMap["dynamic"]['tts']['volume'];
-    return Slider(
-        value: volume,
-        onChanged: (newVolume) {
-          setState(() {
-            volume = newVolume;
-            configMap["dynamic"]['tts']['volume'] = volume;
-          });
-        },
-        min: 0.0,
-        max: 1.0,
-        divisions: 10,
-        label: "Volume: $volume");
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Text('音量调节'),
+        Slider(
+          value: volume,
+          onChanged: (newVolume) async {
+            setState(() {
+              volume = newVolume;
+              configMap["dynamic"]['tts']['volume'] = volume;
+            });
+            await updateConfigMap(configMap);
+          },
+          min: 0.0,
+          max: 1.0,
+          divisions: 10,
+          label: '音量: ${volume.toStringAsFixed(1)}',
+        ),
+      ],
+    );
   }
 
   Widget _pitch() {
     pitch = configMap["dynamic"]['tts']['pitch'];
-    return Slider(
-      value: pitch,
-      onChanged: (newPitch) {
-        setState(() {
-          pitch = newPitch;
-          configMap["dynamic"]['tts']['pitch'] = pitch;
-        });
-      },
-      min: 0.5,
-      max: 2.0,
-      divisions: 15,
-      label: "Pitch: $pitch",
-      activeColor: Colors.red,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Text('音调调节'),
+        Slider(
+          value: pitch,
+          onChanged: (newPitch) async {
+            setState(() {
+              pitch = newPitch;
+              configMap["dynamic"]['tts']['pitch'] = pitch;
+            });
+            await updateConfigMap(configMap);
+          },
+          min: 0.5,
+          max: 2.0,
+          divisions: 15,
+          label: '音调: ${pitch.toStringAsFixed(1)}',
+          activeColor: Colors.red,
+        ),
+      ],
     );
   }
 
   Widget _rate() {
     rate = configMap["dynamic"]['tts']['rate'];
-    return Slider(
-      value: rate,
-      onChanged: (newRate) {
-        setState(() {
-          rate = newRate;
-          configMap["dynamic"]['tts']['rate'] = rate;
-        });
-      },
-      min: 0.0,
-      max: 5.0,
-      divisions: 25,
-      label: "Rate: $rate",
-      activeColor: Colors.green,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Text('语速调节'),
+        Slider(
+          value: rate,
+          onChanged: (newRate) async {
+            setState(() {
+              rate = newRate;
+              configMap["dynamic"]['tts']['rate'] = rate;
+            });
+            await updateConfigMap(configMap);
+          },
+          min: 0.0,
+          max: 5.0,
+          divisions: 25,
+          label: '语速: ${rate.toStringAsFixed(1)}',
+          activeColor: Colors.green,
+        ),
+      ],
     );
   }
+
+  Widget _buildResetButtons() => Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween, // 使子元素间间距相等，两端对齐
+        children: [
+          Expanded(
+            child: ElevatedButton(
+              onPressed: resetSlidersToDefaults,
+              child: const Text('重置'),
+            ),
+          ),
+        ],
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -229,24 +302,10 @@ class _TtsEnginesSettingPageState extends State<TtsEnginesSettingPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment:
-                    MainAxisAlignment.spaceBetween, // 使子元素间间距相等，两端对齐
-                children: [
-                  Expanded(
-                    // 使按钮自适应宽度并均匀分配空间
-                    child: ElevatedButton(
-                      onPressed: () {
-                        updateConfigMap(configMap);
-                      },
-                      child: const Text('保存'),
-                    ),
-                  ),
-                ],
-              ),
               _engineSection(),
               _futureBuilder(),
               _buildSliders(),
+              _buildResetButtons(),
             ],
           ),
         ),

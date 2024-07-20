@@ -42,28 +42,14 @@ class _WarningFilterSettingPageState extends State<WarningFilterSettingPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment:
-                    MainAxisAlignment.spaceBetween, // 使子元素间间距相等，两端对齐
-                children: [
-                  Expanded(
-                    // 使按钮自适应宽度并均匀分配空间
-                    child: ElevatedButton(
-                      onPressed: () {
-                        updateConfigMap(configMap);
-                      },
-                      child: const Text('保存'),
-                    ),
-                  ),
-                ],
-              ),
               SwitchListTile(
                 title: const Text('启用超管警告朗读'),
                 value: configMap['dynamic']['filter']['warning']['enable'],
-                onChanged: (value) {
+                onChanged: (value) async {
                   setState(() {
                     configMap['dynamic']['filter']['warning']['enable'] = value;
                   });
+                  await updateConfigMap(configMap);
                 },
               ),
             ],
