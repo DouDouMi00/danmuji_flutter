@@ -1,14 +1,74 @@
-//services/config.dart
+// services/config.dart
 import 'dart:convert';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'dart:io';
-import 'package:path_provider/path_provider.dart';
-import '/services/logger.dart';
-import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-Map<String, dynamic> _configMap = {};
-String _configPath = '';
+// 定义配置的键名
+const String _configKey = 'app_config';
+late SharedPreferences prefs;
+late Map<String, dynamic> config;
+
+// 定义配置的默认值
+final Map<String, dynamic> _defaultConfig = {
+  "kvdb": {
+    "bili": {"uid": 0, "buvid3": "", "sessdata": "", "jct": ""},
+    "isFirstTimeToLogin": true
+  },
+  "engine": {
+    "bili": {"liveID": 21654925}
+  },
+  "dynamic": {
+    "tts": {
+      "engine": "",
+      "language": "",
+      "volume": 1.0,
+      "rate": 2.0,
+      "pitch": 1.0,
+      "history": {
+        "engine": "",
+        "language": "",
+        "volume": 1.0,
+        "rate": 2.0,
+        "pitch": 1.0
+      }
+    },
+    "filter": {
+      "danmu": {
+        "enable": true,
+        "symbolEnable": true,
+        "emojiEnable": true,
+        "deduplicate": false,
+        "readfansMedalName": false,
+        "readfansMedalGuardLevel": true,
+        "isFansMedalBelongToLive": false,
+        "fansMedalGuardLevelBigger": 0,
+        "fansMedalLevelBigger": 0,
+        "lengthShorter": 0,
+        "blacklistKeywords": [],
+        "blacklistUsers": [],
+        "whitelistUsers": [],
+        "whitelistKeywords": []
+      },
+      "gift": {
+        "enable": true,
+        "freeGiftEnable": true,
+        "deduplicateTime": 10,
+        "freeGiftCountBigger": 0,
+        "moneyGiftPriceBigger": 0
+      },
+      "guardBuy": {"enable": true},
+      "like": {"enable": true, "deduplicate": true},
+      "welcome": {
+        "enable": true,
+        "isFansMedalBelongToLive": false,
+        "fansMedalGuardLevelBigger": 0,
+        "fansMedalLevelBigger": 0
+      },
+      "subscribe": {"enable": true},
+      "superChat": {"enable": true},
+      "warning": {"enable": true}
+    }
+  }
+};
 
 // 合并配置
 void mergeConfigRecursively(
@@ -22,54 +82,29 @@ void mergeConfigRecursively(
   });
 }
 
-// 获取应用程序文档目录
+// 初始化配置
 Future<void> initConfig() async {
-  final directory = await getApplicationDocumentsDirectory();
-  _configPath = '${directory.path}/config.json';
-  // 读取现有的配置文件
-  if (await File(_configPath).exists()) {
-    final jsonString = await File(_configPath).readAsString();
-    _configMap = jsonDecode(jsonString);
-  } else {
-    _configMap = {};
-  }
-  // 从资源加载模板配置文件
-  final fileContent =
-      await rootBundle.loadString('assets/config.template.json');
-  final templateConfig = jsonDecode(fileContent);
-  mergeConfigRecursively(templateConfig, _configMap);
-  File(_configPath).writeAsStringSync(jsonEncode(_configMap));
-}
-
-Future<void> updateConfigMap(Map<String, dynamic> config) async {
-  try {
-    // 遍历新配置并合并到老配置中
-    config.forEach((key, value) {
-      _configMap[key] = value;
-    });
-    // 异步写入更新后的配置
-    await File(_configPath).writeAsString(jsonEncode(_configMap));
-    // 显示保存成功的对话框
-    Get.dialog(
-      AlertDialog(
-        title: const Text('提示'),
-        content: const Text('保存成功！'),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
-    logger.info('Config updated successfully');
-  } catch (e) {
-    logger.info('Error updating config: $e');
-    // 可以在这里添加更详细的错误处理逻辑
+  prefs = await SharedPreferences.getInstance();
+  final jsonString = prefs.getString(_configKey);
+  if (jsonString != null) {
+    config = jsonDecode(jsonString);
+    // 合并默认配置和已存在的配置
+    mergeConfigRecursively(_defaultConfig, config);
+    await prefs.setString(_configKey, jsonEncode(config));
+  } else if (jsonString == null) {
+    config = _defaultConfig;
+    await prefs.setString(_configKey, jsonEncode(_defaultConfig));
   }
 }
 
-// 提供访问_configMap的方法，确保在调用前已经初始化了_configMap
+// 更新配置
+Future<void> updateConfigMap(Map<String, dynamic> newConfig) async {
+  // 将配置转换为JSON字符串并保存
+  config = newConfig;
+  await prefs.setString(_configKey, jsonEncode(config));
+}
+
+// 获取配置
 Map<String, dynamic> getConfigMap() {
-  return _configMap;
+  return _defaultConfig;
 }
