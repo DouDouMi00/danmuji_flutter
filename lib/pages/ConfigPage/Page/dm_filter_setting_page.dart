@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '/services/config.dart';
 import '/widgets/obscure_text_field.dart';
-import '/widgets/white_list_editor_page.dart';
+import '/pages/white_list_editor_page.dart';
 
 class DmFilterSettingPage extends StatefulWidget {
   final Map<String, dynamic> configMap;

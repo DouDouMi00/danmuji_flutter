@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 import 'pages/ConfigPage/index.dart';
 import '/widgets/obscure_text_field.dart' show InputType;
-import '/widgets/white_list_editor_page.dart';
+import '/pages/white_list_editor_page.dart';
 
 List<GetPage<dynamic>> get appRoutes => [
       GetPage(
