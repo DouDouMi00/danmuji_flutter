@@ -23,11 +23,10 @@ class EditableListPage extends StatefulWidget {
   const EditableListPage({super.key, required this.params});
 
   @override
-  // ignore: library_private_types_in_public_api
-  _EditableListPageState createState() => _EditableListPageState();
+  EditableListPageState createState() => EditableListPageState();
 }
 
-class _EditableListPageState extends State<EditableListPage> {
+class EditableListPageState extends State<EditableListPage> {
   late List<dynamic> listData; // 初始化数据
   late Function(List<dynamic>) onSaved;
   late String title;

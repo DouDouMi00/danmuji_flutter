@@ -67,7 +67,7 @@ class MessageHandler {
 
     if (command['info'][3].length != 0) {
       isFansMedalBelongToLive =
-          command['info'][3][3] == getConfigMap()['engine']['bili']['liveID'];
+          command['info'][3][3] == getConfigMap().engine.engineBili.liveId;
       fansMedalLevel = command['info'][3][0];
       fansMedalName = command['info'][3][1];
       fansMedalGuardLevel = guardLevelMap[command['info'][3][10]];
@@ -205,8 +205,7 @@ class MessageHandler {
 
   void _handleInteractWord(command) {
     // 处理互动词逻辑
-    if (command['data']['roomid'] !=
-        getConfigMap()['engine']['bili']['liveID']) {
+    if (command['data']['roomid'] != getConfigMap().engine.engineBili.liveId) {
       return;
     }
     var uid = command['data']['uid'];
@@ -218,7 +217,7 @@ class MessageHandler {
 
     if (fansMedalData != null) {
       isFansMedalBelongToLive = fansMedalData['anchor_roomid'] ==
-          getConfigMap()['engine']['bili']['liveID'];
+          getConfigMap().engine.engineBili.liveId;
       fansMedalLevel = fansMedalData['medal_level'];
       fansMedalGuardLevel = guardLevelMap[fansMedalData['guard_level']];
     }

@@ -24,19 +24,18 @@ void stopTtsTask() async {
 }
 
 String messagesToText(Map<String, dynamic> msg) {
-  final filterConfig = getConfigMap()['dynamic']['filter'];
+  final filterConfig = getConfigMap().dynamicConfig.filter.danmu;
   if (msg['type'] == 'danmu') {
-    String liveRoomGuardLeveltxt = filterConfig['danmu']
-                ['readfansMedalGuardLevel'] &&
-            msg['liveRoomGuardLevel'] != 0
-        ? '头衔${msg['liveRoomGuardLevelName']}'
-        : '';
+    String liveRoomGuardLeveltxt =
+        filterConfig.readfansMedalGuardLevel && msg['liveRoomGuardLevel'] != 0
+            ? '头衔${msg['liveRoomGuardLevelName']}'
+            : '';
     String fansMedalNametxt =
-        filterConfig['danmu']['readfansMedalName'] && msg['fansMedalName'] != 0
+        filterConfig.readfansMedalName && msg['fansMedalName'] != 0
             ? '勋章${msg['fansMedalName']}'
             : '';
     String fansMedalLeveltxt =
-        filterConfig['danmu']['readfansMedalName'] && msg['fansMedalLevel'] != 0
+        filterConfig.readfansMedalName && msg['fansMedalLevel'] != 0
             ? '${msg['fansMedalLevel']}级'
             : '';
     return '$liveRoomGuardLeveltxt $fansMedalNametxt $fansMedalLeveltxt ${msg['uname']}说${msg['msg']}';
@@ -73,13 +72,13 @@ Future<void> tts(String text, [channel = 0, config]) async {
 Future<void> init() async {
   _shouldExitTtsTask = true;
   flutterTts = FlutterTts();
-  final ttsConfig = getConfigMap()["dynamic"]["tts"];
+  final ttsConfig = getConfigMap().dynamicConfig.tts;
   // 设置引擎和语言 音量 语速 音高
-  flutterTts.setEngine(ttsConfig["engine"]);
-  flutterTts.setLanguage(ttsConfig["language"]);
-  flutterTts.setVolume(ttsConfig["volume"]);
-  flutterTts.setSpeechRate(ttsConfig["rate"]);
-  flutterTts.setPitch(ttsConfig["pitch"]);
+  flutterTts.setEngine(ttsConfig.engine);
+  flutterTts.setLanguage(ttsConfig.language);
+  flutterTts.setVolume(ttsConfig.volume);
+  flutterTts.setSpeechRate(ttsConfig.rate);
+  flutterTts.setPitch(ttsConfig.pitch);
   _setAwaitOptions();
   flutterTts.setCompletionHandler(() {
     ttsState = TtsState.stopped;
@@ -150,7 +149,6 @@ Future<void> readHistoryByType(List<String> types,
   List<dynamic> messages = getHaveReadMessages();
   bool found = false;
 
-  // Determine the iteration direction
   int step = revert ? 1 : -1;
   int start = revert ? 0 : readHistoryIndex;
   int end = revert ? messages.length : -1;
@@ -166,23 +164,22 @@ Future<void> readHistoryByType(List<String> types,
     if (found) break;
   }
 
-  // Handle boundary conditions and provide feedback
   if ((!revert && readHistoryIndex == -1) ||
       (revert && readHistoryIndex == messages.length) ||
       !found) {
     readHistoryIndex = revert ? 0 : messages.length - 1;
     String msg = revert ? "已到达第一条,继续翻页将从最后一条开始" : "已到达最后一条,继续翻页将从第一条开始";
     await tts(messagesToText({"type": "system", "msg": msg}), 1,
-        getConfigMap()["dynamic"]["tts"]["history"]);
+        getConfigMap().dynamicConfig.tts.history);
     return;
   }
 
   await tts(messagesToText(messages[readHistoryIndex]), 1,
-      getConfigMap()["dynamic"]["tts"]["history"]);
+      getConfigMap().dynamicConfig.tts.history);
 }
 
 Future<void> resetHistoryIndex() async {
   readHistoryIndex = getHaveReadMessages().length;
   await tts(messagesToText({"type": "system", "msg": "焦点已回到最新"}), 1,
-      getConfigMap()['dynamic']['tts']['history']);
+      getConfigMap().dynamicConfig.tts.history);
 }

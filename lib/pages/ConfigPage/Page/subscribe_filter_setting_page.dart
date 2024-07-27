@@ -4,23 +4,22 @@ import 'package:get/get.dart';
 import '/services/config.dart';
 
 class SubscribeFilterSettingPage extends StatefulWidget {
-  final Map<String, dynamic> configMap;
+  final DefaultConfig configMap;
 
   const SubscribeFilterSettingPage({super.key, required this.configMap});
 
   @override
-  // ignore: library_private_types_in_public_api
-  _SubscribeFilterSettingPageState createState() =>
-      _SubscribeFilterSettingPageState();
+  SubscribeFilterSettingPageState createState() =>
+      SubscribeFilterSettingPageState();
 }
 
-class _SubscribeFilterSettingPageState
+class SubscribeFilterSettingPageState
     extends State<SubscribeFilterSettingPage> {
-  late Map<String, dynamic> configMap;
+  late DefaultConfig configMap;
   @override
   void initState() {
     super.initState();
-    configMap = Get.arguments as Map<String, dynamic>;
+    configMap = Get.arguments as DefaultConfig;
   }
 
   @override
@@ -44,12 +43,11 @@ class _SubscribeFilterSettingPageState
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SwitchListTile(
-                title: const Text('启用关注朗读'),
-                value: configMap['dynamic']['filter']['subscribe']['enable'],
+                title: const Text('关注朗读'),
+                value: configMap.dynamicConfig.filter.subscribe.enable,
                 onChanged: (value) async {
                   setState(() {
-                    configMap['dynamic']['filter']['subscribe']['enable'] =
-                        value;
+                    configMap.dynamicConfig.filter.subscribe.enable = value;
                   });
                   await updateConfigMap(configMap);
                 },

@@ -7,20 +7,19 @@ import '/widgets/obscure_text_field.dart';
 class ConfigEditPage extends StatefulWidget {
   const ConfigEditPage({super.key});
   @override
-  // ignore: library_private_types_in_public_api
-  _ConfigEditPageState createState() => _ConfigEditPageState();
+  ConfigEditPageState createState() => ConfigEditPageState();
 }
 
-class _ConfigEditPageState extends State<ConfigEditPage> {
-  late Future<Map<String, dynamic>> _configFuture;
-  late Map<String, dynamic> configMap;
+class ConfigEditPageState extends State<ConfigEditPage> {
+  late Future<DefaultConfig> _configFuture;
+  late DefaultConfig configMap;
   @override
   void initState() {
     super.initState();
     _configFuture = loadConfig();
   }
 
-  Future<Map<String, dynamic>> loadConfig() async {
+  Future<DefaultConfig> loadConfig() async {
     return getConfigMap();
   }
 
@@ -30,7 +29,7 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
       appBar: AppBar(title: const Text('设置')),
       body: Padding(
         padding: const EdgeInsets.all(32.0),
-        child: FutureBuilder<Map<String, dynamic>>(
+        child: FutureBuilder<DefaultConfig>(
           future: _configFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -40,7 +39,7 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
             } else if (snapshot.hasError) {
               return Text('Error: ${snapshot.error}');
             } else {
-              configMap = snapshot.data as Map<String, dynamic>;
+              configMap = snapshot.data as DefaultConfig;
               return SingleChildScrollView(
                 scrollDirection: Axis.vertical,
                 child: _buildConfig(configMap),
@@ -52,24 +51,24 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
     );
   }
 
-  Widget _buildConfig(Map<String, dynamic> configMap) {
+  Widget _buildConfig(DefaultConfig configMap) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ListTile(
           leading: const Icon(Icons.live_tv_outlined),
-          title: Text('直播间ID: ${configMap['engine']['bili']['liveID']}'),
+          title: Text('直播间ID: ${configMap.engine.engineBili.liveId}'),
           trailing: const Icon(Icons.navigate_next),
           onTap: () {
             showInputNumberDialog(
               InputDialogParams(
                 title: '直播间ID',
-                initialValue: configMap['engine']['bili']['liveID'],
+                initialValue: configMap.engine.engineBili.liveId,
                 inputType: InputType.intInputType,
                 isObscured: false,
                 onSaved: (value) async {
                   setState(() {
-                    configMap['engine']['bili']['liveID'] = value;
+                    configMap.engine.engineBili.liveId = value;
                   });
                   await updateConfigMap(configMap);
                 },

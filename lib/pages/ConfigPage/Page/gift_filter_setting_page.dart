@@ -5,21 +5,20 @@ import '/services/config.dart';
 import '/widgets/obscure_text_field.dart';
 
 class GiftFilterSettingPage extends StatefulWidget {
-  final Map<String, dynamic> configMap;
+  final DefaultConfig configMap;
 
   const GiftFilterSettingPage({super.key, required this.configMap});
 
   @override
-  // ignore: library_private_types_in_public_api
-  _GiftFilterSettingPageState createState() => _GiftFilterSettingPageState();
+  GiftFilterSettingPageState createState() => GiftFilterSettingPageState();
 }
 
-class _GiftFilterSettingPageState extends State<GiftFilterSettingPage> {
-  late Map<String, dynamic> configMap;
+class GiftFilterSettingPageState extends State<GiftFilterSettingPage> {
+  late DefaultConfig configMap;
   @override
   void initState() {
     super.initState();
-    configMap = Get.arguments as Map<String, dynamic>;
+    configMap = Get.arguments as DefaultConfig;
   }
 
   @override
@@ -43,22 +42,21 @@ class _GiftFilterSettingPageState extends State<GiftFilterSettingPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SwitchListTile(
-                title: const Text('启用礼物朗读'),
-                value: configMap['dynamic']['filter']['gift']['enable'],
+                title: const Text('礼物朗读'),
+                value: configMap.dynamicConfig.filter.gift.enable,
                 onChanged: (value) async {
                   setState(() {
-                    configMap['dynamic']['filter']['gift']['enable'] = value;
+                    configMap.dynamicConfig.filter.gift.enable = value;
                   });
                   await updateConfigMap(configMap);
                 },
               ),
               SwitchListTile(
-                title: const Text('启用免费礼物朗读'),
-                value: configMap['dynamic']['filter']['gift']['freeGiftEnable'],
+                title: const Text('免费礼物朗读'),
+                value: configMap.dynamicConfig.filter.gift.freeGiftEnable,
                 onChanged: (value) async {
                   setState(() {
-                    configMap['dynamic']['filter']['gift']['freeGiftEnable'] =
-                        value;
+                    configMap.dynamicConfig.filter.gift.freeGiftEnable = value;
                   });
                   await updateConfigMap(configMap);
                 },
@@ -66,19 +64,19 @@ class _GiftFilterSettingPageState extends State<GiftFilterSettingPage> {
               ListTile(
                 leading: const Icon(Icons.timer_outlined),
                 title: Text(
-                    '几秒内礼物不重复朗读 : ${configMap['dynamic']['filter']['gift']['deduplicateTime']}'),
+                    '几秒内礼物不重复朗读 : ${configMap.dynamicConfig.filter.gift.deduplicateTime}'),
                 trailing: const Icon(Icons.navigate_next),
                 onTap: () {
                   showInputNumberDialog(
                     InputDialogParams(
                       title: '几秒内礼物不重复朗读',
-                      initialValue: configMap['dynamic']['filter']['gift']
-                          ['deduplicateTime'],
+                      initialValue:
+                          configMap.dynamicConfig.filter.gift.deduplicateTime,
                       inputType: InputType.intInputType,
                       onSaved: (value) async {
                         setState(() {
-                          configMap['dynamic']['filter']['gift']
-                              ['deduplicateTime'] = value;
+                          configMap.dynamicConfig.filter.gift.deduplicateTime =
+                              value;
                         });
                         await updateConfigMap(configMap);
                       },
@@ -90,19 +88,19 @@ class _GiftFilterSettingPageState extends State<GiftFilterSettingPage> {
               ListTile(
                 leading: const Icon(Icons.numbers_outlined),
                 title: Text(
-                    '免费礼物数量大于等于 : ${configMap['dynamic']['filter']['gift']['freeGiftCountBigger']}'),
+                    '免费礼物数量大于等于 : ${configMap.dynamicConfig.filter.gift.freeGiftCountBigger}'),
                 trailing: const Icon(Icons.navigate_next),
                 onTap: () {
                   showInputNumberDialog(
                     InputDialogParams(
                       title: '免费礼物数量大于等于',
-                      initialValue: configMap['dynamic']['filter']['gift']
-                          ['freeGiftCountBigger'],
+                      initialValue: configMap
+                          .dynamicConfig.filter.gift.freeGiftCountBigger,
                       inputType: InputType.doubleInputType,
                       onSaved: (value) async {
                         setState(() {
-                          configMap['dynamic']['filter']['gift']
-                              ['freeGiftCountBigger'] = value;
+                          configMap.dynamicConfig.filter.gift
+                              .freeGiftCountBigger = value;
                         });
                         await updateConfigMap(configMap);
                       },
@@ -113,19 +111,19 @@ class _GiftFilterSettingPageState extends State<GiftFilterSettingPage> {
               ListTile(
                 leading: const Icon(Icons.attach_money_outlined),
                 title: Text(
-                    '付费礼物金额大于等于 : ${configMap['dynamic']['filter']['gift']['moneyGiftPriceBigger']}'),
+                    '付费礼物金额大于等于 : ${configMap.dynamicConfig.filter.gift.moneyGiftPriceBigger}'),
                 trailing: const Icon(Icons.navigate_next),
                 onTap: () {
                   showInputNumberDialog(
                     InputDialogParams(
                       title: '付费礼物金额大于等于',
-                      initialValue: configMap['dynamic']['filter']['gift']
-                          ['moneyGiftPriceBigger'],
+                      initialValue: configMap
+                          .dynamicConfig.filter.gift.moneyGiftPriceBigger,
                       inputType: InputType.doubleInputType,
                       onSaved: (value) async {
                         setState(() {
-                          configMap['dynamic']['filter']['gift']
-                              ['moneyGiftPriceBigger'] = value;
+                          configMap.dynamicConfig.filter.gift
+                              .moneyGiftPriceBigger = value;
                         });
                         await updateConfigMap(configMap);
                       },

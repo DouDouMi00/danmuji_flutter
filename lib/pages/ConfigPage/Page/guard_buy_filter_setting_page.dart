@@ -4,22 +4,21 @@ import 'package:get/get.dart';
 import '/services/config.dart';
 
 class GuardBuyFilterSettingPage extends StatefulWidget {
-  final Map<String, dynamic> configMap;
+  final DefaultConfig configMap;
 
   const GuardBuyFilterSettingPage({super.key, required this.configMap});
 
   @override
-  // ignore: library_private_types_in_public_api
-  _GuardBuyFilterSettingPageState createState() =>
-      _GuardBuyFilterSettingPageState();
+  GuardBuyFilterSettingPageState createState() =>
+      GuardBuyFilterSettingPageState();
 }
 
-class _GuardBuyFilterSettingPageState extends State<GuardBuyFilterSettingPage> {
-  late Map<String, dynamic> configMap;
+class GuardBuyFilterSettingPageState extends State<GuardBuyFilterSettingPage> {
+  late DefaultConfig configMap;
   @override
   void initState() {
     super.initState();
-    configMap = Get.arguments as Map<String, dynamic>;
+    configMap = Get.arguments as DefaultConfig;
   }
 
   @override
@@ -43,12 +42,11 @@ class _GuardBuyFilterSettingPageState extends State<GuardBuyFilterSettingPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SwitchListTile(
-                title: const Text('启用舰队购买过滤器'),
-                value: configMap['dynamic']['filter']['guardBuy']['enable'],
+                title: const Text('舰队购买过滤器'),
+                value: configMap.dynamicConfig.filter.guardBuy.enable,
                 onChanged: (value) async {
                   setState(() {
-                    configMap['dynamic']['filter']['guardBuy']['enable'] =
-                        value;
+                    configMap.dynamicConfig.filter.guardBuy.enable = value;
                   });
                   await updateConfigMap(configMap);
                 },

@@ -4,21 +4,20 @@ import 'package:get/get.dart';
 import '/services/config.dart';
 
 class LikeFilterSettingPage extends StatefulWidget {
-  final Map<String, dynamic> configMap;
+  final DefaultConfig configMap;
 
   const LikeFilterSettingPage({super.key, required this.configMap});
 
   @override
-  // ignore: library_private_types_in_public_api
-  _LikeFilterSettingPageState createState() => _LikeFilterSettingPageState();
+  LikeFilterSettingPageState createState() => LikeFilterSettingPageState();
 }
 
-class _LikeFilterSettingPageState extends State<LikeFilterSettingPage> {
-  late Map<String, dynamic> configMap;
+class LikeFilterSettingPageState extends State<LikeFilterSettingPage> {
+  late DefaultConfig configMap;
   @override
   void initState() {
     super.initState();
-    configMap = Get.arguments as Map<String, dynamic>;
+    configMap = Get.arguments as DefaultConfig;
   }
 
   @override
@@ -42,22 +41,21 @@ class _LikeFilterSettingPageState extends State<LikeFilterSettingPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SwitchListTile(
-                title: const Text('启用点赞过滤器'),
-                value: configMap['dynamic']['filter']['like']['enable'],
+                title: const Text('点赞过滤器'),
+                value: configMap.dynamicConfig.filter.like.enable,
                 onChanged: (value) async {
                   setState(() {
-                    configMap['dynamic']['filter']['like']['enable'] = value;
+                    configMap.dynamicConfig.filter.like.enable = value;
                   });
                   await updateConfigMap(configMap);
                 },
               ),
               SwitchListTile(
                 title: const Text('去除重复点赞'),
-                value: configMap['dynamic']['filter']['like']['deduplicate'],
+                value: configMap.dynamicConfig.filter.like.deduplicate,
                 onChanged: (value) async {
                   setState(() {
-                    configMap['dynamic']['filter']['like']['deduplicate'] =
-                        value;
+                    configMap.dynamicConfig.filter.like.deduplicate = value;
                   });
                   await updateConfigMap(configMap);
                 },

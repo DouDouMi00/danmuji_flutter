@@ -84,7 +84,7 @@ class DanmakuReceiver {
   WebSocketChannel? ws;
   int? _anchorUid;
   int? get anchorUid => _anchorUid;
-  int roomId = getConfigMap()['engine']['bili']['liveID'];
+  int roomId = getConfigMap().engine.engineBili.liveId;
 
   DanmakuReceiver() {
     final headers = <String, String>{

@@ -5,22 +5,21 @@ import '/services/config.dart';
 import '/widgets/obscure_text_field.dart';
 
 class WelcomeFilterSettingPage extends StatefulWidget {
-  final Map<String, dynamic> configMap;
+  final DefaultConfig configMap;
 
   const WelcomeFilterSettingPage({super.key, required this.configMap});
 
   @override
-  // ignore: library_private_types_in_public_api
-  _WelcomeFilterSettingPageState createState() =>
-      _WelcomeFilterSettingPageState();
+  WelcomeFilterSettingPageState createState() =>
+      WelcomeFilterSettingPageState();
 }
 
-class _WelcomeFilterSettingPageState extends State<WelcomeFilterSettingPage> {
-  late Map<String, dynamic> configMap;
+class WelcomeFilterSettingPageState extends State<WelcomeFilterSettingPage> {
+  late DefaultConfig configMap;
   @override
   void initState() {
     super.initState();
-    configMap = Get.arguments as Map<String, dynamic>;
+    configMap = Get.arguments as DefaultConfig;
   }
 
   @override
@@ -50,11 +49,11 @@ class _WelcomeFilterSettingPageState extends State<WelcomeFilterSettingPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SwitchListTile(
-                title: const Text('启用进入直播间朗读'),
-                value: configMap['dynamic']['filter']['welcome']['enable'],
+                title: const Text('进入直播间朗读'),
+                value: configMap.dynamicConfig.filter.welcome.enable,
                 onChanged: (value) async {
                   setState(() {
-                    configMap['dynamic']['filter']['welcome']['enable'] = value;
+                    configMap.dynamicConfig.filter.welcome.enable = value;
                   });
                   await updateConfigMap(configMap);
                 },
@@ -62,12 +61,12 @@ class _WelcomeFilterSettingPageState extends State<WelcomeFilterSettingPage> {
               // 粉丝牌必须为本直播间
               SwitchListTile(
                 title: const Text('粉丝牌必须为本直播间'),
-                value: configMap['dynamic']['filter']['welcome']
-                    ['isFansMedalBelongToLive'],
+                value: configMap
+                    .dynamicConfig.filter.welcome.isFansMedalBelongToLive,
                 onChanged: (value) async {
                   setState(() {
-                    configMap['dynamic']['filter']['welcome']
-                        ['isFansMedalBelongToLive'] = value;
+                    configMap.dynamicConfig.filter.welcome
+                        .isFansMedalBelongToLive = value;
                   });
                   await updateConfigMap(configMap);
                 },
@@ -76,19 +75,19 @@ class _WelcomeFilterSettingPageState extends State<WelcomeFilterSettingPage> {
               ListTile(
                 leading: const Icon(Icons.anchor_outlined),
                 title: Text(
-                    '大航海大于等于: ${guardLevelOptions[configMap['dynamic']['filter']["welcome"]['fansMedalGuardLevelBigger']]['title']}'),
+                    '大航海大于等于: ${guardLevelOptions[configMap.dynamicConfig.filter.welcome.fansMedalGuardLevelBigger]['title']}'),
                 trailing: const Icon(Icons.navigate_next),
                 onTap: () {
                   showRadioDialog(
                     RadioDialogParams(
                       title: '大航海大于等于',
-                      initialValue: configMap['dynamic']['filter']["welcome"]
-                          ['fansMedalGuardLevelBigger'],
+                      initialValue: configMap.dynamicConfig.filter.welcome
+                          .fansMedalGuardLevelBigger,
                       valueOptions: guardLevelOptions,
                       onSaved: (newValue) async {
                         setState(() {
-                          configMap['dynamic']['filter']["welcome"]
-                              ['fansMedalGuardLevelBigger'] = newValue;
+                          configMap.dynamicConfig.filter.welcome
+                              .fansMedalGuardLevelBigger = newValue;
                         });
                         await updateConfigMap(configMap);
                       },
@@ -100,14 +99,14 @@ class _WelcomeFilterSettingPageState extends State<WelcomeFilterSettingPage> {
               ListTile(
                 leading: const Icon(Icons.badge_outlined),
                 title: Text(
-                    '粉丝勋章等级大于等于: ${configMap['dynamic']['filter']["danmu"]['fansMedalLevelBigger']}'),
+                    '粉丝勋章等级大于等于: ${configMap.dynamicConfig.filter.welcome.fansMedalLevelBigger}'),
                 trailing: const Icon(Icons.navigate_next),
                 onTap: () {
                   showInputNumberDialog(
                     InputDialogParams(
                       title: '粉丝勋章等级',
-                      initialValue: configMap['dynamic']['filter']["danmu"]
-                              ['fansMedalLevelBigger']
+                      initialValue: configMap
+                          .dynamicConfig.filter.welcome.fansMedalLevelBigger
                           .toString(),
                       inputType: InputType.intInputType,
                       isObscured: false,
@@ -115,8 +114,8 @@ class _WelcomeFilterSettingPageState extends State<WelcomeFilterSettingPage> {
                       maxValue: 40,
                       onSaved: (value) async {
                         setState(() {
-                          configMap['dynamic']['filter']["danmu"]
-                              ['fansMedalLevelBigger'] = value;
+                          configMap.dynamicConfig.filter.welcome
+                              .fansMedalLevelBigger = value;
                         });
                         await updateConfigMap(configMap);
                       },

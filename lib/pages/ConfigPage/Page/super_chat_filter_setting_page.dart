@@ -4,23 +4,22 @@ import 'package:get/get.dart';
 import '/services/config.dart';
 
 class SuperChatFilterSettingPage extends StatefulWidget {
-  final Map<String, dynamic> configMap;
+  final DefaultConfig configMap;
 
   const SuperChatFilterSettingPage({super.key, required this.configMap});
 
   @override
-  // ignore: library_private_types_in_public_api
-  _SuperChatFilterSettingPageState createState() =>
-      _SuperChatFilterSettingPageState();
+  SuperChatFilterSettingPageState createState() =>
+      SuperChatFilterSettingPageState();
 }
 
-class _SuperChatFilterSettingPageState
+class SuperChatFilterSettingPageState
     extends State<SuperChatFilterSettingPage> {
-  late Map<String, dynamic> configMap;
+  late DefaultConfig configMap;
   @override
   void initState() {
     super.initState();
-    configMap = Get.arguments as Map<String, dynamic>;
+    configMap = Get.arguments as DefaultConfig;
   }
 
   @override
@@ -44,14 +43,13 @@ class _SuperChatFilterSettingPageState
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SwitchListTile(
-                title: const Text('启用醒目留言朗读'),
-                value: configMap['dynamic']['filter']['superChat']['enable'],
+                title: const Text('醒目留言朗读'),
+                value: configMap.dynamicConfig.filter.superChat.enable,
                 onChanged: (value) async {
                   setState(() {
-                    configMap['dynamic']['filter']['superChat']['enable'] =
-                        value;
-                    });
-                        await updateConfigMap(configMap);
+                    configMap.dynamicConfig.filter.superChat.enable = value;
+                  });
+                  await updateConfigMap(configMap);
                 },
               ),
             ],

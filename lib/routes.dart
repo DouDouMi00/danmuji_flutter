@@ -2,56 +2,57 @@ import 'package:get/get.dart';
 import 'pages/ConfigPage/index.dart';
 import '/widgets/obscure_text_field.dart' show InputType;
 import '/pages/white_list_editor_page.dart';
+import '/services/config.dart';
 
 List<GetPage<dynamic>> get appRoutes => [
       GetPage(
         name: '/accountSettings',
-        page: () => const AccountSettingPage(configMap: {}),
+        page: () => AccountSettingPage(configMap: getConfigMap()),
       ),
       GetPage(
         name: '/ttsEnginesSettings',
-        page: () => const TtsEnginesSettingPage(configMap: {}),
+        page: () => TtsEnginesSettingPage(configMap: getConfigMap()),
       ),
       GetPage(
         name: '/dmFilterSettings',
-        page: () => const DmFilterSettingPage(configMap: {}),
+        page: () => DmFilterSettingPage(configMap: getConfigMap()),
       ),
       GetPage(
         name: '/giftFilterSettings',
-        page: () => const GiftFilterSettingPage(configMap: {}),
+        page: () => GiftFilterSettingPage(configMap: getConfigMap()),
       ),
       GetPage(
         name: '/guardBuyFilterSettings',
-        page: () => const GuardBuyFilterSettingPage(configMap: {}),
+        page: () => GuardBuyFilterSettingPage(configMap: getConfigMap()),
       ),
       GetPage(
         name: '/likeFilterSettings',
-        page: () => const LikeFilterSettingPage(configMap: {}),
+        page: () => LikeFilterSettingPage(configMap: getConfigMap()),
       ),
       GetPage(
         name: '/welcomeFilterSettings',
-        page: () => const WelcomeFilterSettingPage(configMap: {}),
+        page: () => WelcomeFilterSettingPage(configMap: getConfigMap()),
       ),
       GetPage(
         name: '/subscribeFilterSettings',
-        page: () => const SubscribeFilterSettingPage(configMap: {}),
+        page: () => SubscribeFilterSettingPage(configMap: getConfigMap()),
       ),
       GetPage(
         name: '/superChatFilterSettings',
-        page: () => const SuperChatFilterSettingPage(configMap: {}),
+        page: () => SuperChatFilterSettingPage(configMap: getConfigMap()),
       ),
       GetPage(
         name: '/warningFilterSettings',
-        page: () => const WarningFilterSettingPage(configMap: {}),
+        page: () => WarningFilterSettingPage(configMap: getConfigMap()),
       ),
       GetPage(
         name: '/filterListEditor',
         page: () => EditableListPage(
           params: EditableListParams(
             title: '',
-            inputType : InputType.stringInputType,
+            inputType: InputType.stringInputType,
             initialValue: [],
-            onSaved: (value) {}, 
+            onSaved: (value) {},
           ),
         ),
       ),

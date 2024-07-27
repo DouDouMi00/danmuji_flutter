@@ -1,6 +1,8 @@
 // services/config.dart
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'default_config_entity.dart';
+export '/services/default_config_entity.dart';
 
 // 定义配置的键名
 const String _configKey = 'app_config';
@@ -10,24 +12,24 @@ late Map<String, dynamic> config;
 // 定义配置的默认值
 final Map<String, dynamic> _defaultConfig = {
   "kvdb": {
-    "bili": {"uid": 0, "buvid3": "", "sessdata": "", "jct": ""},
+    "kvdbBili": {"uid": 0, "buvid3": "", "sessdata": "", "jct": ""},
     "isFirstTimeToLogin": true
   },
   "engine": {
-    "bili": {"liveID": 21654925}
+    "engineBili": {"liveID": 21654925}
   },
-  "dynamic": {
+  "dynamicConfig": {
     "tts": {
       "engine": "",
       "language": "",
       "volume": 1.0,
-      "rate": 2.0,
+      "rate": 1.0,
       "pitch": 1.0,
       "history": {
         "engine": "",
         "language": "",
         "volume": 1.0,
-        "rate": 2.0,
+        "rate": 1.0,
         "pitch": 1.0
       }
     },
@@ -43,8 +45,8 @@ final Map<String, dynamic> _defaultConfig = {
         "fansMedalGuardLevelBigger": 0,
         "fansMedalLevelBigger": 0,
         "lengthShorter": 0,
-        "blacklistKeywords": [],
         "blacklistUsers": [],
+        "blacklistKeywords": [],
         "whitelistUsers": [],
         "whitelistKeywords": []
       },
@@ -91,20 +93,20 @@ Future<void> initConfig() async {
     // 合并默认配置和已存在的配置
     mergeConfigRecursively(_defaultConfig, config);
     await prefs.setString(_configKey, jsonEncode(config));
-  } else if (jsonString == null) {
+  } else {
     config = _defaultConfig;
-    await prefs.setString(_configKey, jsonEncode(_defaultConfig));
+    await prefs.setString(_configKey, jsonEncode(config));
   }
 }
 
 // 更新配置
-Future<void> updateConfigMap(Map<String, dynamic> newConfig) async {
+Future<void> updateConfigMap(DefaultConfig newConfig) async {
   // 将配置转换为JSON字符串并保存
-  config = newConfig;
+  config = newConfig.toJson();
   await prefs.setString(_configKey, jsonEncode(config));
 }
 
 // 获取配置
-Map<String, dynamic> getConfigMap() {
-  return _defaultConfig;
+DefaultConfig getConfigMap() {
+  return defaultConfigFromJson(jsonEncode(config));
 }

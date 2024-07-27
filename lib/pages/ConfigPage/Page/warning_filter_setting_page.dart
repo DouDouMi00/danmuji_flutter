@@ -4,22 +4,21 @@ import 'package:get/get.dart';
 import '/services/config.dart';
 
 class WarningFilterSettingPage extends StatefulWidget {
-  final Map<String, dynamic> configMap;
+  final DefaultConfig configMap;
 
   const WarningFilterSettingPage({super.key, required this.configMap});
 
   @override
-  // ignore: library_private_types_in_public_api
-  _WarningFilterSettingPageState createState() =>
-      _WarningFilterSettingPageState();
+  WarningFilterSettingPageState createState() =>
+      WarningFilterSettingPageState();
 }
 
-class _WarningFilterSettingPageState extends State<WarningFilterSettingPage> {
-  late Map<String, dynamic> configMap;
+class WarningFilterSettingPageState extends State<WarningFilterSettingPage> {
+  late DefaultConfig configMap;
   @override
   void initState() {
     super.initState();
-    configMap = Get.arguments as Map<String, dynamic>;
+    configMap = Get.arguments as DefaultConfig;
   }
 
   @override
@@ -43,11 +42,11 @@ class _WarningFilterSettingPageState extends State<WarningFilterSettingPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SwitchListTile(
-                title: const Text('启用超管警告朗读'),
-                value: configMap['dynamic']['filter']['warning']['enable'],
+                title: const Text('超管警告朗读'),
+                value: configMap.dynamicConfig.filter.warning.enable,
                 onChanged: (value) async {
                   setState(() {
-                    configMap['dynamic']['filter']['warning']['enable'] = value;
+                    configMap.dynamicConfig.filter.warning.enable = value;
                   });
                   await updateConfigMap(configMap);
                 },

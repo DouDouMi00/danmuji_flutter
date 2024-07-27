@@ -11,12 +11,11 @@ import '/services/logger.dart';
 class ControlPage extends StatefulWidget {
   const ControlPage({super.key});
   @override
-  // ignore: library_private_types_in_public_api
-  _ControlPageState createState() => _ControlPageState();
+  ControlPageState createState() => ControlPageState();
 }
 
 // ControlPage的状态类，管理页面的动态更新和事件处理。
-class _ControlPageState extends State<ControlPage> {
+class ControlPageState extends State<ControlPage> {
   // 是否处于运行状态的标志。
   bool isRunning = false;
   // 操作按钮的文本内容，根据运行状态动态改变。

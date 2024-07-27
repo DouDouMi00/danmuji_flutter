@@ -4,42 +4,41 @@ import 'dart:async';
 List<String> lastDanmuMessages = [];
 bool filterDanmu(int uid, String uname, bool isFansMedalBelongToLive,
     int fansMedalLevel, int fansMedalGuardLevel, String msg, bool isEmoji) {
-  var dynamicConfig = getConfigMap()['dynamic'];
-  if (!dynamicConfig['filter']['danmu']['enable']) return false;
-  if (dynamicConfig['filter']['danmu']['whitelistUsers'].contains(uid)) {
+  var dynamicConfig = getConfigMap().dynamicConfig.filter.danmu;
+  if (!dynamicConfig.enable) return false;
+  if (dynamicConfig.whitelistUsers.contains(uid)) {
     return true;
   }
-  if (dynamicConfig['filter']['danmu']['whitelistKeywords'].isNotEmpty) {
-    for (var keyword in dynamicConfig['filter']['danmu']['whitelistKeywords']) {
+  if (dynamicConfig.whitelistKeywords.isNotEmpty) {
+    for (var keyword in dynamicConfig.whitelistKeywords) {
       if (msg.contains(keyword)) return true;
     }
   }
-  if (dynamicConfig['filter']['danmu']['isFansMedalBelongToLive'] &&
-      !isFansMedalBelongToLive) return false;
-  if (dynamicConfig['filter']['danmu']['fansMedalLevelBigger'] != 0 &&
-      fansMedalLevel <
-          dynamicConfig['filter']['danmu']['fansMedalLevelBigger']) {
+  if (dynamicConfig.isFansMedalBelongToLive && !isFansMedalBelongToLive) {
     return false;
   }
-  if (dynamicConfig['filter']['danmu']['fansMedalGuardLevelBigger'] != 0 &&
-      fansMedalGuardLevel <
-          dynamicConfig['filter']['danmu']['fansMedalGuardLevelBigger']) {
+  if (dynamicConfig.fansMedalLevelBigger != 0 &&
+      fansMedalLevel < dynamicConfig.fansMedalLevelBigger) {
     return false;
   }
-  if (dynamicConfig['filter']['danmu']['lengthShorter'] != 0 &&
-      msg.length > dynamicConfig['filter']['danmu']['lengthShorter']) {
+  if (dynamicConfig.fansMedalGuardLevelBigger != 0 &&
+      fansMedalGuardLevel < dynamicConfig.fansMedalGuardLevelBigger) {
     return false;
   }
-  if (!dynamicConfig['filter']['danmu']['symbolEnable'] &&
+  if (dynamicConfig.lengthShorter != 0 &&
+      msg.length > dynamicConfig.lengthShorter) {
+    return false;
+  }
+  if (!dynamicConfig.symbolEnable &&
       RegExp(r'^[^\p{L}\p{N}]+$', unicode: true).hasMatch(msg)) return false;
-  if (!dynamicConfig['filter']['danmu']['emojiEnable'] && isEmoji) return false;
-  if (dynamicConfig['filter']['danmu']['blacklistUsers'].contains(uid)) {
+  if (!dynamicConfig.emojiEnable && isEmoji) return false;
+  if (dynamicConfig.blacklistUsers.contains(uid)) {
     return false;
   }
-  for (var keyword in dynamicConfig['filter']['danmu']['blacklistKeywords']) {
+  for (var keyword in dynamicConfig.blacklistKeywords) {
     if (msg.contains(keyword)) return false;
   }
-  if (dynamicConfig['filter']['danmu']['deduplicate']) {
+  if (dynamicConfig.deduplicate) {
     if (lastDanmuMessages.contains(msg)) {
       lastDanmuMessages.add('');
       return false;
@@ -55,34 +54,32 @@ bool filterDanmu(int uid, String uname, bool isFansMedalBelongToLive,
 Map<String, dynamic> giftUids = {};
 Future<bool?> filterGift(String uid, String uname, int price, String giftName,
     int num, Function(Map<String, dynamic>, String) deduplicateCallback) async {
-  var dynamicConfig = getConfigMap()['dynamic'];
-  if (!dynamicConfig["filter"]["gift"]["enable"]) {
+  var dynamicConfig = getConfigMap().dynamicConfig.filter.gift;
+  if (!dynamicConfig.enable) {
     return false;
   }
   if (price == 0) {
-    if (!dynamicConfig["filter"]["gift"]["freeGiftEnable"]) {
+    if (!dynamicConfig.freeGiftEnable) {
       return false;
     }
-    if (dynamicConfig["filter"]["gift"]["freeGiftCountBigger"] != 0 &&
-        num < dynamicConfig["filter"]["gift"]["freeGiftCountBigger"]) {
+    if (dynamicConfig.freeGiftCountBigger != 0 &&
+        num < dynamicConfig.freeGiftCountBigger) {
       return false;
     }
   } else {
-    if (dynamicConfig["filter"]["gift"]["moneyGiftPriceBigger"] != 0 &&
-        price < dynamicConfig["filter"]["gift"]["moneyGiftPriceBigger"]) {
+    if (dynamicConfig.moneyGiftPriceBigger != 0 &&
+        price < dynamicConfig.moneyGiftPriceBigger) {
       return false;
     }
   }
-  if (dynamicConfig["filter"]["gift"]["deduplicateTime"] != 0) {
+  if (dynamicConfig.deduplicateTime != 0) {
     if (!giftUids.containsKey(uid)) {
       giftUids[uid] = {'uid': uid, 'uname': uname, 'gifts': {}};
     }
     if (giftUids[uid]['gifts'].containsKey(giftName)) {
       giftUids[uid]['gifts'][giftName]['task'].cancel();
     }
-    Timer timer = Timer(
-        Duration(seconds: dynamicConfig["filter"]["gift"]["deduplicateTime"]),
-        () {
+    Timer timer = Timer(Duration(seconds: dynamicConfig.deduplicateTime), () {
       deduplicateCallback(giftUids[uid], giftName);
       giftUids[uid]['gifts'].remove(giftName);
     });
@@ -97,18 +94,17 @@ Future<bool?> filterGift(String uid, String uname, int price, String giftName,
 
 bool filterWelcome(int uid, String uname, bool isFansMedalBelongToLive,
     int fansMedalLevel, int fansMedalGuardLevel) {
-  final dynamicConfig = getConfigMap()['dynamic'];
-  if (!dynamicConfig["filter"]["welcome"]["enable"]) return false;
-  if (dynamicConfig["filter"]["welcome"]["isFansMedalBelongToLive"] &&
-      !isFansMedalBelongToLive) return false;
-  if (dynamicConfig["filter"]["welcome"]["fansMedalLevelBigger"] != 0 &&
-      fansMedalLevel <
-          dynamicConfig["filter"]["welcome"]["fansMedalLevelBigger"]) {
+  final dynamicConfig = getConfigMap().dynamicConfig.filter.welcome;
+  if (!dynamicConfig.enable) return false;
+  if (dynamicConfig.isFansMedalBelongToLive && !isFansMedalBelongToLive) {
     return false;
   }
-  if (dynamicConfig["filter"]["welcome"]["fansMedalGuardLevelBigger"] != 0 &&
-      fansMedalGuardLevel <
-          dynamicConfig["filter"]["welcome"]["fansMedalGuardLevelBigger"]) {
+  if (dynamicConfig.fansMedalLevelBigger != 0 &&
+      fansMedalLevel < dynamicConfig.fansMedalLevelBigger) {
+    return false;
+  }
+  if (dynamicConfig.fansMedalGuardLevelBigger != 0 &&
+      fansMedalGuardLevel < dynamicConfig.fansMedalGuardLevelBigger) {
     return false;
   }
   return true;
@@ -116,18 +112,18 @@ bool filterWelcome(int uid, String uname, bool isFansMedalBelongToLive,
 
 bool filterGuardBuy(
     int uid, String uname, bool newGuard, String giftName, int num) {
-  final dynamicConfig = getConfigMap()['dynamic'];
-  if (!dynamicConfig["filter"]["guardBuy"]["enable"]) return false;
+  final dynamicConfig = getConfigMap().dynamicConfig.filter.guardBuy;
+  if (!dynamicConfig.enable) return false;
   return true;
 }
 
 Map<String, bool> likedUids = {};
 bool filterLike(int uid, String uname) {
-  final dynamicConfig = getConfigMap()['dynamic']['filter']['like'];
-  if (!dynamicConfig['enable']) {
+  final dynamicConfig = getConfigMap().dynamicConfig.filter.like;
+  if (!dynamicConfig.enable) {
     return false;
   }
-  if (dynamicConfig['deduplicate']) {
+  if (dynamicConfig.deduplicate) {
     if (likedUids.containsKey(uid.toString())) {
       return false;
     }
@@ -138,19 +134,19 @@ bool filterLike(int uid, String uname) {
 
 bool filterSubscribe(int uid, String uname, bool isFansMedalBelongToLive,
     int fansMedalLevel, int fansMedalGuardLevel) {
-  var dynamicConfig = getConfigMap()['dynamic'];
-  if (!dynamicConfig['filter']['subscribe']['enable']) return false;
+  var dynamicConfig = getConfigMap().dynamicConfig.filter.subscribe;
+  if (!dynamicConfig.enable) return false;
   return true;
 }
 
 bool filterSuperChat(int uid, String uname, int price, String msg) {
-  var dynamicConfig = getConfigMap()['dynamic'];
-  if (!dynamicConfig['filter']['superChat']['enable']) return false;
+  var dynamicConfig = getConfigMap().dynamicConfig.filter.superChat;
+  if (!dynamicConfig.enable) return false;
   return true;
 }
 
 bool filterWarning(String msg, bool isCutOff) {
-  var dynamicConfig = getConfigMap()['dynamic'];
-  if (!dynamicConfig['filter']['warning']['enable']) return false;
+  var dynamicConfig = getConfigMap().dynamicConfig.filter.warning;
+  if (!dynamicConfig.enable) return false;
   return true;
 }

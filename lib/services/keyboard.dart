@@ -9,26 +9,24 @@ Future<void> handleFlush() async {
 
 Future<void> handleTTSRatePlus() async {
   var nowJsonConfig = getConfigMap();
-  nowJsonConfig['dynamic']['tts']['rate'] += 0.2;
-  nowJsonConfig['dynamic']['tts']['rate'] =
-      max(nowJsonConfig['dynamic']['tts']['rate'] as double, 0.0);
-  nowJsonConfig['dynamic']['tts']['rate'] =
-      min(nowJsonConfig['dynamic']['tts']['rate'] as double, 5.0);
+  nowJsonConfig.dynamicConfig.tts.rate += 0.1;
+  nowJsonConfig.dynamicConfig.tts.rate =
+      max(nowJsonConfig.dynamicConfig.tts.rate, 0.0);
+  nowJsonConfig.dynamicConfig.tts.rate =
+      min(nowJsonConfig.dynamicConfig.tts.rate, 5.0);
   await updateConfigMap(nowJsonConfig);
-  await ttsSystem(
-      'TTS语速增加到${nowJsonConfig['dynamic']['tts']['rate']}');
+  await ttsSystem('TTS语速增加到${nowJsonConfig.dynamicConfig.tts.rate}');
 }
 
 Future<void> handleTTSVolumeMinus() async {
   var nowJsonConfig = getConfigMap();
-  nowJsonConfig['dynamic']['tts']['rate'] -= 1;
-  nowJsonConfig['dynamic']['tts']['rate'] =
-      max(nowJsonConfig['dynamic']['tts']['rate'] as double, 0.0);
-  nowJsonConfig['dynamic']['tts']['rate'] =
-      min(nowJsonConfig['dynamic']['tts']['rate'] as double, 5.0);
+  nowJsonConfig.dynamicConfig.tts.rate -= 0.1;
+  nowJsonConfig.dynamicConfig.tts.rate =
+      max(nowJsonConfig.dynamicConfig.tts.rate, 0.0);
+  nowJsonConfig.dynamicConfig.tts.rate =
+      min(nowJsonConfig.dynamicConfig.tts.rate, 5.0);
   await updateConfigMap(nowJsonConfig);
-  await ttsSystem(
-      'TTS语速减少到${nowJsonConfig['dynamic']['tts']['rate']}');
+  await ttsSystem('TTS语速减少到${nowJsonConfig.dynamicConfig.tts.rate}');
 }
 
 // 历史模式回到最新弹幕

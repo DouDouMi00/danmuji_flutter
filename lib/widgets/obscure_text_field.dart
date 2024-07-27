@@ -30,11 +30,10 @@ class InputNumberDialog extends StatefulWidget {
   const InputNumberDialog({super.key, required this.params});
 
   @override
-  // ignore: library_private_types_in_public_api
-  _InputNumberDialogState createState() => _InputNumberDialogState();
+  InputNumberDialogState createState() => InputNumberDialogState();
 }
 
-class _InputNumberDialogState extends State<InputNumberDialog> {
+class InputNumberDialogState extends State<InputNumberDialog> {
   late TextEditingController _controller;
   late bool _isObscured;
   late dynamic parsedValue;
@@ -215,11 +214,10 @@ class RadioDialog extends StatefulWidget {
   const RadioDialog({super.key, required this.params});
 
   @override
-  // ignore: library_private_types_in_public_api
-  _RadioDialogState createState() => _RadioDialogState();
+  RadioDialogState createState() => RadioDialogState();
 }
 
-class _RadioDialogState extends State<RadioDialog> {
+class RadioDialogState extends State<RadioDialog> {
   late String _title;
   late dynamic _initialValue;
   late List<Map<String, dynamic>> _valueOptions;
