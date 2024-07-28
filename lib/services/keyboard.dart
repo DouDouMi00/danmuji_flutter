@@ -8,7 +8,7 @@ Future<void> handleFlush() async {
 }
 
 Future<void> handleTTSRatePlus() async {
-  var nowJsonConfig = getConfigMap();
+  DefaultConfig nowJsonConfig = getConfigMap();
   nowJsonConfig.dynamicConfig.tts.rate += 0.1;
   nowJsonConfig.dynamicConfig.tts.rate =
       max(nowJsonConfig.dynamicConfig.tts.rate, 0.0);
@@ -19,7 +19,7 @@ Future<void> handleTTSRatePlus() async {
 }
 
 Future<void> handleTTSVolumeMinus() async {
-  var nowJsonConfig = getConfigMap();
+  DefaultConfig nowJsonConfig = getConfigMap();
   nowJsonConfig.dynamicConfig.tts.rate -= 0.1;
   nowJsonConfig.dynamicConfig.tts.rate =
       max(nowJsonConfig.dynamicConfig.tts.rate, 0.0);

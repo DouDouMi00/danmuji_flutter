@@ -94,7 +94,7 @@ Future<bool?> filterGift(String uid, String uname, int price, String giftName,
 
 bool filterWelcome(int uid, String uname, bool isFansMedalBelongToLive,
     int fansMedalLevel, int fansMedalGuardLevel) {
-  final dynamicConfig = getConfigMap().dynamicConfig.filter.welcome;
+  var dynamicConfig = getConfigMap().dynamicConfig.filter.welcome;
   if (!dynamicConfig.enable) return false;
   if (dynamicConfig.isFansMedalBelongToLive && !isFansMedalBelongToLive) {
     return false;
@@ -112,14 +112,14 @@ bool filterWelcome(int uid, String uname, bool isFansMedalBelongToLive,
 
 bool filterGuardBuy(
     int uid, String uname, bool newGuard, String giftName, int num) {
-  final dynamicConfig = getConfigMap().dynamicConfig.filter.guardBuy;
+  var dynamicConfig = getConfigMap().dynamicConfig.filter.guardBuy;
   if (!dynamicConfig.enable) return false;
   return true;
 }
 
 Map<String, bool> likedUids = {};
 bool filterLike(int uid, String uname) {
-  final dynamicConfig = getConfigMap().dynamicConfig.filter.like;
+  var dynamicConfig = getConfigMap().dynamicConfig.filter.like;
   if (!dynamicConfig.enable) {
     return false;
   }
