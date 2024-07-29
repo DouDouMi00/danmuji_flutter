@@ -4,6 +4,7 @@ import 'dart:math';
 import '/services/messages_handler.dart'
     show popMessagesQueue, getHaveReadMessages;
 import '/services/logger.dart';
+import '/pages/control_page.dart' show messageController;
 
 late FlutterTts flutterTts;
 TtsState ttsState = TtsState.stopped;
@@ -38,7 +39,7 @@ String messagesToText(Map<String, dynamic> msg) {
         filterConfig.readfansMedalName && msg['fansMedalLevel'] != 0
             ? '${msg['fansMedalLevel']}级'
             : '';
-    return '$liveRoomGuardLeveltxt $fansMedalNametxt $fansMedalLeveltxt ${msg['uname']}说${msg['msg']}';
+    return '$liveRoomGuardLeveltxt$fansMedalNametxt$fansMedalLeveltxt${msg['uname']}说 : ${msg['msg']}';
   } else if (msg['type'] == 'gift') {
     return '感谢${msg['uname']}送出的${msg['num']}个${msg['giftName']}';
   } else if (msg['type'] == 'guardBuy') {
@@ -66,6 +67,7 @@ Future<void> tts(String text, [channel = 0, config]) async {
     await Future.delayed(const Duration(milliseconds: 100));
   }
   ttsState = TtsState.playing;
+  messageController.sendMessage(text);
   await flutterTts.speak(text);
 }
 
