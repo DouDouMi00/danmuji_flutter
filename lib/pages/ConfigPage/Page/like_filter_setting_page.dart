@@ -41,7 +41,7 @@ class LikeFilterSettingPageState extends State<LikeFilterSettingPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SwitchListTile(
-                title: const Text('点赞过滤器'),
+                title: const Text('点赞朗读'),
                 value: configMap.dynamicConfig.filter.like.enable,
                 onChanged: (value) async {
                   setState(() {

@@ -42,7 +42,7 @@ class GuardBuyFilterSettingPageState extends State<GuardBuyFilterSettingPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SwitchListTile(
-                title: const Text('舰队购买过滤器'),
+                title: const Text('舰队购买朗读'),
                 value: configMap.dynamicConfig.filter.guardBuy.enable,
                 onChanged: (value) async {
                   setState(() {
