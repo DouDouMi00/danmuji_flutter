@@ -7,14 +7,12 @@ import '/services/logger.dart';
 import '/pages/control_page.dart' show messageController;
 
 late FlutterTts flutterTts;
-TtsState ttsState = TtsState.stopped;
+late Tts ttsConfig;
 bool prepareDisableTTSTask = false;
 bool disableTTSTask = false;
 int? readHistoryIndex;
 bool initalized = false;
 bool _shouldExitTtsTask = true;
-
-enum TtsState { playing, stopped, paused, continued }
 
 Future<void> _setAwaitOptions() async {
   await flutterTts.awaitSpeakCompletion(true);
@@ -62,29 +60,40 @@ String messagesToText(Map<String, dynamic> msg) {
   }
 }
 
-Future<void> tts(String text, [channel = 0, config]) async {
-  while (ttsState == TtsState.playing) {
-    await Future.delayed(const Duration(milliseconds: 100));
+Future<void> syncWithConfig() async {
+  Tts newTtsConfig = getConfigMap().dynamicConfig.tts;
+  if (ttsConfig.volume != newTtsConfig.volume) {
+    await flutterTts.setVolume(newTtsConfig.volume);
+    logger.info('音量配置更新为${newTtsConfig.volume}');
   }
-  ttsState = TtsState.playing;
+  if (ttsConfig.pitch != newTtsConfig.pitch) {
+    await flutterTts.setPitch(newTtsConfig.pitch);
+    logger.info('音高配置更新为${newTtsConfig.pitch}');
+  }
+  if (ttsConfig.rate != newTtsConfig.rate) {
+    await flutterTts.setSpeechRate(newTtsConfig.rate);
+    logger.info('语速配置更新为${newTtsConfig.rate}');
+  }
+}
+
+Future<void> tts(String text, [channel = 0, config]) async {
+  await syncWithConfig();
   messageController.sendMessage(text);
+  await flutterTts.stop();
   await flutterTts.speak(text);
 }
 
 Future<void> init() async {
   _shouldExitTtsTask = true;
   flutterTts = FlutterTts();
-  final ttsConfig = getConfigMap().dynamicConfig.tts;
+  ttsConfig = getConfigMap().dynamicConfig.tts;
   // 设置引擎和语言 音量 语速 音高
-  flutterTts.setEngine(ttsConfig.engine);
-  flutterTts.setLanguage(ttsConfig.language);
-  flutterTts.setVolume(ttsConfig.volume);
-  flutterTts.setSpeechRate(ttsConfig.rate);
-  flutterTts.setPitch(ttsConfig.pitch);
-  _setAwaitOptions();
-  flutterTts.setCompletionHandler(() {
-    ttsState = TtsState.stopped;
-  });
+  await flutterTts.setEngine(ttsConfig.engine);
+  await flutterTts.setLanguage(ttsConfig.language);
+  await flutterTts.setVolume(ttsConfig.volume);
+  await flutterTts.setPitch(ttsConfig.pitch);
+  await flutterTts.setSpeechRate(ttsConfig.rate);
+  await _setAwaitOptions();
   await tts("tts 初始化完成");
   initalized = true;
 }
@@ -94,32 +103,33 @@ Future<void> ttsTask() async {
   while (_shouldExitTtsTask) {
     if (prepareDisableTTSTask) {
       disableTTSTask = true;
-      await Future.delayed(const Duration(milliseconds: 100));
+      await Future.delayed(const Duration(milliseconds: 10));
       continue;
     } else {
       disableTTSTask = false;
     }
     Map<String, dynamic>? msg = popMessagesQueue();
     if (msg == null) {
-      await Future.delayed(const Duration(milliseconds: 100));
+      await Future.delayed(const Duration(milliseconds: 10));
       continue;
     }
     logger.info("取出消息$msg");
     String text = messagesToText(msg);
     await tts(text);
   }
+  await flutterTts.stop();
 }
 
 Future<void> setDisableTTSTask(bool mode, {bool waiting = true}) async {
   if (prepareDisableTTSTask == false && mode == true) {
     prepareDisableTTSTask = mode;
     while (!disableTTSTask && waiting) {
-      await Future.delayed(const Duration(milliseconds: 100));
+      await Future.delayed(const Duration(milliseconds: 10));
     }
   } else if (prepareDisableTTSTask == true && mode == false) {
     prepareDisableTTSTask = mode;
     while (disableTTSTask && waiting) {
-      await Future.delayed(const Duration(milliseconds: 100));
+      await Future.delayed(const Duration(milliseconds: 10));
     }
   }
 }
@@ -128,7 +138,7 @@ int ttsSystemCallerID = 0;
 
 Future<void> ttsSystem(msg) async {
   while (!initalized) {
-    await Future.delayed(const Duration(milliseconds: 100));
+    await Future.delayed(const Duration(milliseconds: 10));
   }
   ttsSystemCallerID += 1;
   final myCallerID = ttsSystemCallerID;
