@@ -9,24 +9,34 @@ Future<void> handleFlush() async {
 
 Future<void> handleTTSRatePlus() async {
   DefaultConfig nowJsonConfig = getConfigMap();
-  nowJsonConfig.dynamicConfig.tts.rate += 0.1;
-  nowJsonConfig.dynamicConfig.tts.rate =
-      max(nowJsonConfig.dynamicConfig.tts.rate, 0.0);
-  nowJsonConfig.dynamicConfig.tts.rate =
-      min(nowJsonConfig.dynamicConfig.tts.rate, 5.0);
+  double rate = nowJsonConfig.dynamicConfig.tts.rate;
+
+  rate += 0.1;
+  rate = max(rate, 0.0);
+  rate = min(rate, 5.0);
+
+  rate = double.parse(rate.toStringAsFixed(1));
+  nowJsonConfig.dynamicConfig.tts.rate = rate;
+  String rateFormatted = rate.toStringAsFixed(1);
+
   await updateConfigMap(nowJsonConfig);
-  await ttsSystem('TTS语速增加到${nowJsonConfig.dynamicConfig.tts.rate}');
+  await ttsSystem('TTS语速增加到$rateFormatted');
 }
 
 Future<void> handleTTSVolumeMinus() async {
   DefaultConfig nowJsonConfig = getConfigMap();
-  nowJsonConfig.dynamicConfig.tts.rate -= 0.1;
-  nowJsonConfig.dynamicConfig.tts.rate =
-      max(nowJsonConfig.dynamicConfig.tts.rate, 0.0);
-  nowJsonConfig.dynamicConfig.tts.rate =
-      min(nowJsonConfig.dynamicConfig.tts.rate, 5.0);
+  double rate = nowJsonConfig.dynamicConfig.tts.rate;
+
+  rate -= 0.1;
+  rate = max(rate, 0.0);
+  rate = min(rate, 5.0);
+
+  rate = double.parse(rate.toStringAsFixed(1));
+  nowJsonConfig.dynamicConfig.tts.rate = rate;
+  String rateFormatted = rate.toStringAsFixed(1);
+
   await updateConfigMap(nowJsonConfig);
-  await ttsSystem('TTS语速减少到${nowJsonConfig.dynamicConfig.tts.rate}');
+  await ttsSystem('TTS语速减少到$rateFormatted');
 }
 
 // 历史模式回到最新弹幕
