@@ -125,8 +125,8 @@ class MessageHandler {
         PinyinHelper.getShortPinyin(uname); // 假设实现了pinyinConvert函数来处理拼音转换
     var giftName = command['data']['giftName'];
     var num = command['data']['num'];
-    var price = command['data']['price'] / 1000.0;
-    price = command['data']['coin_type'] == 'gold' ? price : 0.0;
+    double price = command['data']['price'] / 1000;
+    price = command['data']['coin_type'] == 'gold' ? price : 0;
     var faceImg = command['data']['face'];
 
     logger.info(
@@ -186,7 +186,7 @@ class MessageHandler {
     var uid = command["data"]["uid"];
     var uname = command["data"]["user_info"]["uname"];
     var unamePronunciation = PinyinHelper.getShortPinyin(uname);
-    var price = command["data"]["price"];
+    double price = command["data"]["price"];
     var msg = command["data"]["message"];
     var faceImg = command["data"]["user_info"]["face"];
     logger.info("[SC] $uname bought ${price.toStringAsFixed(2)}元SC: $msg");
@@ -282,7 +282,7 @@ class MessageHandler {
     // 处理切断连接逻辑
     logger.info(command);
     var msg = command['msg'];
-    logger.info("Cut Off, $msg");
+    logger.info("[Warning] Cut Off, $msg");
     emitter.emitEvent(jsonEncode({
       'eventType': 'warning',
       'data': {

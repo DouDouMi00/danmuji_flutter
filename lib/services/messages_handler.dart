@@ -51,10 +51,10 @@ void setupEventListeners() {
   });
 }
 
-List<dynamic> messagesQueue = [];
-List<dynamic> haveReadMessages = [];
+List<Map<String, dynamic>> messagesQueue = [];
+List<Map<String, dynamic>> haveReadMessages = [];
 
-dynamic popMessagesQueue() {
+Map<String, dynamic>? popMessagesQueue() {
   if (messagesQueue.isEmpty) {
     return null;
   }
@@ -63,7 +63,7 @@ dynamic popMessagesQueue() {
   return data;
 }
 
-List<dynamic> getHaveReadMessages() {
+List<Map<String, dynamic>> getHaveReadMessages() {
   return haveReadMessages;
 }
 
@@ -110,7 +110,7 @@ void onGift(dynamic command) async {
     Map<String, dynamic> giftInfo = userInfo['gifts'][giftName];
     messagesQueueAppend({
       "type": "gift",
-      "time": DateTime.now().millisecondsSinceEpoch.toDouble(),
+      "time": DateTime.now(),
       "uid": userInfo["uid"],
       "uname": userInfo["uname"],
       "giftName": giftName,

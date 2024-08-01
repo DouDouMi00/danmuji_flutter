@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:brotli/brotli.dart';
 import '/services/config.dart';
 import '/services/logger.dart';
+import '/services/tts.dart' show ttsSystem;
 
 final buffer = Uint8List(16);
 
@@ -84,9 +85,9 @@ class DanmakuReceiver {
   WebSocketChannel? ws;
   int? _anchorUid;
   int? get anchorUid => _anchorUid;
-  int roomId = getConfigMap().engine.engineBili.liveId;
 
   DanmakuReceiver() {
+    int roomId = getConfigMap().engine.engineBili.liveId;
     final headers = <String, String>{
       'Cookie': 'buvid3=' '; SESSDATA=' '; bili_jct=' ';',
       'User-Agent':
@@ -118,7 +119,7 @@ class DanmakuReceiver {
       final authPacket = packetEncode(1, DanmakuType.auth, authJSONString);
       ws?.sink.add(authPacket);
       ws?.stream.listen(
-        (event) {
+        (event) async {
           final data = Uint8List.fromList(event);
           final dataBytes = ByteData.view(data.buffer);
           final totalLength = dataBytes.getInt32(0);
@@ -128,6 +129,7 @@ class DanmakuReceiver {
           switch (type) {
             case DanmakuType.authReply:
               logger.info('认证通过，已连接到弹幕服务器 $roomId');
+              await ttsSystem('认证通过，进入直播间$roomId');
               Timer.periodic(const Duration(seconds: 30), (timer) {
                 ws?.sink.add(packetEncode(1, 2, "[object Object]"));
               });

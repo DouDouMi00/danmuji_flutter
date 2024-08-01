@@ -55,7 +55,7 @@ final Map<String, dynamic> _defaultConfig = {
         "freeGiftEnable": true,
         "deduplicateTime": 10,
         "freeGiftCountBigger": 0,
-        "moneyGiftPriceBigger": 0
+        "moneyGiftPriceBigger": 0.0
       },
       "guardBuy": {"enable": true},
       "like": {"enable": true, "deduplicate": true},

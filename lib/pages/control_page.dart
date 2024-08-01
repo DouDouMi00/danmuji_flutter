@@ -9,28 +9,31 @@ import '/services/logger.dart';
 import 'package:get/get.dart';
 
 late MessageQueueController messageController;
-late ScrollController _scrollController;
+late ScrollController scrollController;
 bool showBackToBottomButton = false;
-bool autoScroll = true;
+int autoScroll = 0;
+int newMessages = 0;
 
 class MessageQueueController extends GetxController {
   // 创建一个RxList作为消息队列
   final messages = <String>[].obs;
 
   // 发送消息的方法
-  void sendMessage(String message) {
+  void sendMessage(String message) async {
     messages.add(message);
     if (showBackToBottomButton == false) {
-      autoScroll = true;
-      _scrollController
+      autoScroll += 1;
+      await scrollController
           .animateTo(
-        _scrollController.position.maxScrollExtent,
+        scrollController.position.maxScrollExtent,
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOut,
       )
           .whenComplete(() {
-        autoScroll = false;
+        autoScroll -= 1;
       });
+    } else {
+      newMessages += 1;
     }
   }
 
@@ -62,20 +65,18 @@ class ControlPageState extends State<ControlPage> {
   void initState() {
     super.initState();
     messageController = Get.put(MessageQueueController());
-    _scrollController = ScrollController();
+    scrollController = ScrollController();
     // 检测当前滑动距离是不是在底部
-    _scrollController.addListener(() {
-      if (_scrollController.offset <
-              _scrollController.position.maxScrollExtent &&
-          autoScroll == false) {
+    scrollController.addListener(() {
+      if (scrollController.offset < scrollController.position.maxScrollExtent &&
+          autoScroll <= 0) {
         setState(() {
           showBackToBottomButton = true;
         });
-      } else if (_scrollController.offset ==
-          _scrollController.position.maxScrollExtent) {
+      } else if (scrollController.offset ==
+          scrollController.position.maxScrollExtent) {
         setState(() {
           showBackToBottomButton = false;
-          autoScroll = true;
         });
       }
     });
@@ -91,7 +92,7 @@ class ControlPageState extends State<ControlPage> {
     } finally {
       stopTtsTask();
       messageController.clearMessages();
-      _scrollController.dispose();
+      scrollController.dispose();
     }
   }
 
@@ -109,8 +110,7 @@ class ControlPageState extends State<ControlPage> {
                 child: Stack(
                   children: [
                     ListView.builder(
-                      padding: EdgeInsets.zero,
-                      controller: _scrollController,
+                      controller: scrollController,
                       itemCount: messageController.messages.length,
                       itemBuilder: (context, index) {
                         return Text(messageController.messages[index]);
@@ -123,18 +123,23 @@ class ControlPageState extends State<ControlPage> {
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: ElevatedButton(
-                            onPressed: () {
+                            onPressed: () async {
+                              while (scrollController.offset <
+                                  scrollController.position.maxScrollExtent) {
+                                await scrollController.animateTo(
+                                  scrollController.position.maxScrollExtent,
+                                  duration: const Duration(milliseconds: 300),
+                                  curve: Curves.easeOut,
+                                );
+                              }
                               setState(() {
+                                newMessages = 0;
                                 showBackToBottomButton = false;
-                                autoScroll = true;
                               });
-                              _scrollController.animateTo(
-                                _scrollController.position.maxScrollExtent,
-                                duration: const Duration(milliseconds: 300),
-                                curve: Curves.easeOut,
-                              );
                             },
-                            child: const Text('回到底部'),
+                            child: newMessages != 0
+                                ? Text('新消息 $newMessages 条')
+                                : const Text('回到底部'),
                           ),
                         ),
                       ),

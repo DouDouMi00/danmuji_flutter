@@ -1,6 +1,5 @@
 import 'package:flutter_tts/flutter_tts.dart';
 import '/services/config.dart';
-import 'dart:math';
 import '/services/messages_handler.dart'
     show popMessagesQueue, getHaveReadMessages;
 import '/services/logger.dart';
@@ -150,44 +149,77 @@ Future<void> ttsSystem(msg) async {
   await setDisableTTSTask(false, waiting: false);
 }
 
+Iterable<int> dartRange([int start = 0, int? end, int step = 1]) sync* {
+  if (end == null) {
+    // 如果 end 没有提供，那么 start 就是 end，而 start 则默认从 0 开始
+    end = start;
+    start = 0;
+  }
+
+  // 检查步长是否为零，如果是，则抛出异常
+  if (step == 0) throw ArgumentError('Step cannot be zero.');
+
+  if (step > 0) {
+    // 正向遍历
+    for (var i = start; i < end; i += step) {
+      yield i;
+    }
+  } else {
+    // 反向遍历
+    for (var i = start; i > end; i += step) {
+      yield i;
+    }
+  }
+}
+
 Future<void> readHistoryByType(List<String> types,
     [bool revert = false]) async {
-  int readHistoryIndex = getHaveReadMessages().length;
+  readHistoryIndex ??= getHaveReadMessages().length;
 
-  readHistoryIndex = revert
-      ? (readHistoryIndex + 1) % (getHaveReadMessages().length + 1)
-      : max(0, readHistoryIndex - 1);
+  readHistoryIndex = !revert ? readHistoryIndex! - 1 : readHistoryIndex! + 1;
 
   List<dynamic> messages = getHaveReadMessages();
   bool found = false;
 
-  int step = revert ? 1 : -1;
-  int start = revert ? 0 : readHistoryIndex;
-  int end = revert ? messages.length : -1;
-
-  for (int i = start; i != end; i += step) {
+  for (var i in dartRange(readHistoryIndex!,
+      !revert ? -1 : getHaveReadMessages().length, !revert ? -1 : 1)) {
     for (String type in types) {
-      if (messages[(i + messages.length) % messages.length]["type"] == type) {
-        readHistoryIndex = (i + messages.length) % messages.length;
+      if (messages[i]["type"] == type) {
+        readHistoryIndex = i;
         found = true;
         break;
       }
     }
-    if (found) break;
+    if (found) {
+      break;
+    }
   }
 
   if ((!revert && readHistoryIndex == -1) ||
-      (revert && readHistoryIndex == messages.length) ||
+      (revert && readHistoryIndex! > getHaveReadMessages().length) ||
       !found) {
-    readHistoryIndex = revert ? 0 : messages.length - 1;
-    String msg = revert ? "已到达第一条,继续翻页将从最后一条开始" : "已到达最后一条,继续翻页将从第一条开始";
-    await tts(messagesToText({"type": "system", "msg": msg}), 1,
-        getConfigMap().dynamicConfig.tts.history);
+    if (!revert) {
+      readHistoryIndex = getHaveReadMessages().length;
+      await tts(
+        messagesToText({"type": "system", "msg": "已到达最后一条,继续翻页将从第一条开始"}),
+        1,
+        getConfigMap().dynamicConfig.tts.history,
+      );
+    } else {
+      readHistoryIndex = 0;
+      await tts(
+        messagesToText({"type": "system", "msg": "已到达第一条,继续翻页将从最后一条开始"}),
+        1,
+        getConfigMap().dynamicConfig.tts.history,
+      );
+    }
     return;
   }
-
-  await tts(messagesToText(messages[readHistoryIndex]), 1,
-      getConfigMap().dynamicConfig.tts.history);
+  await tts(
+    messagesToText(messages[readHistoryIndex!]),
+    1,
+    getConfigMap().dynamicConfig.tts.history,
+  );
 }
 
 Future<void> resetHistoryIndex() async {

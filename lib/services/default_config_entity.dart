@@ -177,7 +177,7 @@ class Gift {
   bool freeGiftEnable;
   int deduplicateTime;
   int freeGiftCountBigger;
-  int moneyGiftPriceBigger;
+  double moneyGiftPriceBigger;
 
   Gift({
     required this.enable,
@@ -192,7 +192,7 @@ class Gift {
         freeGiftEnable: json["freeGiftEnable"],
         deduplicateTime: json["deduplicateTime"],
         freeGiftCountBigger: json["freeGiftCountBigger"],
-        moneyGiftPriceBigger: json["moneyGiftPriceBigger"],
+        moneyGiftPriceBigger: json["moneyGiftPriceBigger"]?.toDouble(),
       );
 
   Map<String, dynamic> toJson() => {
@@ -383,3 +383,66 @@ class KvdbBili {
         "jct": jct,
       };
 }
+
+// // 模板
+// Map<String, Map<String, Object>> template = {
+//   "kvdb": {
+//     "kvdbBili": {"uid": 0, "buvid3": "", "sessdata": "", "jct": ""},
+//     "isFirstTimeToLogin": true
+//   },
+//   "engine": {
+//     "engineBili": {"liveID": 0}
+//   },
+//   "dynamicConfig": {
+//     "tts": {
+//       "engine": "",
+//       "language": "",
+//       "volume": 1.1,
+//       "rate": 1.1,
+//       "pitch": 1.1,
+//       "history": {
+//         "engine": "",
+//         "language": "",
+//         "volume": 1.1,
+//         "rate": 1.1,
+//         "pitch": 1.1
+//       }
+//     },
+//     "filter": {
+//       "danmu": {
+//         "enable": true,
+//         "symbolEnable": true,
+//         "emojiEnable": true,
+//         "deduplicate": false,
+//         "readfansMedalName": false,
+//         "readfansMedalGuardLevel": true,
+//         "isFansMedalBelongToLive": false,
+//         "fansMedalGuardLevelBigger": 0,
+//         "fansMedalLevelBigger": 0,
+//         "lengthShorter": 0,
+//         "blacklistUsers": [0, 0],
+//         "blacklistKeywords": ["", ""],
+//         "whitelistUsers": [0, 0],
+//         "whitelistKeywords": ["", ""]
+//       },
+//       "gift": {
+//         "enable": true,
+//         "freeGiftEnable": true,
+//         "deduplicateTime": 10,
+//         "freeGiftCountBigger": 0,
+//         "moneyGiftPriceBigger": 1.1
+//       },
+//       "guardBuy": {"enable": true},
+//       "like": {"enable": true, "deduplicate": true},
+//       "welcome": {
+//         "enable": true,
+//         "isFansMedalBelongToLive": false,
+//         "fansMedalGuardLevelBigger": 0,
+//         "fansMedalLevelBigger": 0
+//       },
+//       "subscribe": {"enable": true},
+//       "superChat": {"enable": true},
+//       "warning": {"enable": true}
+//     }
+//   }
+// };

@@ -1,17 +1,22 @@
 import '/services/config.dart';
 import 'dart:async';
 
-List<String> lastDanmuMessages = [];
+List<String?> lastDanmuMessages = [];
+
 bool filterDanmu(int uid, String uname, bool isFansMedalBelongToLive,
     int fansMedalLevel, int fansMedalGuardLevel, String msg, bool isEmoji) {
   var dynamicConfig = getConfigMap().dynamicConfig.filter.danmu;
-  if (!dynamicConfig.enable) return false;
+  if (!dynamicConfig.enable) {
+    return false;
+  }
   if (dynamicConfig.whitelistUsers.contains(uid)) {
     return true;
   }
   if (dynamicConfig.whitelistKeywords.isNotEmpty) {
-    for (var keyword in dynamicConfig.whitelistKeywords) {
-      if (msg.contains(keyword)) return true;
+    for (String keyword in dynamicConfig.whitelistKeywords) {
+      if (msg.contains(keyword)) {
+        return true;
+      }
     }
   }
   if (dynamicConfig.isFansMedalBelongToLive && !isFansMedalBelongToLive) {
@@ -30,17 +35,23 @@ bool filterDanmu(int uid, String uname, bool isFansMedalBelongToLive,
     return false;
   }
   if (!dynamicConfig.symbolEnable &&
-      RegExp(r'^[^\p{L}\p{N}]+$', unicode: true).hasMatch(msg)) return false;
-  if (!dynamicConfig.emojiEnable && isEmoji) return false;
+      RegExp(r'^[^\p{L}\p{N}]+$', unicode: true).hasMatch(msg)) {
+    return false;
+  }
+  if (!dynamicConfig.emojiEnable && isEmoji) {
+    return false;
+  }
   if (dynamicConfig.blacklistUsers.contains(uid)) {
     return false;
   }
   for (var keyword in dynamicConfig.blacklistKeywords) {
-    if (msg.contains(keyword)) return false;
+    if (msg.contains(keyword)) {
+      return false;
+    }
   }
   if (dynamicConfig.deduplicate) {
     if (lastDanmuMessages.contains(msg)) {
-      lastDanmuMessages.add('');
+      lastDanmuMessages.add(null);
       return false;
     }
     lastDanmuMessages.add(msg);
@@ -52,7 +63,8 @@ bool filterDanmu(int uid, String uname, bool isFansMedalBelongToLive,
 }
 
 Map<String, dynamic> giftUids = {};
-Future<bool?> filterGift(String uid, String uname, int price, String giftName,
+
+Future<bool?> filterGift(int uid, String uname, double price, String giftName,
     int num, Function(Map<String, dynamic>, String) deduplicateCallback) async {
   var dynamicConfig = getConfigMap().dynamicConfig.filter.gift;
   if (!dynamicConfig.enable) {
@@ -72,19 +84,23 @@ Future<bool?> filterGift(String uid, String uname, int price, String giftName,
       return false;
     }
   }
+  // 开启了礼物聚合后，所有的礼物都不读除非超时和变化了礼物名称
   if (dynamicConfig.deduplicateTime != 0) {
-    if (!giftUids.containsKey(uid)) {
-      giftUids[uid] = {'uid': uid, 'uname': uname, 'gifts': {}};
+    String uidstr = uid.toString();
+    if (!giftUids.containsKey(uidstr)) {
+      giftUids[uidstr] = {'uid': uidstr, 'uname': uname, 'gifts': {}};
     }
-    if (giftUids[uid]['gifts'].containsKey(giftName)) {
-      giftUids[uid]['gifts'][giftName]['task'].cancel();
+    if (giftUids[uidstr]['gifts'].containsKey(giftName)) {
+      giftUids[uidstr]['gifts'][giftName]['task'].cancel();
     }
     Timer timer = Timer(Duration(seconds: dynamicConfig.deduplicateTime), () {
-      deduplicateCallback(giftUids[uid], giftName);
-      giftUids[uid]['gifts'].remove(giftName);
+      deduplicateCallback(giftUids[uidstr], giftName);
+      giftUids[uidstr]['gifts'].remove(giftName);
     });
-    giftUids[uid]['gifts'][giftName] = {
-      'count': giftUids[uid]['gifts'][giftName]['count'] + num ?? num,
+    giftUids[uidstr]['gifts'][giftName] = {
+      'count': giftUids[uidstr]["gifts"].containsKey(giftName)
+          ? giftUids[uidstr]["gifts"][giftName]["count"] + num
+          : num,
       'task': timer,
     };
     return null;
@@ -95,7 +111,9 @@ Future<bool?> filterGift(String uid, String uname, int price, String giftName,
 bool filterWelcome(int uid, String uname, bool isFansMedalBelongToLive,
     int fansMedalLevel, int fansMedalGuardLevel) {
   var dynamicConfig = getConfigMap().dynamicConfig.filter.welcome;
-  if (!dynamicConfig.enable) return false;
+  if (!dynamicConfig.enable) {
+    return false;
+  }
   if (dynamicConfig.isFansMedalBelongToLive && !isFansMedalBelongToLive) {
     return false;
   }
@@ -113,11 +131,14 @@ bool filterWelcome(int uid, String uname, bool isFansMedalBelongToLive,
 bool filterGuardBuy(
     int uid, String uname, bool newGuard, String giftName, int num) {
   var dynamicConfig = getConfigMap().dynamicConfig.filter.guardBuy;
-  if (!dynamicConfig.enable) return false;
+  if (!dynamicConfig.enable) {
+    return false;
+  }
   return true;
 }
 
 Map<String, bool> likedUids = {};
+
 bool filterLike(int uid, String uname) {
   var dynamicConfig = getConfigMap().dynamicConfig.filter.like;
   if (!dynamicConfig.enable) {
@@ -135,18 +156,24 @@ bool filterLike(int uid, String uname) {
 bool filterSubscribe(int uid, String uname, bool isFansMedalBelongToLive,
     int fansMedalLevel, int fansMedalGuardLevel) {
   var dynamicConfig = getConfigMap().dynamicConfig.filter.subscribe;
-  if (!dynamicConfig.enable) return false;
+  if (!dynamicConfig.enable) {
+    return false;
+  }
   return true;
 }
 
-bool filterSuperChat(int uid, String uname, int price, String msg) {
+bool filterSuperChat(int uid, String uname, double price, String msg) {
   var dynamicConfig = getConfigMap().dynamicConfig.filter.superChat;
-  if (!dynamicConfig.enable) return false;
+  if (!dynamicConfig.enable) {
+    return false;
+  }
   return true;
 }
 
 bool filterWarning(String msg, bool isCutOff) {
   var dynamicConfig = getConfigMap().dynamicConfig.filter.warning;
-  if (!dynamicConfig.enable) return false;
+  if (!dynamicConfig.enable) {
+    return false;
+  }
   return true;
 }
