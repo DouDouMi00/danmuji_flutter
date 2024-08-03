@@ -1,6 +1,5 @@
 import '/services/messages_handler.dart' show markAllMessagesInvalid;
 import '/services/config.dart';
-import 'dart:math';
 import '/services/tts.dart';
 
 Future<void> handleFlush() async {
@@ -12,8 +11,7 @@ Future<void> handleTTSRatePlus() async {
   double rate = nowJsonConfig.dynamicConfig.tts.rate;
 
   rate += 0.1;
-  rate = max(rate, 0.0);
-  rate = min(rate, 5.0);
+  rate = rate.clamp(0.0, 5.0);
 
   rate = double.parse(rate.toStringAsFixed(1));
   nowJsonConfig.dynamicConfig.tts.rate = rate;
@@ -28,8 +26,7 @@ Future<void> handleTTSVolumeMinus() async {
   double rate = nowJsonConfig.dynamicConfig.tts.rate;
 
   rate -= 0.1;
-  rate = max(rate, 0.0);
-  rate = min(rate, 5.0);
+  rate = rate.clamp(0.0, 5.0);
 
   rate = double.parse(rate.toStringAsFixed(1));
   nowJsonConfig.dynamicConfig.tts.rate = rate;

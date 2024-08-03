@@ -60,6 +60,7 @@ class ControlPageState extends State<ControlPage> {
   late DanmakuReceiver receiver;
   // 消息处理程序，用于处理各种消息，如弹幕、礼物等。
   late MessageHandler messageHandler;
+  double _dividerPosition = 0.6;
 
   @override
   void initState() {
@@ -96,6 +97,13 @@ class ControlPageState extends State<ControlPage> {
     }
   }
 
+  void _updateDividerPosition(DragUpdateDetails details) {
+    setState(() {
+      _dividerPosition += details.delta.dy / context.size!.height;
+      _dividerPosition = _dividerPosition.clamp(0.1, 0.9);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -104,10 +112,10 @@ class ControlPageState extends State<ControlPage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Obx(
-              () => Expanded(
-                flex: 3,
-                child: Stack(
+            Expanded(
+              flex: (_dividerPosition * 100).round(),
+              child: Obx(
+                () => Stack(
                   children: [
                     ListView.builder(
                       controller: scrollController,
@@ -147,8 +155,18 @@ class ControlPageState extends State<ControlPage> {
                 ),
               ),
             ),
+            GestureDetector(
+              onVerticalDragUpdate: _updateDividerPosition,
+              child: Container(
+                height: 20,
+                color: Colors.grey[100],
+                child: const Center(
+                  child: Icon(Icons.drag_handle, color: Colors.grey),
+                ),
+              ),
+            ),
             Expanded(
-              flex: 2,
+              flex: ((1 - _dividerPosition) * 100).round(),
               child: LayoutBuilder(
                   builder: (BuildContext context, BoxConstraints constraints) {
                 double buttonWidth = constraints.maxWidth / 2;
