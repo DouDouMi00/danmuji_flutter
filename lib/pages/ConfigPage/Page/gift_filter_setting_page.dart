@@ -26,14 +26,7 @@ class GiftFilterSettingPageState extends State<GiftFilterSettingPage> {
     return Scaffold(
       appBar: AppBar(
         // 添加AppBar并启用返回按钮
-        title: const Text('礼物过滤器'),
-        leading: IconButton(
-          // 这里是返回按钮
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Get.back();
-          },
-        ),
+        title: const Text('礼物过滤器')
       ),
       body: Padding(
         padding: const EdgeInsets.all(32.0),

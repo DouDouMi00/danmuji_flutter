@@ -80,9 +80,10 @@ class InputNumberDialogState extends State<InputNumberDialog> {
               ),
               if (widget.params.isObscured)
                 IconButton(
-                  icon: Icon(
-                    _isObscured ? Icons.visibility_off : Icons.visibility,
-                  ),
+                  isSelected: _isObscured,
+                  icon: const Icon(Icons.visibility),
+                  selectedIcon: const Icon(Icons.visibility_off),
+                  tooltip: _isObscured ? '显示密码' : '隐藏密码',
                   onPressed: () {
                     setState(() {
                       _isObscured = !_isObscured;
@@ -95,29 +96,29 @@ class InputNumberDialogState extends State<InputNumberDialog> {
       ),
       actions: [
         // 取消按钮
-        TextButton(
+        ElevatedButton(
           child: const Text('取消'),
           onPressed: () {
             Get.back();
           },
         ),
-        TextButton(
+        ElevatedButton(
           child: const Text('保存'),
           onPressed: () {
             if (_controller.text.isEmpty) {
               // 显示错误对话框，提示输入不能为空
               Get.dialog(
-                AlertDialog(
-                  title: const Text('错误'),
-                  content: const Text('输入不能为空，请输入有效值。'),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Get.back(),
-                      child: const Text('OK'),
-                    ),
-                  ],
-                ),
-              );
+                  AlertDialog(
+                    title: const Text('错误'),
+                    content: const Text('输入不能为空，请输入有效值。'),
+                    actions: [
+                      ElevatedButton(
+                        onPressed: () => Get.back(),
+                        child: const Text('OK'),
+                      ),
+                    ],
+                  ),
+                  barrierDismissible: false);
             } else {
               dynamic value;
               if (widget.params.inputType == InputType.intInputType ||
@@ -132,49 +133,49 @@ class InputNumberDialogState extends State<InputNumberDialog> {
                       parsedValue < widget.params.minValue!) {
                     // 显示错误对话框
                     Get.dialog(
-                      AlertDialog(
-                        title: const Text('错误'),
-                        content: const Text('数值小于最小值'),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Get.back(),
-                            child: const Text('OK'),
-                          ),
-                        ],
-                      ),
-                    );
+                        AlertDialog(
+                          title: const Text('错误'),
+                          content: const Text('数值小于最小值'),
+                          actions: [
+                            ElevatedButton(
+                              onPressed: () => Get.back(),
+                              child: const Text('OK'),
+                            ),
+                          ],
+                        ),
+                        barrierDismissible: false);
                     return;
                   }
                   if (widget.params.maxValue != null &&
                       parsedValue > widget.params.maxValue!) {
                     Get.dialog(
-                      AlertDialog(
-                        title: const Text('错误'),
-                        content: const Text('数值大于最大值'),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Get.back(),
-                            child: const Text('OK'),
-                          ),
-                        ],
-                      ),
-                    );
+                        AlertDialog(
+                          title: const Text('错误'),
+                          content: const Text('数值大于最大值'),
+                          actions: [
+                            ElevatedButton(
+                              onPressed: () => Get.back(),
+                              child: const Text('OK'),
+                            ),
+                          ],
+                        ),
+                        barrierDismissible: false);
                     return;
                   }
                   value = parsedValue;
                 } catch (e) {
                   Get.dialog(
-                    AlertDialog(
-                      title: const Text('错误'),
-                      content: const Text('请输入有效的数字'),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Get.back(),
-                          child: const Text('OK'),
-                        ),
-                      ],
-                    ),
-                  );
+                      AlertDialog(
+                        title: const Text('错误'),
+                        content: const Text('请输入有效的数字'),
+                        actions: [
+                          ElevatedButton(
+                            onPressed: () => Get.back(),
+                            child: const Text('OK'),
+                          ),
+                        ],
+                      ),
+                      barrierDismissible: false);
                   return;
                 }
               } else {
@@ -192,7 +193,7 @@ class InputNumberDialogState extends State<InputNumberDialog> {
 }
 
 void showInputNumberDialog(InputDialogParams params) {
-  Get.dialog(InputNumberDialog(params: params));
+  Get.dialog(InputNumberDialog(params: params), barrierDismissible: false);
 }
 
 class RadioDialogParams {
@@ -256,13 +257,13 @@ class RadioDialogState extends State<RadioDialog> {
         ),
       ),
       actions: [
-        TextButton(
+        ElevatedButton(
           child: const Text('取消'),
           onPressed: () {
             Get.back();
           },
         ),
-        TextButton(
+        ElevatedButton(
           onPressed: _save,
           child: const Text('保存'),
         ),
@@ -272,5 +273,5 @@ class RadioDialogState extends State<RadioDialog> {
 }
 
 void showRadioDialog(RadioDialogParams params) {
-  Get.dialog(RadioDialog(params: params));
+  Get.dialog(RadioDialog(params: params), barrierDismissible: false);
 }

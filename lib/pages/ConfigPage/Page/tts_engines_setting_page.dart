@@ -296,14 +296,7 @@ class TtsEnginesSettingPageState extends State<TtsEnginesSettingPage> {
     return Scaffold(
       appBar: AppBar(
         // 添加AppBar并启用返回按钮
-        title: const Text('tts 引擎配置'),
-        leading: IconButton(
-          // 这里是返回按钮
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Get.back();
-          },
-        ),
+        title: const Text('tts 引擎配置')
       ),
       body: Padding(
         padding: const EdgeInsets.all(32.0),
