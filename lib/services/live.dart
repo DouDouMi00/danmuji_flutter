@@ -49,7 +49,12 @@ class MessageHandler {
   void _handleDanmaku(command) {
     // 处理弹幕逻辑
     var uid = command['info'][2][0];
-    var faceImg = command['info'][0][15]['user']['base']['face'];
+    String faceImg;
+    try {
+      faceImg = command['info'][0][15]['user']['base']['face'];
+    } catch (e) {
+      faceImg = 'static.hdslb.com/images/member/noface.gif';
+    }
     var msg = command['info'][1];
     var uname = command['info'][2][1];
     var isadmin = command['info'][2][2] == 1;
@@ -65,7 +70,7 @@ class MessageHandler {
     int authorType;
     bool isEmoji;
 
-    if (command['info'][3].length != 0) {
+    if (command['info'][3].isNotEmpty) {
       isFansMedalBelongToLive =
           command['info'][3][3] == getConfigMap().engine.engineBili.liveId;
       fansMedalLevel = command['info'][3][0];
@@ -125,7 +130,7 @@ class MessageHandler {
         PinyinHelper.getShortPinyin(uname); // 假设实现了pinyinConvert函数来处理拼音转换
     var giftName = command['data']['giftName'];
     var num = command['data']['num'];
-    double price = command['data']['price'] / 1000;
+    double price = command['data']['price'] / 1000.0;
     price = command['data']['coin_type'] == 'gold' ? price : 0;
     var faceImg = command['data']['face'];
 
@@ -186,7 +191,7 @@ class MessageHandler {
     var uid = command["data"]["uid"];
     var uname = command["data"]["user_info"]["uname"];
     var unamePronunciation = PinyinHelper.getShortPinyin(uname);
-    double price = command["data"]["price"];
+    double price = command["data"]["price"] / 1.0;
     var msg = command["data"]["message"];
     var faceImg = command["data"]["user_info"]["face"];
     logger.info("[SC] $uname bought ${price.toStringAsFixed(2)}元SC: $msg");
