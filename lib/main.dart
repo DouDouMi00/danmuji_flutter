@@ -1,17 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+
 import '/controllers/home_controller.dart';
-import '/services/messages_handler.dart';
-import '/services/config.dart';
-import 'pages/ConfigPage/config_page.dart';
-import 'pages/control_page.dart';
+import '/pages/ConfigPage/config_page.dart';
+import '/pages/control_page.dart';
+import '/pages/custom_theme.dart';
 import '/routes.dart';
+import '/services/config.dart';
+
+// import '/services/logger.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  setupEventListeners();
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      systemNavigationBarColor: Colors.transparent, // 根据主题设置底栏颜色
+      statusBarColor: Colors.transparent, // 如果想要状态栏透明，可以设置为透明色
+    ),
+  );
+
+  // 让 Flutter 在导航栏后面绘制
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+
   await initConfig();
   runApp(const MyApp());
+  // 添加监听器处理日志记录
+  // logger.onRecord.listen(handleLogRecord);
 }
 
 class MyApp extends StatelessWidget {
@@ -22,6 +37,15 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       initialRoute: '/',
       home: const MyHomePage(),
+      theme: lightTheme,
+      darkTheme: darkTheme,
+      themeMode: prefs.getInt('theme') == 0
+          ? MediaQuery.of(context).platformBrightness == Brightness.dark
+              ? ThemeMode.dark
+              : ThemeMode.light
+          : prefs.getInt('theme') == 1
+              ? ThemeMode.light
+              : ThemeMode.dark,
       getPages: appRoutes,
     );
   }

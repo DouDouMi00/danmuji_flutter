@@ -1,10 +1,15 @@
 import 'package:get/get.dart';
-import 'pages/ConfigPage/index.dart';
-import '/widgets/obscure_text_field.dart' show InputType;
+
 import '/pages/white_list_editor_page.dart';
 import '/services/config.dart';
+import '/widgets/obscure_text_field.dart' show InputType;
+import 'pages/ConfigPage/index.dart';
 
 List<GetPage<dynamic>> get appRoutes => [
+      GetPage(
+        name: '/systemPrompt',
+        page: () => SystemPromptPage(configMap: getConfigMap()),
+      ),
       GetPage(
         name: '/accountSettings',
         page: () => AccountSettingPage(configMap: getConfigMap()),
@@ -44,6 +49,10 @@ List<GetPage<dynamic>> get appRoutes => [
       GetPage(
         name: '/warningFilterSettings',
         page: () => WarningFilterSettingPage(configMap: getConfigMap()),
+      ),
+      GetPage(
+        name: '/themeSettings',
+        page: () => const ThemeSettingPage(),
       ),
       GetPage(
         name: '/filterListEditor',

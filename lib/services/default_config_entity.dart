@@ -37,22 +37,68 @@ class DefaultConfig {
 }
 
 class DynamicConfig {
+  DynamicSystem dynamicSystem;
   Tts tts;
   Filter filter;
 
   DynamicConfig({
+    required this.dynamicSystem,
     required this.tts,
     required this.filter,
   });
 
   factory DynamicConfig.fromJson(Map<String, dynamic> json) => DynamicConfig(
+        dynamicSystem: DynamicSystem.fromJson(json["dynamicSystem"]),
         tts: Tts.fromJson(json["tts"]),
         filter: Filter.fromJson(json["filter"]),
       );
 
   Map<String, dynamic> toJson() => {
+        "dynamicSystem": dynamicSystem.toJson(),
         "tts": tts.toJson(),
         "filter": filter.toJson(),
+      };
+}
+
+class DynamicSystem {
+  AlertWhenMessagesQueueLonger alertWhenMessagesQueueLonger;
+
+  DynamicSystem({
+    required this.alertWhenMessagesQueueLonger,
+  });
+
+  factory DynamicSystem.fromJson(Map<String, dynamic> json) => DynamicSystem(
+        alertWhenMessagesQueueLonger: AlertWhenMessagesQueueLonger.fromJson(
+            json["alertWhenMessagesQueueLonger"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "alertWhenMessagesQueueLonger": alertWhenMessagesQueueLonger.toJson(),
+      };
+}
+
+class AlertWhenMessagesQueueLonger {
+  bool enable;
+  int threshold;
+  int interval;
+
+  AlertWhenMessagesQueueLonger({
+    required this.enable,
+    required this.threshold,
+    required this.interval,
+  });
+
+  factory AlertWhenMessagesQueueLonger.fromJson(Map<String, dynamic> json) =>
+      AlertWhenMessagesQueueLonger(
+        enable: json["enable"],
+        threshold: json["threshold"],
+        interval: json["interval"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "enable": enable,
+        "threshold": threshold,
+        "interval": interval,
       };
 }
 
@@ -394,6 +440,13 @@ class KvdbBili {
 //     "engineBili": {"liveID": 0}
 //   },
 //   "dynamicConfig": {
+//     "dynamicSystem": {
+//       "alertWhenMessagesQueueLonger": {
+//         "enable": true,
+//         "threshold": 50,
+//         "interval": 30
+//       }
+//     },
 //     "tts": {
 //       "engine": "",
 //       "language": "",

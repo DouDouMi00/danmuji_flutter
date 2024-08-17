@@ -1,11 +1,16 @@
 // pages/ConfigPage/config_page.dart
+import 'dart:io' show Platform;
+
+import 'package:android_intent_plus/android_intent.dart';
 import 'package:flutter/material.dart';
-import '/services/config.dart';
 import 'package:get/get.dart';
+
+import '/services/config.dart';
 import '/widgets/obscure_text_field.dart';
 
 class ConfigEditPage extends StatefulWidget {
   const ConfigEditPage({super.key});
+
   @override
   ConfigEditPageState createState() => ConfigEditPageState();
 }
@@ -13,6 +18,7 @@ class ConfigEditPage extends StatefulWidget {
 class ConfigEditPageState extends State<ConfigEditPage> {
   late Future<DefaultConfig> _configFuture;
   late DefaultConfig configMap;
+
   @override
   void initState() {
     super.initState();
@@ -28,7 +34,7 @@ class ConfigEditPageState extends State<ConfigEditPage> {
     return Scaffold(
       appBar: AppBar(title: const Text('设置')),
       body: Padding(
-        padding: const EdgeInsets.all(32.0),
+        padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
         child: FutureBuilder<DefaultConfig>(
           future: _configFuture,
           builder: (context, snapshot) {
@@ -49,6 +55,55 @@ class ConfigEditPageState extends State<ConfigEditPage> {
         ),
       ),
     );
+  }
+
+  /// 打开无障碍设置页面
+  void _openAccessibilitySettings() {
+    const AndroidIntent intent = AndroidIntent(
+      action: 'android.settings.ACCESSIBILITY_SETTINGS',
+    );
+    intent.launch();
+  }
+
+  /// 打开应用详情页面
+  void _openApplicationDetails() {
+    const AndroidIntent intent = AndroidIntent(
+      action: 'android.settings.APPLICATION_DETAILS_SETTINGS',
+      data: 'package:com.DouDouMi00.danmuji_flutter',
+    );
+    intent.launch();
+  }
+
+  /// 打开省电模式设置页面
+  void _openBatterySaverSettings() {
+    const AndroidIntent intent = AndroidIntent(
+      action: 'android.settings.BATTERY_SAVER_SETTINGS',
+    );
+    intent.launch();
+  }
+
+  List<Widget> _buildSystemSettings() {
+    return [
+      const Divider(),
+      ListTile(
+        leading: const Icon(Icons.accessibility_new_outlined),
+        title: const Text('系统辅助功能'),
+        trailing: const Icon(Icons.navigate_next),
+        onTap: () => _openAccessibilitySettings(),
+      ),
+      ListTile(
+        leading: const Icon(Icons.settings_applications_outlined),
+        title: const Text('系统应用设置'),
+        trailing: const Icon(Icons.navigate_next),
+        onTap: () => _openApplicationDetails(),
+      ),
+      ListTile(
+        leading: const Icon(Icons.battery_saver_outlined),
+        title: const Text('系统省电模式设置'),
+        trailing: const Icon(Icons.navigate_next),
+        onTap: () => _openBatterySaverSettings(),
+      ),
+    ];
   }
 
   Widget _buildConfig(DefaultConfig configMap) {
@@ -89,6 +144,19 @@ class ConfigEditPageState extends State<ConfigEditPage> {
           title: const Text('TTS 引擎'),
           trailing: const Icon(Icons.navigate_next),
           onTap: () => Get.toNamed('/ttsEnginesSettings', arguments: configMap),
+        ),
+        ListTile(
+          leading: const Icon(Icons.brightness_medium_outlined),
+          title: const Text('主题设置'),
+          trailing: const Icon(Icons.navigate_next),
+          onTap: () => Get.toNamed('/themeSettings', arguments: configMap),
+        ),
+        const Divider(),
+        ListTile(
+          leading: const Icon(Icons.info_outline),
+          title: const Text('弹幕机提示'),
+          trailing: const Icon(Icons.navigate_next),
+          onTap: () => Get.toNamed('/systemPrompt', arguments: configMap),
         ),
         ListTile(
           leading: const Icon(Icons.chat_outlined),
@@ -143,6 +211,7 @@ class ConfigEditPageState extends State<ConfigEditPage> {
           onTap: () =>
               Get.toNamed('/warningFilterSettings', arguments: configMap),
         ),
+        if (Platform.isAndroid) ..._buildSystemSettings(),
       ],
     );
   }

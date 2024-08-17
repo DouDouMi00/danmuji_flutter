@@ -1,7 +1,10 @@
 // services/config.dart
 import 'dart:convert';
+
 import 'package:shared_preferences/shared_preferences.dart';
+
 import 'default_config_entity.dart';
+
 export '/services/default_config_entity.dart';
 
 // 定义配置的键名
@@ -19,6 +22,13 @@ final Map<String, dynamic> _defaultConfig = {
     "engineBili": {"liveID": 21654925}
   },
   "dynamicConfig": {
+    "dynamicSystem": {
+      "alertWhenMessagesQueueLonger": {
+        "enable": true,
+        "threshold": 50,
+        "interval": 30
+      }
+    },
     "tts": {
       "engine": "",
       "language": "",
@@ -88,6 +98,9 @@ void mergeConfigRecursively(
 Future<void> initConfig() async {
   prefs = await SharedPreferences.getInstance();
   final jsonString = prefs.getString(_configKey);
+  if (prefs.getInt('theme') == null) {
+    await prefs.setInt('theme', 0);
+  }
   if (jsonString != null) {
     config = jsonDecode(jsonString);
     // 合并默认配置和已存在的配置
@@ -100,10 +113,13 @@ Future<void> initConfig() async {
 }
 
 // 更新配置
-Future<void> updateConfigMap(DefaultConfig newConfig) async {
+Future<void> updateConfigMap(DefaultConfig newConfig,
+    {bool test = false}) async {
   // 将配置转换为JSON字符串并保存
   config = newConfig.toJson();
-  await prefs.setString(_configKey, jsonEncode(config));
+  if (!test) {
+    await prefs.setString(_configKey, jsonEncode(config));
+  }
 }
 
 // 获取配置

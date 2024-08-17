@@ -1,18 +1,18 @@
 // live.dart
 import 'dart:convert';
+
+import 'package:pinyin/pinyin.dart';
+
 import '/services/blivedm.dart';
 import '/services/config.dart';
-import '/services/tool.dart';
-import 'package:pinyin/pinyin.dart';
-import 'event_emitter.dart';
 import '/services/logger.dart';
+import '/services/tool.dart';
+import 'event_emitter.dart';
 
-EventEmitter emitter = EventEmitter();
+EventEmitter liveEvent = EventEmitter();
 
 class MessageHandler {
-  final DanmakuReceiver receiver;
-
-  MessageHandler(this.receiver);
+  final DanmakuReceiver receiver = DanmakuReceiver();
 
   void setupEventHandlers() {
     // **BaseHandler._CMD_CALLBACK_DICT, (基础处理器的命令回调字典)
@@ -33,6 +33,57 @@ class MessageHandler {
     receiver.onLikeCallback(_handleLike);
     receiver.onWarningCallback(_handleWarning);
     receiver.onCutOffCallback(_handleCutOff);
+  }
+
+  void run() {
+    receiver.run();
+  }
+
+  void stop() {
+    receiver.dispose();
+  }
+
+  List<Map<String, dynamic>> getRichContent(
+      Map<String, dynamic> data, bool isEmoji) {
+    List<Map<String, dynamic>> richContent = [];
+    if (isEmoji) {
+      richContent.add({"type": 1, "url": data["info"][0][13]["url"]});
+      return richContent;
+    }
+
+    int startPos = 0;
+    int pos = 0;
+    Map<String, dynamic> dataJson = jsonDecode(data["info"][0][15]["extra"]);
+    String contentMsgText = dataJson["content"];
+
+    while (pos <= contentMsgText.length - 1) {
+      if (contentMsgText[pos] == "[" && pos != startPos) {
+        richContent
+            .add({"type": 0, "text": contentMsgText.substring(startPos, pos)});
+        startPos = pos;
+      }
+      if (contentMsgText[pos] == "]" && pos > 0) {
+        String emotKey = contentMsgText.substring(startPos, pos + 1);
+        Map<String, dynamic> emotInfo = dataJson["emots"][emotKey];
+        richContent.add({
+          "type": 1,
+          "text": emotKey,
+          "url": emotInfo["url"],
+          "width": emotInfo["width"],
+          "height": emotInfo["height"],
+        });
+        startPos = pos + 1;
+      }
+      // Reach the end of the string
+      if (pos == contentMsgText.length - 1 &&
+          startPos < contentMsgText.length) {
+        richContent
+            .add({"type": 0, "text": contentMsgText.substring(startPos)});
+        break;
+      }
+      pos++;
+    }
+    return richContent;
   }
 
   Map guardLevelMap = {0: 0, 1: 3, 2: 2, 3: 1};
@@ -69,6 +120,8 @@ class MessageHandler {
     String authorTypeText;
     int authorType;
     bool isEmoji;
+    bool isEmojiRaw;
+    List<Map<String, dynamic>> richContent;
 
     if (command['info'][3].isNotEmpty) {
       isFansMedalBelongToLive =
@@ -99,9 +152,11 @@ class MessageHandler {
       authorTypeText = "";
     }
     isEmoji = command['info'][0][12] == 1 || isStringAllEmojis(msg);
+    isEmojiRaw = command["info"][0][12] == 1;
+    richContent = getRichContent(command, isEmojiRaw);
     logger.info(
         '[Danmu] [$authorTypeText] [$liveRoomGuardLevelName] [[$fansMedalGuardLevelName]$fansMedalName:$fansMedalLevel] $uname: $msg');
-    emitter.emitEvent(jsonEncode({
+    liveEvent.emitEvent(jsonEncode({
       'eventType': 'danmu',
       'data': {
         'uid': uid,
@@ -116,6 +171,7 @@ class MessageHandler {
         'liveRoomGuardLevelName': liveRoomGuardLevelName,
         'liveRoomGuardLevel': liveRoomGuardLevel,
         'msg': msg,
+        'richContent': richContent,
         'faceImg': faceImg,
         'isEmoji': isEmoji,
       }
@@ -137,7 +193,7 @@ class MessageHandler {
     logger.info(
         "[Gift] $uname $unamePronunciation bought ${price.toStringAsFixed(2)}元的$giftName x $num.");
 
-    emitter.emitEvent(jsonEncode({
+    liveEvent.emitEvent(jsonEncode({
       'eventType': 'gift',
       'data': {
         'uid': uid,
@@ -170,7 +226,7 @@ class MessageHandler {
 
     logger.info(
         '[GuardBuy] $uname bought ${newGuard ? 'New ' : ''}$giftName x $num.');
-    emitter.emitEvent(jsonEncode({
+    liveEvent.emitEvent(jsonEncode({
       'eventType': 'guardBuy',
       'data': {
         'uid': uid,
@@ -195,7 +251,7 @@ class MessageHandler {
     var msg = command["data"]["message"];
     var faceImg = command["data"]["user_info"]["face"];
     logger.info("[SC] $uname bought ${price.toStringAsFixed(2)}元SC: $msg");
-    emitter.emitEvent(jsonEncode({
+    liveEvent.emitEvent(jsonEncode({
       'eventType': 'superChat',
       'data': {
         'uid': uid,
@@ -232,7 +288,7 @@ class MessageHandler {
         "[Interact] $uname ${isSubscribe ? 'subscribe' : 'enter'} the stream.");
 
     if (isSubscribe) {
-      emitter.emitEvent(jsonEncode({
+      liveEvent.emitEvent(jsonEncode({
         'eventType': 'subscribe',
         'data': {
           'uid': uid,
@@ -243,7 +299,7 @@ class MessageHandler {
         }
       }));
     } else {
-      emitter.emitEvent(jsonEncode({
+      liveEvent.emitEvent(jsonEncode({
         'eventType': 'welcome',
         'data': {
           'uid': uid,
@@ -261,7 +317,7 @@ class MessageHandler {
     var uid = command["data"]["uid"];
     var uname = command["data"]["uname"];
     logger.info("[Like] $uname liked the stream.");
-    emitter.emitEvent(jsonEncode({
+    liveEvent.emitEvent(jsonEncode({
       'eventType': 'like',
       'data': {
         'uid': uid,
@@ -274,7 +330,7 @@ class MessageHandler {
     // 处理警告逻辑
     var msg = command['msg'];
     logger.info("[Warning] $msg");
-    emitter.emitEvent(jsonEncode({
+    liveEvent.emitEvent(jsonEncode({
       'eventType': 'warning',
       'data': {
         'msg': msg,
@@ -288,7 +344,7 @@ class MessageHandler {
     logger.info(command);
     var msg = command['msg'];
     logger.info("[Warning] Cut Off, $msg");
-    emitter.emitEvent(jsonEncode({
+    liveEvent.emitEvent(jsonEncode({
       'eventType': 'warning',
       'data': {
         'msg': msg,

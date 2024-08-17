@@ -1,9 +1,10 @@
 import 'package:flutter_tts/flutter_tts.dart';
+
 import '/services/config.dart';
+import '/services/logger.dart';
 import '/services/messages_handler.dart'
     show popMessagesQueue, getHaveReadMessages;
-import '/services/logger.dart';
-import '/pages/control_page.dart' show messageController;
+import '/services/stats.dart';
 
 late FlutterTts flutterTts;
 late Tts ttsConfig;
@@ -17,7 +18,7 @@ Future<void> _setAwaitOptions() async {
   await flutterTts.awaitSpeakCompletion(true);
 }
 
-void stopTtsTask() async {
+void stopTtsTask() {
   _shouldExitTtsTask = false;
 }
 
@@ -77,7 +78,6 @@ Future<void> syncWithConfig() async {
 
 Future<void> tts(String text, [channel = 0, config]) async {
   await syncWithConfig();
-  messageController.sendMessage(text);
   await flutterTts.stop();
   await flutterTts.speak(text);
 }
@@ -112,6 +112,10 @@ Future<void> ttsTask() async {
       await Future.delayed(const Duration(milliseconds: 10));
       continue;
     }
+    int currentTime = DateTime.now().millisecondsSinceEpoch;
+    int storedTime = msg['time'].toInt(); // 显式转换为int类型
+    int difference = currentTime - storedTime;
+    appendDelay(difference ~/ 1000);
     logger.info("取出消息$msg");
     String text = messagesToText(msg);
     await tts(text);

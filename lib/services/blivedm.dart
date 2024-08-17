@@ -1,9 +1,11 @@
-import 'dart:typed_data';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:web_socket_channel/web_socket_channel.dart';
 import 'dart:async';
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:brotli/brotli.dart';
+import 'package:http/http.dart' as http;
+import 'package:web_socket_channel/web_socket_channel.dart';
+
 import '/services/config.dart';
 import '/services/logger.dart';
 import '/services/tts.dart' show ttsSystem;
@@ -81,12 +83,32 @@ class DanmakuReceiver {
   final List<Function> _likeInfoV3Click = [];
   final List<Function> _warning = [];
   final List<Function> _cutOff = [];
+  bool isclose = false;
 
   WebSocketChannel? ws;
   int? _anchorUid;
+  Timer? _heartbeatTimer;
+
   int? get anchorUid => _anchorUid;
 
-  DanmakuReceiver() {
+  Uint8List packetEncode(int protocol, int type, String payload) {
+    final utf8Payload = utf8.encode(payload);
+    final totalLength = 16 + utf8Payload.length;
+    final packetHeader = ByteData(16);
+    packetHeader.setInt32(0, totalLength);
+    packetHeader.setInt16(4, 16);
+    packetHeader.setUint16(6, protocol);
+    packetHeader.setUint32(8, type);
+    packetHeader.setUint32(12, 1);
+    final packet = BytesBuilder();
+    packet.add(packetHeader.buffer.asInt8List());
+    packet.add(utf8Payload);
+    return packet.toBytes();
+  }
+
+  Future<void> run() async {
+    logger.info('正在连接弹幕服务器');
+    isclose = false;
     int roomId = getConfigMap().engine.engineBili.liveId;
     final headers = <String, String>{
       'Cookie': 'buvid3=' '; SESSDATA=' '; bili_jct=' ';',
@@ -96,19 +118,20 @@ class DanmakuReceiver {
     http
         .get(
             Uri.parse(
-                'https://api.live.bilibili.com/room/v1/Room/room_init?id=$roomId'),
+                'https://api.live.bilibili.com/xlive/web-room/v1/index/getInfoByRoom?room_id=$roomId'),
             headers: headers)
         .then((value) async {
       final dataJSON = jsonDecode(value.body);
       _anchorUid = dataJSON['data']['uid'];
       final roomInfoJSON = jsonDecode((await http.get(
               Uri.parse(
-                  'https://api.live.bilibili.com/room/v1/Danmu/getConf?room_id=${dataJSON['data']['room_id']}&platform=pc&player=web'),
+                  'https://api.live.bilibili.com/xlive/web-room/v1/index/getDanmuInfo?id=${dataJSON['data']['room_info']['room_id']}'),
               headers: headers))
           .body);
-      roomId = dataJSON['data']['room_id'];
+      roomId = dataJSON['data']['room_info']['room_id'];
+      String title = dataJSON['data']['room_info']['title'];
       ws = WebSocketChannel.connect(Uri.parse(
-          'wss://${roomInfoJSON['data']['host_server_list'][0]['host']}:${roomInfoJSON['data']['host_server_list'][0]['wss_port']}/sub'));
+          'wss://${roomInfoJSON['data']['host_list'][0]['host']}:${roomInfoJSON['data']['host_list'][0]['wss_port']}/sub'));
       final authJSONString = jsonEncode({
         'roomid': roomId,
         'protover': 3,
@@ -129,9 +152,16 @@ class DanmakuReceiver {
           switch (type) {
             case DanmakuType.authReply:
               logger.info('认证通过，已连接到弹幕服务器 $roomId');
-              await ttsSystem('认证通过，进入直播间$roomId');
-              Timer.periodic(const Duration(seconds: 30), (timer) {
-                ws?.sink.add(packetEncode(1, 2, "[object Object]"));
+              await ttsSystem('认证通过，进入直播间$roomId ，直播标题$title');
+              _heartbeatTimer =
+                  Timer.periodic(const Duration(seconds: 24), (timer) {
+                if (!isclose) {
+                  ws?.sink.add(packetEncode(1, 2, "[object Object]"));
+                  logger.info('发送心跳包');
+                } else {
+                  logger.info('心跳包发送失败');
+                  timer.cancel();
+                }
               });
               break;
             case DanmakuType.data:
@@ -155,35 +185,35 @@ class DanmakuReceiver {
                     switch (cmd) {
                       case 'DANMU_MSG':
                         for (final handler in _danmuMsg) {
-                          Future.microtask(() => handler(dataJSON));
+                          handler(dataJSON);
                         }
                       case 'SEND_GIFT':
                         for (final handler in _sendGift) {
-                          Future.microtask(() => handler(dataJSON));
+                          handler(dataJSON);
                         }
                       case 'USER_TOAST_MSG':
                         for (final handler in _userToastMsg) {
-                          Future.microtask(() => handler(dataJSON));
+                          handler(dataJSON);
                         }
                       case 'SUPER_CHAT_MESSAGE':
                         for (final handler in _superChatMessage) {
-                          Future.microtask(() => handler(dataJSON));
+                          handler(dataJSON);
                         }
                       case 'INTERACT_WORD':
                         for (final handler in _interactWord) {
-                          Future.microtask(() => handler(dataJSON));
+                          handler(dataJSON);
                         }
                       case 'LIKE_INFO_V3_CLICK':
                         for (final handler in _likeInfoV3Click) {
-                          Future.microtask(() => handler(dataJSON));
+                          handler(dataJSON);
                         }
                       case 'WARNING':
                         for (final handler in _warning) {
-                          Future.microtask(() => handler(dataJSON));
+                          handler(dataJSON);
                         }
                       case 'CUT_OFF':
                         for (final handler in _cutOff) {
-                          Future.microtask(() => handler(dataJSON));
+                          handler(dataJSON);
                         }
                     }
                     offset += length;
@@ -196,24 +226,11 @@ class DanmakuReceiver {
       );
     });
   }
-  Uint8List packetEncode(int protocol, int type, String payload) {
-    final utf8Payload = utf8.encode(payload);
-    final totalLength = 16 + utf8Payload.length;
-    final packetHeader = ByteData(16);
-    packetHeader.setInt32(0, totalLength);
-    packetHeader.setInt16(4, 16);
-    packetHeader.setUint16(6, protocol);
-    packetHeader.setUint32(8, type);
-    packetHeader.setUint32(12, 1);
-    final packet = BytesBuilder();
-    packet.add(packetHeader.buffer.asInt8List());
-    packet.add(utf8Payload);
-    return packet.toBytes();
-  }
 
   void dispose() {
+    isclose = true;
+    _heartbeatTimer?.cancel();
     ws?.sink.close();
-    ws = null;
     _danmuMsg.clear();
     _sendGift.clear();
     _userToastMsg.clear();
@@ -222,6 +239,7 @@ class DanmakuReceiver {
     _likeInfoV3Click.clear();
     _warning.clear();
     _cutOff.clear();
+
     logger.info('已断开弹幕服务器连接');
   }
 

@@ -1,11 +1,41 @@
-import 'dart:convert';
-import 'live.dart' show emitter;
-import '/services/filter.dart';
 import 'dart:async';
-import '/services/logger.dart';
+import 'dart:convert';
 
-void setupEventListeners() {
-  emitter.onEvent.listen((eventData) async {
+import '/services/filter.dart';
+import '/services/logger.dart';
+import '/services/stats.dart';
+import 'live.dart' show liveEvent;
+
+List<Map<String, dynamic>> messagesQueue = [];
+List<Map<String, dynamic>> haveReadMessages = [];
+StreamSubscription? liveEventSubscription;
+
+Map<String, dynamic>? popMessagesQueue() {
+  if (messagesQueue.isEmpty) {
+    return null;
+  }
+  var data = messagesQueue.removeAt(0);
+  setOutputMessagesLength(messagesQueue.length);
+  haveReadMessages.add(data);
+  return data;
+}
+
+List<Map<String, dynamic>> getHaveReadMessages() {
+  return haveReadMessages;
+}
+
+void messagesQueueAppend(dynamic data) {
+  messagesQueue.add(data);
+  setOutputMessagesLength(messagesQueue.length);
+}
+
+void messagesQueueAppendAtStart(dynamic data) {
+  messagesQueue.insert(0, data);
+  setOutputMessagesLength(messagesQueue.length);
+}
+
+void setupLiveEventListeners() {
+  liveEventSubscription = liveEvent.onEvent.listen((eventData) async {
     Map<String, dynamic> eventDataMap;
 
     try {
@@ -51,28 +81,8 @@ void setupEventListeners() {
   });
 }
 
-List<Map<String, dynamic>> messagesQueue = [];
-List<Map<String, dynamic>> haveReadMessages = [];
-
-Map<String, dynamic>? popMessagesQueue() {
-  if (messagesQueue.isEmpty) {
-    return null;
-  }
-  var data = messagesQueue.removeAt(0);
-  haveReadMessages.add(data);
-  return data;
-}
-
-List<Map<String, dynamic>> getHaveReadMessages() {
-  return haveReadMessages;
-}
-
-void messagesQueueAppend(dynamic data) {
-  messagesQueue.add(data);
-}
-
-void messagesQueueAppendAtStart(dynamic data) {
-  messagesQueue.insert(0, data);
+void cancelLiveEventListeners() {
+  liveEventSubscription?.cancel();
 }
 
 void onDanmu(dynamic command) {
@@ -84,9 +94,8 @@ void onDanmu(dynamic command) {
       command['fansMedalGuardLevel'],
       command['msg'],
       command['isEmoji'])) {
-    messagesQueueAppend({
-      "type": "danmu",
-      "time": DateTime.now(),
+    appendDanmuFilteredStats(false, args: {
+      "time": DateTime.now().millisecondsSinceEpoch,
       "uid": command['uid'],
       "uname": command['uname'],
       "msg": command['msg'],
@@ -102,6 +111,34 @@ void onDanmu(dynamic command) {
       "authorType": command['authorType'],
       "authorTypeText": command['authorTypeText'],
     });
+    messagesQueueAppend({
+      "type": "danmu",
+      "time": DateTime.now().millisecondsSinceEpoch,
+      "uid": command['uid'],
+      "uname": command['uname'],
+      "msg": command['msg'],
+      "richContent": command['richContent'],
+      "isEmoji": command['isEmoji'],
+      "fansMedalName": command['fansMedalName'],
+      "fansMedalLevel": command['fansMedalLevel'],
+      "fansMedalGuardLevelName": command['fansMedalGuardLevelName'],
+      "fansMedalGuardLevel": command['fansMedalGuardLevel'],
+      "liveRoomGuardLevelName": command['liveRoomGuardLevelName'],
+      "liveRoomGuardLevel": command['liveRoomGuardLevel'],
+      "faceImg": command['faceImg'],
+      "authorType": command['authorType'],
+      "authorTypeText": command['authorTypeText'],
+    });
+  } else {
+    appendDanmuFilteredStats(true, args: {
+      "faceImg": command['faceImg'],
+      "time": DateTime.now().millisecondsSinceEpoch,
+      "uid": command['uid'],
+      "uname": command['uname'],
+      "msg": command['msg'],
+      "richContent": command['richContent'],
+      "isEmoji": command['isEmoji'],
+    });
   }
 }
 
@@ -110,7 +147,7 @@ void onGift(dynamic command) async {
     Map<String, dynamic> giftInfo = userInfo['gifts'][giftName];
     messagesQueueAppend({
       "type": "gift",
-      "time": DateTime.now(),
+      "time": DateTime.now().millisecondsSinceEpoch,
       "uid": userInfo["uid"],
       "uname": userInfo["uname"],
       "giftName": giftName,
@@ -126,11 +163,32 @@ void onGift(dynamic command) async {
       command['num'],
       deduplicateCallback);
   if (result == true) {
-    messagesQueueAppend({
-      "type": "gift",
-      "time": DateTime.now(),
+    appendGiftFilteredStats(false, args: {
+      "time": DateTime.now().millisecondsSinceEpoch,
       "uid": command['uid'],
       "uname": command['uname'],
+      "unamePronunciation": command['unamePronunciation'],
+      "price": command['price'],
+      "faceImg": command['faceImg'],
+      "giftName": command['giftName'],
+      "num": command['num'],
+    });
+    messagesQueueAppend({
+      "type": "gift",
+      "time": DateTime.now().millisecondsSinceEpoch,
+      "uid": command['uid'],
+      "uname": command['uname'],
+      "giftName": command['giftName'],
+      "num": command['num'],
+    });
+  } else {
+    appendGiftFilteredStats((result != null), args: {
+      "uid": command['uid'],
+      "uname": command['uname'],
+      "unamePronunciation": command['unamePronunciation'],
+      "time": DateTime.now().millisecondsSinceEpoch,
+      "price": command['price'],
+      "faceImg": command['faceImg'],
       "giftName": command['giftName'],
       "num": command['num'],
     });
@@ -140,23 +198,59 @@ void onGift(dynamic command) async {
 void onGuardBuy(dynamic command) {
   if (filterGuardBuy(command['uid'], command['uname'], command['newGuard'],
       command['giftName'], command['num'])) {
+    appendGuardBuyFilteredStats(false, args: {
+      "uid": command['uid'],
+      "uname": command['uname'],
+      "unamePronunciation": command['unamePronunciation'],
+      "time": DateTime.now().millisecondsSinceEpoch,
+      "liveRoomGuardLevel": command['liveRoomGuardLevel'],
+      "newGuard": command['newGuard'],
+      "faceImg": command['faceImg'],
+      "giftName": command['giftName'],
+      "num": command['num'],
+      "title": command['title'],
+    });
     messagesQueueAppend({
       "type": "guardBuy",
-      "time": DateTime.now(),
+      "time": DateTime.now().millisecondsSinceEpoch,
       "uid": command['uid'],
       "uname": command['uname'],
       "newGuard": command['newGuard'],
       "giftName": command['giftName'],
       "num": command['num'],
     });
+  } else {
+    appendGuardBuyFilteredStats(true, args: {
+      "uid": command['uid'],
+      "uname": command['uname'],
+      "unamePronunciation": command['unamePronunciation'],
+      "time": DateTime.now().millisecondsSinceEpoch,
+      "liveRoomGuardLevel": command['liveRoomGuardLevel'],
+      "newGuard": command['newGuard'],
+      "faceImg": command['faceImg'],
+      "giftName": command['giftName'],
+      "num": command['num'],
+      "title": command['title'],
+    });
   }
 }
 
 void onLike(dynamic command) {
   if (filterLike(command['uid'], command['uname'])) {
+    appendLikeFilteredStats(false, args: {
+      "time": DateTime.now().millisecondsSinceEpoch,
+      "uid": command['uid'],
+      "uname": command['uname'],
+    });
     messagesQueueAppend({
       "type": "like",
-      "time": DateTime.now(),
+      "time": DateTime.now().millisecondsSinceEpoch,
+      "uid": command['uid'],
+      "uname": command['uname'],
+    });
+  } else {
+    appendLikeFilteredStats(true, args: {
+      "time": DateTime.now().millisecondsSinceEpoch,
       "uid": command['uid'],
       "uname": command['uname'],
     });
@@ -166,11 +260,30 @@ void onLike(dynamic command) {
 void onSuperChat(dynamic command) {
   if (filterSuperChat(
       command['uid'], command['uname'], command['price'], command['msg'])) {
+    appendSuperChatFilteredStats(false, args: {
+      "time": DateTime.now().millisecondsSinceEpoch,
+      "uid": command['uid'],
+      "faceImg": command['faceImg'],
+      "uname": command['uname'],
+      "unamePronunciation": command['unamePronunciation'],
+      "price": command['price'],
+      "msg": command['msg'],
+    });
     messagesQueueAppend({
       "type": "superChat",
-      "time": DateTime.now(),
+      "time": DateTime.now().millisecondsSinceEpoch,
       "uid": command['uid'],
       "uname": command['uname'],
+      "price": command['price'],
+      "msg": command['msg'],
+    });
+  } else {
+    appendSuperChatFilteredStats(true, args: {
+      "time": DateTime.now().millisecondsSinceEpoch,
+      "uid": command['uid'],
+      "faceImg": command['faceImg'],
+      "uname": command['uname'],
+      "unamePronunciation": command['unamePronunciation'],
       "price": command['price'],
       "msg": command['msg'],
     });
@@ -184,9 +297,20 @@ void onSubscribe(dynamic command) {
       command['isFansMedalBelongToLive'],
       command['fansMedalLevel'],
       command['fansMedalGuardLevel'])) {
+    appendSubscribeFilteredStats(false, args: {
+      "time": DateTime.now().millisecondsSinceEpoch,
+      "uid": command['uid'],
+      "uname": command['uname'],
+    });
     messagesQueueAppend({
       "type": "subscribe",
-      "time": DateTime.now(),
+      "time": DateTime.now().millisecondsSinceEpoch,
+      "uid": command['uid'],
+      "uname": command['uname'],
+    });
+  } else {
+    appendSubscribeFilteredStats(true, args: {
+      "time": DateTime.now().millisecondsSinceEpoch,
       "uid": command['uid'],
       "uname": command['uname'],
     });
@@ -200,9 +324,20 @@ void onWelcome(dynamic command) {
       command['isFansMedalBelongToLive'],
       command['fansMedalLevel'],
       command['fansMedalGuardLevel'])) {
+    appendWelcomeFilteredStats(false, args: {
+      "time": DateTime.now().millisecondsSinceEpoch,
+      "uid": command['uid'],
+      "uname": command['uname'],
+    });
     messagesQueueAppend({
       "type": "welcome",
-      "time": DateTime.now(),
+      "time": DateTime.now().millisecondsSinceEpoch,
+      "uid": command['uid'],
+      "uname": command['uname'],
+    });
+  } else {
+    appendWelcomeFilteredStats(true, args: {
+      "time": DateTime.now().millisecondsSinceEpoch,
       "uid": command['uid'],
       "uname": command['uname'],
     });
@@ -211,9 +346,20 @@ void onWelcome(dynamic command) {
 
 void onWarning(dynamic command) {
   if (filterWarning(command['msg'], command['isCutOff'])) {
+    appendWarningFilteredStats(false, args: {
+      "time": DateTime.now().millisecondsSinceEpoch,
+      "msg": command['msg'],
+      "isCutOff": command['isCutOff'],
+    });
     messagesQueueAppend({
       "type": "warning",
-      "time": DateTime.now(),
+      "time": DateTime.now().millisecondsSinceEpoch,
+      "msg": command['msg'],
+      "isCutOff": command['isCutOff'],
+    });
+  } else {
+    appendWarningFilteredStats(true, args: {
+      "time": DateTime.now().millisecondsSinceEpoch,
       "msg": command['msg'],
       "isCutOff": command['isCutOff'],
     });
@@ -222,6 +368,17 @@ void onWarning(dynamic command) {
 
 Future<void> markAllMessagesInvalid() async {
   messagesQueue = [
-    {"type": "system", "time": DateTime.now(), "msg": "已清空弹幕列表"}
+    {
+      "type": "system",
+      "time": DateTime.now().millisecondsSinceEpoch,
+      "msg": "已清空弹幕列表"
+    }
   ];
+  setOutputMessagesLength(messagesQueue.length);
+}
+
+void clearMessagesQueue() {
+  messagesQueue.clear();
+  haveReadMessages.clear();
+  setOutputMessagesLength(messagesQueue.length);
 }
