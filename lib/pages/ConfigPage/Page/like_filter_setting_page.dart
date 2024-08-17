@@ -1,6 +1,7 @@
 //like_filter_setting_page.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 import '/services/config.dart';
 
 class LikeFilterSettingPage extends StatefulWidget {
@@ -14,6 +15,7 @@ class LikeFilterSettingPage extends StatefulWidget {
 
 class LikeFilterSettingPageState extends State<LikeFilterSettingPage> {
   late DefaultConfig configMap;
+
   @override
   void initState() {
     super.initState();
@@ -23,12 +25,9 @@ class LikeFilterSettingPageState extends State<LikeFilterSettingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        // 添加AppBar并启用返回按钮
-        title: const Text('点赞过滤器')
-      ),
+      appBar: AppBar(title: const Text('点赞过滤器')),
       body: Padding(
-        padding: const EdgeInsets.all(32.0),
+        padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

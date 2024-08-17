@@ -1,9 +1,10 @@
 //dm_filter_setting_page.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+import '/pages/white_list_editor_page.dart';
 import '/services/config.dart';
 import '/widgets/obscure_text_field.dart';
-import '/pages/white_list_editor_page.dart';
 
 class DmFilterSettingPage extends StatefulWidget {
   final DefaultConfig configMap;
@@ -22,6 +23,7 @@ class DmFilterSettingPageState extends State<DmFilterSettingPage> {
     {'title': '总督', 'value': 3},
   ];
   late DefaultConfig configMap;
+
   @override
   void initState() {
     super.initState();
@@ -31,12 +33,9 @@ class DmFilterSettingPageState extends State<DmFilterSettingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        // 添加AppBar并返回按钮
-        title: const Text('弹幕过滤器')
-      ),
+      appBar: AppBar(title: const Text('弹幕过滤器')),
       body: Padding(
-        padding: const EdgeInsets.all(32.0),
+        padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -178,7 +177,7 @@ class DmFilterSettingPageState extends State<DmFilterSettingPage> {
               ListTile(
                 leading: const Icon(Icons.text_snippet_outlined),
                 title: Text(
-                    '文本长度小于等于: ${configMap.dynamicConfig.filter.danmu.lengthShorter}'),
+                    '读出文本长度小于等于: ${configMap.dynamicConfig.filter.danmu.lengthShorter}'),
                 trailing: const Icon(Icons.navigate_next),
                 onTap: () {
                   showInputNumberDialog(

@@ -1,9 +1,11 @@
 // tts_engines_setting_page.dart
+import 'dart:io' show Platform;
+
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'dart:io' show Platform;
-import 'package:get/get.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:get/get.dart';
+
 import '/services/config.dart';
 import '/widgets/obscure_text_field.dart';
 
@@ -22,6 +24,7 @@ class TtsEnginesSettingPageState extends State<TtsEnginesSettingPage> {
   late double pitch;
   late double rate;
   bool isCurrentLanguageInstalled = false;
+
   bool get isAndroid => !kIsWeb && Platform.isAndroid;
   String? engine;
   String? language;
@@ -91,6 +94,7 @@ class TtsEnginesSettingPageState extends State<TtsEnginesSettingPage> {
   }
 
   Future<dynamic> _getLanguages() async => await flutterTts.getLanguages;
+
   Future<dynamic> _getEngines() async => await flutterTts.getEngines;
 
   Future<String?> _getDefaultEngine() async {
@@ -294,12 +298,9 @@ class TtsEnginesSettingPageState extends State<TtsEnginesSettingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        // 添加AppBar并启用返回按钮
-        title: const Text('tts 引擎配置')
-      ),
+      appBar: AppBar(title: const Text('tts 引擎配置')),
       body: Padding(
-        padding: const EdgeInsets.all(32.0),
+        padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

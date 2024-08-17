@@ -1,6 +1,7 @@
 //subscribe_filter_setting_page.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 import '/services/config.dart';
 
 class SubscribeFilterSettingPage extends StatefulWidget {
@@ -16,6 +17,7 @@ class SubscribeFilterSettingPage extends StatefulWidget {
 class SubscribeFilterSettingPageState
     extends State<SubscribeFilterSettingPage> {
   late DefaultConfig configMap;
+
   @override
   void initState() {
     super.initState();
@@ -25,12 +27,9 @@ class SubscribeFilterSettingPageState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        // 添加AppBar并启用返回按钮
-        title: const Text('关注过滤器')
-      ),
+      appBar: AppBar(title: const Text('关注过滤器')),
       body: Padding(
-        padding: const EdgeInsets.all(32.0),
+        padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

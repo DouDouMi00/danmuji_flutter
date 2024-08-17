@@ -1,6 +1,7 @@
 //welcome_filter_setting_page.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 import '/services/config.dart';
 import '/widgets/obscure_text_field.dart';
 
@@ -16,6 +17,7 @@ class WelcomeFilterSettingPage extends StatefulWidget {
 
 class WelcomeFilterSettingPageState extends State<WelcomeFilterSettingPage> {
   late DefaultConfig configMap;
+
   @override
   void initState() {
     super.initState();
@@ -31,12 +33,9 @@ class WelcomeFilterSettingPageState extends State<WelcomeFilterSettingPage> {
       {'title': '总督', 'value': 3},
     ];
     return Scaffold(
-      appBar: AppBar(
-        // 添加AppBar并启用返回按钮
-        title: const Text('进入直播间过滤器')
-      ),
+      appBar: AppBar(title: const Text('进入直播间过滤器')),
       body: Padding(
-        padding: const EdgeInsets.all(32.0),
+        padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
