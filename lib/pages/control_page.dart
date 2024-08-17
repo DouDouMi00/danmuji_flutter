@@ -421,17 +421,18 @@ class ControlPageState extends State<ControlPage>
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            Expanded(
-                              child: ElevatedButton(
-                                onPressed: isRunning ? handleTTSRatePlus : null,
-                                child: const Text('语速+1'),
-                              ),
-                            ),
+                            // 调整按钮顺序
                             Expanded(
                               child: ElevatedButton(
                                 onPressed:
                                     isRunning ? handleTTSVolumeMinus : null,
                                 child: const Text('语速-1'),
+                              ),
+                            ),
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: isRunning ? handleTTSRatePlus : null,
+                                child: const Text('语速+1'),
                               ),
                             ),
                           ],
