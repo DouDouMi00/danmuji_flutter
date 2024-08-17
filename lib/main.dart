@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import '/controllers/home_controller.dart';
@@ -13,15 +12,6 @@ import '/services/config.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      systemNavigationBarColor: Colors.transparent, // 根据主题设置底栏颜色
-      statusBarColor: Colors.transparent, // 如果想要状态栏透明，可以设置为透明色
-    ),
-  );
-
-  // 让 Flutter 在导航栏后面绘制
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
   await initConfig();
   runApp(const MyApp());

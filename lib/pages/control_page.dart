@@ -278,10 +278,9 @@ class ControlPageState extends State<ControlPage>
                       return Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          _buildStatItem('输出队列',
-                              '${messageController.messagesQueueLength.value} 条'),
-                          _buildStatItem(
-                              '当前延迟', '${messageController.delay.value} 秒'),
+                          Text(
+                              '输出队列 ${messageController.messagesQueueLength.value} 条'),
+                          Text('当前延迟 ${messageController.delay.value} 秒'),
                         ],
                       );
                     },

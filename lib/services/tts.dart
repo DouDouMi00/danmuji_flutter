@@ -93,7 +93,6 @@ Future<void> init() async {
   await flutterTts.setPitch(ttsConfig.pitch);
   await flutterTts.setSpeechRate(ttsConfig.rate);
   await _setAwaitOptions();
-  await tts("tts 初始化完成");
   initalized = true;
 }
 

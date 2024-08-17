@@ -34,6 +34,9 @@ class TtsEnginesSettingPageState extends State<TtsEnginesSettingPage> {
   void initState() {
     super.initState();
     configMap = Get.arguments as DefaultConfig;
+    volume = configMap.dynamicConfig.tts.volume;
+    pitch = configMap.dynamicConfig.tts.pitch;
+    rate = configMap.dynamicConfig.tts.rate;
     if (isAndroid) {
       _getDefaultEngine();
       _getDefaultVoice();
@@ -210,7 +213,6 @@ class TtsEnginesSettingPageState extends State<TtsEnginesSettingPage> {
   }
 
   Widget _volume() {
-    volume = configMap.dynamicConfig.tts.volume;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -234,7 +236,6 @@ class TtsEnginesSettingPageState extends State<TtsEnginesSettingPage> {
   }
 
   Widget _pitch() {
-    pitch = configMap.dynamicConfig.tts.pitch;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -259,7 +260,6 @@ class TtsEnginesSettingPageState extends State<TtsEnginesSettingPage> {
   }
 
   Widget _rate() {
-    rate = configMap.dynamicConfig.tts.rate;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -283,6 +283,23 @@ class TtsEnginesSettingPageState extends State<TtsEnginesSettingPage> {
     );
   }
 
+  // 新增试听功能
+  void _playSampleText() async {
+    await flutterTts.stop();
+    if (language != null) {
+      await flutterTts.setLanguage(language!);
+    }
+    if (engine != null) {
+      await flutterTts.setEngine(engine!);
+    }
+    // 使用当前设置的参数播放一段文本
+    await flutterTts.setPitch(pitch);
+    await flutterTts.setSpeechRate(rate);
+    await flutterTts.setVolume(volume);
+    await flutterTts.awaitSpeakCompletion(true);
+    await flutterTts.speak('这是一个试听文本，用于测试当前的语音设置。');
+  }
+
   Widget _buildResetButtons() => Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween, // 使子元素间间距相等，两端对齐
         children: [
@@ -290,6 +307,18 @@ class TtsEnginesSettingPageState extends State<TtsEnginesSettingPage> {
             child: ElevatedButton(
               onPressed: resetSlidersToDefaults,
               child: const Text('重置'),
+            ),
+          ),
+        ],
+      );
+
+  Widget _buildSampleButton() => Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween, // 使子元素间间距相等，两端对齐
+        children: [
+          Expanded(
+            child: ElevatedButton(
+              onPressed: _playSampleText,
+              child: const Text('试听'),
             ),
           ),
         ],
@@ -305,6 +334,7 @@ class TtsEnginesSettingPageState extends State<TtsEnginesSettingPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              _buildSampleButton(),
               _engineSection(),
               _futureBuilder(),
               _buildSliders(),
