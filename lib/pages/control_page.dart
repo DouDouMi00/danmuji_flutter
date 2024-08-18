@@ -528,15 +528,15 @@ class ControlPageState extends State<ControlPage>
       messageHandler.run();
     } else {
       messageHandler.stop();
+      await markAllMessagesInvalid();
     }
-    isRunning = !isRunning;
-    setState(() {});
   }
 
   // 振动设备并更新按钮文本，用于反馈用户操作。
   void _vibrateAndUpdateButtonText() {
     Vibration.vibrate(pattern: [30, 30, 30, 30], intensities: [255, 0, 255, 0]);
     setState(() {
+      isRunning = !isRunning;
       buttonText = isRunning ? '停止' : '开始';
     });
   }
