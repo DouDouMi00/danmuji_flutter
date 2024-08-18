@@ -56,13 +56,13 @@ class MyHomePageState extends State<MyHomePage> {
     return Obx(
       () => Scaffold(
         body: controller.currentIndex.value == 0
-            ? const ConfigEditPage()
-            : const ControlPage(),
+            ? const ControlPage()
+            : const ConfigEditPage(),
         bottomNavigationBar: BottomNavigationBar(
           items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.settings), label: '设置'),
             BottomNavigationBarItem(
-                icon: Icon(Icons.control_camera), label: '快捷键'),
+                icon: Icon(Icons.control_camera), label: '主页'),
+            BottomNavigationBarItem(icon: Icon(Icons.settings), label: '设置'),
           ],
           currentIndex: controller.currentIndex.value,
           onTap: controller.onTabChange,

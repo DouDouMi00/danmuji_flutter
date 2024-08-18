@@ -148,6 +148,29 @@ class TtsEnginesSettingPageState extends State<TtsEnginesSettingPage> {
         },
       );
 
+  Future<void> _isLanguageInstalled(String language) async {
+    if (isAndroid) {
+      flutterTts.isLanguageInstalled(language).then((value) {
+        if (!value) {
+          Get.dialog(
+            AlertDialog(
+              title: const Text('提示'),
+              content: const Text('当前语言未安装'),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('确定'),
+                  onPressed: () {
+                    Get.back();
+                  },
+                ),
+              ],
+            ),
+          );
+        }
+      });
+    }
+  }
+
   Widget _languageDropDownSection(List<dynamic> languages) =>
       Column(mainAxisAlignment: MainAxisAlignment.center, children: [
         ListTile(
@@ -161,6 +184,7 @@ class TtsEnginesSettingPageState extends State<TtsEnginesSettingPage> {
                 initialValue: language,
                 valueOptions: getLanguageDropDownMenuItems(languages),
                 onSaved: (value) async {
+                  await _isLanguageInstalled(language!);
                   setState(() {
                     configMap.dynamicConfig.tts.language = value;
                   });

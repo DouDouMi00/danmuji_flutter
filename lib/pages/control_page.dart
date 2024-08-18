@@ -26,6 +26,7 @@ class ControlPageState extends State<ControlPage>
     with TickerProviderStateMixin {
   // 是否处于运行状态的标志。
   bool isRunning = false;
+  bool _isButtonEnabled = true;
 
   // 操作按钮的文本内容，根据运行状态动态改变。
   String buttonText = '开始';
@@ -165,6 +166,11 @@ class ControlPageState extends State<ControlPage>
         newSuperChatMessages));
     scrollOtherController.addListener(addList(showOtherBackToBottomButton,
         scrollOtherController, autoOtherScroll, newOtherMessages));
+    ttsTask();
+    setupLiveEventListeners();
+    setupStatsEventListeners();
+    statsTask();
+    messageHandler.setupEventHandlers();
   }
 
   @override
@@ -321,7 +327,6 @@ class ControlPageState extends State<ControlPage>
                 ],
               ),
             ),
-            const Divider(),
             Expanded(
               flex: (_dividerPosition * 100).round(),
               child: Obx(
@@ -391,10 +396,18 @@ class ControlPageState extends State<ControlPage>
                       // 启动/停止按钮和清空按钮。
                       Expanded(
                         child: ElevatedButton(
-                          onPressed: () {
-                            _toggleRunningStatus();
-                            _vibrateAndUpdateButtonText();
-                          },
+                          onPressed: _isButtonEnabled
+                              ? () async {
+                                  _isButtonEnabled = false; // 禁用按钮
+                                  _toggleRunningStatus();
+                                  _vibrateAndUpdateButtonText();
+                                  // 两秒后重新启用按钮
+                                  await Future.delayed(
+                                      const Duration(seconds: 2));
+                                  _isButtonEnabled = true;
+                                  setState(() {});
+                                }
+                              : null, // 如果按钮不可用，则禁用点击事件
                           style: ButtonStyle(
                             minimumSize: WidgetStateProperty.all<Size>(
                               Size(buttonWidth, double.infinity),
@@ -512,18 +525,9 @@ class ControlPageState extends State<ControlPage>
   // 切换运行状态，启动或停止弹幕接收和处理。
   void _toggleRunningStatus() async {
     if (!isRunning) {
-      ttsTask();
-      setupLiveEventListeners();
-      setupStatsEventListeners();
-      statsTask();
-      messageHandler.setupEventHandlers();
       messageHandler.run();
     } else {
       messageHandler.stop();
-      cancelLiveEventListeners();
-      cancelStatsEventListeners();
-      stopStatsTask();
-      clearMessagesQueue();
     }
     isRunning = !isRunning;
     setState(() {});
