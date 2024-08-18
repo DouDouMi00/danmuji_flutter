@@ -201,6 +201,7 @@ class RadioDialogParams {
   final dynamic initialValue;
   final Function(dynamic) onSaved;
   final List<Map<String, dynamic>> valueOptions;
+
   RadioDialogParams({
     required this.title,
     required this.initialValue,

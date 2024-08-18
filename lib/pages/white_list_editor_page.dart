@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 import '/widgets/obscure_text_field.dart';
 
 class EditableListParams {
@@ -20,6 +21,7 @@ class EditableListParams {
 
 class EditableListPage extends StatefulWidget {
   final EditableListParams params;
+
   const EditableListPage({super.key, required this.params});
 
   @override

@@ -1,7 +1,8 @@
 import 'dart:async';
 
 class EventEmitter {
-  final StreamController<String> _controller = StreamController<String>.broadcast();
+  final StreamController<String> _controller =
+      StreamController<String>.broadcast();
 
   Stream<String> get onEvent => _controller.stream;
 

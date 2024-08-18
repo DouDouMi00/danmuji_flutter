@@ -1,5 +1,6 @@
-import '/services/config.dart';
 import 'dart:async';
+
+import '/services/config.dart';
 
 List<String?> lastDanmuMessages = [];
 
