@@ -122,6 +122,11 @@ class MessageQueueController extends GetxController {
 
   void clearMessages() {
     messagesAll.clear();
+    messagesDanmu.clear();
+    messagesGift.clear();
+    messagesGuardBuy.clear();
+    messagesSuperChat.clear();
+    messagesOther.clear();
     messagesQueueLength.value = 0;
     delay.value = 0;
     filtrationEfficiencyDanmu.value = 0.0;

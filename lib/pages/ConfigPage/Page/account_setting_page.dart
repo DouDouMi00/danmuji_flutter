@@ -120,6 +120,95 @@ class AccountSettingPageState extends State<AccountSettingPage> {
                   );
                 },
               ),
+              const Text('开放平台'),
+              ListTile(
+                leading: const Icon(Icons.person_outline),
+                title: Text(
+                    '主播身份码 : ${configMap.kvdb.openLiveBili.idCode.isNotEmpty ? '****' : '未输入'}'),
+                trailing: const Icon(Icons.edit),
+                onTap: () {
+                  showInputNumberDialog(
+                    InputDialogParams(
+                      title: '主播身份码',
+                      initialValue: configMap.kvdb.openLiveBili.idCode,
+                      inputType: InputType.stringInputType,
+                      isObscured: true,
+                      onSaved: (value) async {
+                        setState(() {
+                          configMap.kvdb.openLiveBili.idCode = value;
+                        });
+                        await updateConfigMap(configMap);
+                      },
+                    ),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.lock_outline),
+                title: Text(
+                    '应用id : ${configMap.kvdb.openLiveBili.appId != 0 ? '****' : '未输入'}'),
+                trailing: const Icon(Icons.edit),
+                onTap: () {
+                  showInputNumberDialog(
+                    InputDialogParams(
+                      title: '应用id',
+                      initialValue: configMap.kvdb.openLiveBili.appId,
+                      inputType: InputType.intInputType,
+                      isObscured: true,
+                      onSaved: (value) async {
+                        setState(() {
+                          configMap.kvdb.openLiveBili.appId = value;
+                        });
+                        await updateConfigMap(configMap);
+                      },
+                    ),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.lock_outline),
+                title: Text(
+                    'access_key : ${configMap.kvdb.openLiveBili.accessKey.isNotEmpty ? '****' : '未输入'}'),
+                trailing: const Icon(Icons.edit),
+                onTap: () {
+                  showInputNumberDialog(
+                    InputDialogParams(
+                      title: 'access_key',
+                      initialValue: configMap.kvdb.openLiveBili.accessKey,
+                      inputType: InputType.stringInputType,
+                      isObscured: true,
+                      onSaved: (value) async {
+                        setState(() {
+                          configMap.kvdb.openLiveBili.accessKey = value;
+                        });
+                        await updateConfigMap(configMap);
+                      },
+                    ),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.lock_outline),
+                title: Text(
+                    'access_key_secret : ${configMap.kvdb.openLiveBili.accessKeySecret.isNotEmpty ? '****' : '未输入'}'),
+                trailing: const Icon(Icons.edit),
+                onTap: () {
+                  showInputNumberDialog(
+                    InputDialogParams(
+                      title: 'access_key_secret',
+                      initialValue: configMap.kvdb.openLiveBili.accessKeySecret,
+                      inputType: InputType.stringInputType,
+                      isObscured: true,
+                      onSaved: (value) async {
+                        setState(() {
+                          configMap.kvdb.openLiveBili.accessKeySecret = value;
+                        });
+                        await updateConfigMap(configMap);
+                      },
+                    ),
+                  );
+                },
+              ),
             ],
           ),
         ),

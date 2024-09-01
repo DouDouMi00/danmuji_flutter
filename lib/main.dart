@@ -12,15 +12,18 @@ import '/services/config.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await initConfig();
-  runApp(const MyApp());
+  final theme = await storage.read(key: 'theme');
+  runApp(MyApp(theme: theme));
   // 添加监听器处理日志记录
   // logger.onRecord.listen(handleLogRecord);
 }
 
+
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final String? theme;
+
+  const MyApp({super.key, required this.theme});
 
   @override
   Widget build(BuildContext context) {
@@ -29,11 +32,11 @@ class MyApp extends StatelessWidget {
       home: const MyHomePage(),
       theme: lightTheme,
       darkTheme: darkTheme,
-      themeMode: prefs.getInt('theme') == 0
+      themeMode: theme == '0'
           ? MediaQuery.of(context).platformBrightness == Brightness.dark
               ? ThemeMode.dark
               : ThemeMode.light
-          : prefs.getInt('theme') == 1
+          : theme == '1'
               ? ThemeMode.light
               : ThemeMode.dark,
       getPages: appRoutes,

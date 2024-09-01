@@ -24,39 +24,42 @@ void stopTtsTask() {
 
 String messagesToText(Map<String, dynamic> msg) {
   final filterConfig = getConfigMap().dynamicConfig.filter.danmu;
-  if (msg['type'] == 'danmu') {
-    String liveRoomGuardLeveltxt =
-        filterConfig.readfansMedalGuardLevel && msg['liveRoomGuardLevel'] != 0
-            ? '头衔${msg['liveRoomGuardLevelName']}'
-            : '';
-    String fansMedalNametxt =
-        filterConfig.readfansMedalName && msg['fansMedalName'] != 0
-            ? '勋章${msg['fansMedalName']}'
-            : '';
-    String fansMedalLeveltxt =
-        filterConfig.readfansMedalName && msg['fansMedalLevel'] != 0
-            ? '${msg['fansMedalLevel']}级'
-            : '';
-    return '$liveRoomGuardLeveltxt$fansMedalNametxt$fansMedalLeveltxt${msg['uname']}说 : ${msg['msg']}';
-  } else if (msg['type'] == 'gift') {
-    return '感谢${msg['uname']}送出的${msg['num']}个${msg['giftName']}';
-  } else if (msg['type'] == 'guardBuy') {
-    return '感谢${msg['uname']}购买${msg['num']}个月的${msg['giftName']}';
-  } else if (msg['type'] == 'like') {
-    return '感谢${msg['uname']}点赞';
-  } else if (msg['type'] == 'superChat') {
-    return '感谢${msg['uname']}的${msg['price']}元的醒目留言${msg['msg']}';
-  } else if (msg['type'] == 'subscribe') {
-    return '感谢${msg['uname']}关注';
-  } else if (msg['type'] == 'welcome') {
-    return '欢迎${msg['uname']}进入直播间';
-  } else if (msg['type'] == 'warning') {
-    final cutOffText = msg['isCutOff'] ? '，直播间已切断' : '';
-    return '超管警告直播间${msg['msg']}$cutOffText';
-  } else if (msg['type'] == 'system') {
-    return '系统提示${msg['msg']}';
-  } else {
-    return '未知类型的消息';
+  switch (msg['type']) {
+    case 'danmu':
+      String liveRoomGuardLeveltxt =
+          filterConfig.readfansMedalGuardLevel && msg['liveRoomGuardLevel'] != 0
+              ? '头衔${msg['liveRoomGuardLevelName']}'
+              : '';
+      String fansMedalNametxt =
+          filterConfig.readfansMedalName && msg['fansMedalName'] != 0
+              ? '勋章${msg['fansMedalName']}'
+              : '';
+      String fansMedalLeveltxt =
+          filterConfig.readfansMedalName && msg['fansMedalLevel'] != 0
+              ? '${msg['fansMedalLevel']}级'
+              : '';
+      return '$liveRoomGuardLeveltxt$fansMedalNametxt$fansMedalLeveltxt${msg['uname']}说 : ${msg['msg']}';
+    case 'gift':
+      return '感谢${msg['uname']}送出的${msg['num']}个${msg['giftName']}';
+    case 'guardBuy':
+      return '感谢${msg['uname']}购买${msg['num']}个月的${msg['giftName']}';
+    case 'guardBuyOpen':
+      return '感谢${msg['uname']}购买${msg['num']}${msg['unit']}的${msg['giftName']}';
+    case 'like':
+      return '感谢${msg['uname']}点赞';
+    case 'superChat':
+      return '感谢${msg['uname']}的${msg['price']}元的醒目留言${msg['msg']}';
+    case 'subscribe':
+      return '感谢${msg['uname']}关注';
+    case 'welcome':
+      return '欢迎${msg['uname']}进入直播间';
+    case 'warning':
+      final cutOffText = msg['isCutOff'] ? '，直播间已切断' : '';
+      return '超管警告直播间${msg['msg']}$cutOffText';
+    case 'system':
+      return '系统提示${msg['msg']}';
+    default:
+      return '未知类型的消息';
   }
 }
 

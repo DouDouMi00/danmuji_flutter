@@ -6,9 +6,9 @@ import '/services/config.dart';
 import '/widgets/obscure_text_field.dart';
 
 class SystemPromptPage extends StatefulWidget {
-  final DefaultConfig configMap;
 
-  const SystemPromptPage({super.key, required this.configMap});
+  const SystemPromptPage({required this.configMap, super.key});
+  final DefaultConfig configMap;
 
   @override
   SystemPromptPageState createState() => SystemPromptPageState();
@@ -28,7 +28,7 @@ class SystemPromptPageState extends State<SystemPromptPage> {
     return Scaffold(
       appBar: AppBar(title: const Text('系统提示')),
       body: Padding(
-        padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -48,7 +48,7 @@ class SystemPromptPageState extends State<SystemPromptPage> {
               ListTile(
                 leading: const Icon(Icons.numbers_outlined),
                 title: Text(
-                    '积压弹幕数量大于: ${configMap.dynamicConfig.dynamicSystem.alertWhenMessagesQueueLonger.threshold}'),
+                    '积压弹幕数量大于: ${configMap.dynamicConfig.dynamicSystem.alertWhenMessagesQueueLonger.threshold}',),
                 trailing: const Icon(Icons.navigate_next),
                 onTap: () {
                   showInputNumberDialog(
@@ -58,7 +58,6 @@ class SystemPromptPageState extends State<SystemPromptPage> {
                           .alertWhenMessagesQueueLonger.threshold
                           .toString(),
                       inputType: InputType.intInputType,
-                      isObscured: false,
                       minValue: 0,
                       onSaved: (value) async {
                         setState(() {
@@ -74,7 +73,7 @@ class SystemPromptPageState extends State<SystemPromptPage> {
               ListTile(
                 leading: const Icon(Icons.watch_later_outlined),
                 title: Text(
-                    '播报间隔: ${configMap.dynamicConfig.dynamicSystem.alertWhenMessagesQueueLonger.interval}'),
+                    '播报间隔: ${configMap.dynamicConfig.dynamicSystem.alertWhenMessagesQueueLonger.interval}',),
                 trailing: const Icon(Icons.navigate_next),
                 onTap: () {
                   showInputNumberDialog(
@@ -84,7 +83,6 @@ class SystemPromptPageState extends State<SystemPromptPage> {
                           .alertWhenMessagesQueueLonger.interval
                           .toString(),
                       inputType: InputType.intInputType,
-                      isObscured: false,
                       minValue: 0,
                       onSaved: (value) async {
                         setState(() {

@@ -73,6 +73,9 @@ void setupLiveEventListeners() {
       case 'warning':
         onWarning(data);
         break;
+      case 'interactionEnd':
+        onInteractionEnd(data);
+        break;
 
       default:
         logger.info('Unhandled event type: $eventType');
@@ -88,6 +91,7 @@ void cancelLiveEventListeners() {
 void onDanmu(dynamic command) {
   if (filterDanmu(
       command['uid'],
+      openId: command['openId'],
       command['uname'],
       command['isFansMedalBelongToLive'],
       command['fansMedalLevel'],
@@ -97,6 +101,7 @@ void onDanmu(dynamic command) {
     appendDanmuFilteredStats(false, args: {
       "time": DateTime.now().millisecondsSinceEpoch,
       "uid": command['uid'],
+      'openId': command['openId'],
       "uname": command['uname'],
       "msg": command['msg'],
       "richContent": command['richContent'],
@@ -115,6 +120,7 @@ void onDanmu(dynamic command) {
       "type": "danmu",
       "time": DateTime.now().millisecondsSinceEpoch,
       "uid": command['uid'],
+      'openId': command['openId'],
       "uname": command['uname'],
       "msg": command['msg'],
       "richContent": command['richContent'],
@@ -134,6 +140,7 @@ void onDanmu(dynamic command) {
       "faceImg": command['faceImg'],
       "time": DateTime.now().millisecondsSinceEpoch,
       "uid": command['uid'],
+      'openId': command['openId'],
       "uname": command['uname'],
       "msg": command['msg'],
       "richContent": command['richContent'],
@@ -157,6 +164,7 @@ void onGift(dynamic command) async {
 
   bool? result = await filterGift(
       command['uid'],
+      openId: command['openId'],
       command['uname'],
       command['price'],
       command['giftName'],
@@ -208,16 +216,18 @@ void onGuardBuy(dynamic command) {
       "faceImg": command['faceImg'],
       "giftName": command['giftName'],
       "num": command['num'],
+      "unit": command['unit'],
       "title": command['title'],
     });
     messagesQueueAppend({
-      "type": "guardBuy",
+      "type": "guardBuyOpen",
       "time": DateTime.now().millisecondsSinceEpoch,
       "uid": command['uid'],
       "uname": command['uname'],
       "newGuard": command['newGuard'],
       "giftName": command['giftName'],
       "num": command['num'],
+      "unit": command['unit'],
     });
   } else {
     appendGuardBuyFilteredStats(true, args: {
@@ -230,13 +240,14 @@ void onGuardBuy(dynamic command) {
       "faceImg": command['faceImg'],
       "giftName": command['giftName'],
       "num": command['num'],
+      "unit": command['unit'],
       "title": command['title'],
     });
   }
 }
 
 void onLike(dynamic command) {
-  if (filterLike(command['uid'], command['uname'])) {
+  if (filterLike(command['uid'], openId: command['openId'], command['uname'])) {
     appendLikeFilteredStats(false, args: {
       "time": DateTime.now().millisecondsSinceEpoch,
       "uid": command['uid'],
@@ -364,6 +375,17 @@ void onWarning(dynamic command) {
       "isCutOff": command['isCutOff'],
     });
   }
+}
+
+void onInteractionEnd(dynamic command) {
+  int timestampInSeconds = command['time'];
+  DateTime dateTime =
+      DateTime.fromMillisecondsSinceEpoch(timestampInSeconds * 1000);
+  messagesQueueAppend({
+    "type": "system",
+    "time": DateTime.now().millisecondsSinceEpoch,
+    "msg": "消息推送结束通知，结束时间为：${dateTime.toString()}"
+  });
 }
 
 Future<void> markAllMessagesInvalid() async {

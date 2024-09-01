@@ -1,7 +1,7 @@
 // services/config.dart
 import 'dart:convert';
 
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'default_config_entity.dart';
 
@@ -9,13 +9,19 @@ export '/services/default_config_entity.dart';
 
 // 定义配置的键名
 const String _configKey = 'app_config';
-late SharedPreferences prefs;
+late FlutterSecureStorage storage;
 late Map<String, dynamic> config;
 
 // 定义配置的默认值
 final Map<String, dynamic> _defaultConfig = {
   "kvdb": {
     "kvdbBili": {"uid": 0, "buvid3": "", "sessdata": "", "jct": ""},
+    "openLiveBili": {
+      "idCode": "",
+      "appId": 0,
+      "accessKey": "",
+      "accessKeySecret": ""
+    },
     "isFirstTimeToLogin": true
   },
   "engine": {
@@ -56,8 +62,10 @@ final Map<String, dynamic> _defaultConfig = {
         "fansMedalLevelBigger": 0,
         "lengthShorter": 0,
         "blacklistUsers": [],
+        "blacklistOpenUsers": [],
         "blacklistKeywords": [],
         "whitelistUsers": [],
+        "whitelistOpenUsers": [],
         "whitelistKeywords": []
       },
       "gift": {
@@ -94,21 +102,29 @@ void mergeConfigRecursively(
   });
 }
 
+AndroidOptions _getAndroidOptions() => const AndroidOptions(
+      encryptedSharedPreferences: true,
+    );
+
 // 初始化配置
-Future<void> initConfig() async {
-  prefs = await SharedPreferences.getInstance();
-  final jsonString = prefs.getString(_configKey);
-  if (prefs.getInt('theme') == null) {
-    await prefs.setInt('theme', 0);
+Future<void> initConfig({bool test = false}) async {
+  if (test) {
+    config = _defaultConfig;
+    return;
+  }
+  storage = FlutterSecureStorage(aOptions: _getAndroidOptions());
+  final jsonString = await storage.read(key: _configKey);
+  if (await storage.read(key: 'theme') == null) {
+    await storage.write(key: 'theme', value: "0");
   }
   if (jsonString != null) {
     config = jsonDecode(jsonString);
     // 合并默认配置和已存在的配置
     mergeConfigRecursively(_defaultConfig, config);
-    await prefs.setString(_configKey, jsonEncode(config));
+    await storage.write(key: _configKey, value: jsonEncode(config));
   } else {
     config = _defaultConfig;
-    await prefs.setString(_configKey, jsonEncode(config));
+    await storage.write(key: _configKey, value: jsonEncode(config));
   }
 }
 
@@ -118,7 +134,7 @@ Future<void> updateConfigMap(DefaultConfig newConfig,
   // 将配置转换为JSON字符串并保存
   config = newConfig.toJson();
   if (!test) {
-    await prefs.setString(_configKey, jsonEncode(config));
+    await storage.write(key: _configKey, value: jsonEncode(config));
   }
 }
 

@@ -158,8 +158,10 @@ class Danmu {
   int fansMedalLevelBigger;
   int lengthShorter;
   List<int> blacklistUsers;
+  List<String> blacklistOpenUsers;
   List<String> blacklistKeywords;
   List<int> whitelistUsers;
+  List<String> whitelistOpenUsers;
   List<String> whitelistKeywords;
 
   Danmu({
@@ -174,8 +176,10 @@ class Danmu {
     required this.fansMedalLevelBigger,
     required this.lengthShorter,
     required this.blacklistUsers,
+    required this.blacklistOpenUsers,
     required this.blacklistKeywords,
     required this.whitelistUsers,
+    required this.whitelistOpenUsers,
     required this.whitelistKeywords,
   });
 
@@ -191,9 +195,13 @@ class Danmu {
         fansMedalLevelBigger: json["fansMedalLevelBigger"],
         lengthShorter: json["lengthShorter"],
         blacklistUsers: List<int>.from(json["blacklistUsers"].map((x) => x)),
+        blacklistOpenUsers:
+            List<String>.from(json["blacklistOpenUsers"].map((x) => x)),
         blacklistKeywords:
             List<String>.from(json["blacklistKeywords"].map((x) => x)),
         whitelistUsers: List<int>.from(json["whitelistUsers"].map((x) => x)),
+        whitelistOpenUsers:
+            List<String>.from(json["whitelistOpenUsers"].map((x) => x)),
         whitelistKeywords:
             List<String>.from(json["whitelistKeywords"].map((x) => x)),
       );
@@ -210,9 +218,13 @@ class Danmu {
         "fansMedalLevelBigger": fansMedalLevelBigger,
         "lengthShorter": lengthShorter,
         "blacklistUsers": List<dynamic>.from(blacklistUsers.map((x) => x)),
+        "blacklistOpenUsers":
+            List<dynamic>.from(blacklistOpenUsers.map((x) => x)),
         "blacklistKeywords":
             List<dynamic>.from(blacklistKeywords.map((x) => x)),
         "whitelistUsers": List<dynamic>.from(whitelistUsers.map((x) => x)),
+        "whitelistOpenUsers":
+            List<dynamic>.from(whitelistOpenUsers.map((x) => x)),
         "whitelistKeywords":
             List<dynamic>.from(whitelistKeywords.map((x) => x)),
       };
@@ -384,20 +396,24 @@ class EngineBili {
 
 class Kvdb {
   KvdbBili kvdbBili;
+  OpenLiveBili openLiveBili;
   bool isFirstTimeToLogin;
 
   Kvdb({
     required this.kvdbBili,
+    required this.openLiveBili,
     required this.isFirstTimeToLogin,
   });
 
   factory Kvdb.fromJson(Map<String, dynamic> json) => Kvdb(
         kvdbBili: KvdbBili.fromJson(json["kvdbBili"]),
+        openLiveBili: OpenLiveBili.fromJson(json["openLiveBili"]),
         isFirstTimeToLogin: json["isFirstTimeToLogin"],
       );
 
   Map<String, dynamic> toJson() => {
         "kvdbBili": kvdbBili.toJson(),
+        "openLiveBili": openLiveBili.toJson(),
         "isFirstTimeToLogin": isFirstTimeToLogin,
       };
 }
@@ -430,10 +446,44 @@ class KvdbBili {
       };
 }
 
+class OpenLiveBili {
+  String idCode;
+  int appId;
+  String accessKey;
+  String accessKeySecret;
+
+  OpenLiveBili({
+    required this.idCode,
+    required this.appId,
+    required this.accessKey,
+    required this.accessKeySecret,
+  });
+
+  factory OpenLiveBili.fromJson(Map<String, dynamic> json) => OpenLiveBili(
+        idCode: json["idCode"],
+        appId: json["appId"],
+        accessKey: json["accessKey"],
+        accessKeySecret: json["accessKeySecret"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "idCode": idCode,
+        "appId": appId,
+        "accessKey": accessKey,
+        "accessKeySecret": accessKeySecret,
+      };
+}
+
 // // 模板
 // Map<String, Map<String, Object>> template = {
 //   "kvdb": {
 //     "kvdbBili": {"uid": 0, "buvid3": "", "sessdata": "", "jct": ""},
+//     "openLiveBili": {
+//       "idCode": "",
+//       "appId": 0,
+//       "accessKey": "",
+//       "accessKeySecret": ""
+//     },
 //     "isFirstTimeToLogin": true
 //   },
 //   "engine": {
@@ -474,8 +524,10 @@ class KvdbBili {
 //         "fansMedalLevelBigger": 0,
 //         "lengthShorter": 0,
 //         "blacklistUsers": [0, 0],
+//         "blacklistOpenUsers": ["", ""],
 //         "blacklistKeywords": ["", ""],
 //         "whitelistUsers": [0, 0],
+//         "whitelistOpenUsers": ["", ""],
 //         "whitelistKeywords": ["", ""]
 //       },
 //       "gift": {

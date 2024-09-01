@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:brotli/brotli.dart';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '/services/config.dart';
@@ -115,116 +115,113 @@ class DanmakuReceiver {
       'User-Agent':
           'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.64 Safari/537.36'
     };
-    http
-        .get(
-            Uri.parse(
-                'https://api.live.bilibili.com/xlive/web-room/v1/index/getInfoByRoom?room_id=$roomId'),
-            headers: headers)
-        .then((value) async {
-      final dataJSON = jsonDecode(value.body);
-      _anchorUid = dataJSON['data']['uid'];
-      final roomInfoJSON = jsonDecode((await http.get(
-              Uri.parse(
-                  'https://api.live.bilibili.com/xlive/web-room/v1/index/getDanmuInfo?id=${dataJSON['data']['room_info']['room_id']}'),
-              headers: headers))
-          .body);
-      roomId = dataJSON['data']['room_info']['room_id'];
-      String title = dataJSON['data']['room_info']['title'];
-      ws = WebSocketChannel.connect(Uri.parse(
-          'wss://${roomInfoJSON['data']['host_list'][0]['host']}:${roomInfoJSON['data']['host_list'][0]['wss_port']}/sub'));
-      final authJSONString = jsonEncode({
-        'roomid': roomId,
-        'protover': 3,
-        'platform': 'web',
-        'uid': 0,
-        'key': roomInfoJSON['data']['token']
-      });
-      final authPacket = packetEncode(1, DanmakuType.auth, authJSONString);
-      ws?.sink.add(authPacket);
-      ws?.stream.listen(
-        (event) async {
-          final data = Uint8List.fromList(event);
-          final dataBytes = ByteData.view(data.buffer);
-          final totalLength = dataBytes.getInt32(0);
-          final protocol = dataBytes.getInt16(6);
-          final type = dataBytes.getInt32(8);
-          final payload = data.getRange(16, totalLength);
-          switch (type) {
-            case DanmakuType.authReply:
-              logger.info('认证通过，已连接到弹幕服务器 $roomId');
-              await ttsSystem('认证通过，进入直播间$roomId ，直播标题$title');
-              _heartbeatTimer =
-                  Timer.periodic(const Duration(seconds: 24), (timer) {
-                if (!isclose) {
-                  ws?.sink.add(packetEncode(1, 2, "[object Object]"));
-                  logger.info('发送心跳包');
-                } else {
-                  logger.info('心跳包发送失败');
-                  timer.cancel();
-                }
-              });
-              break;
-            case DanmakuType.data:
-              // logger.info('totalLength: $totalLength, protocol: $protocol, type: $type, payload: $payload');
-              switch (protocol) {
-                case DanmakuProtocol.json:
-                  // 系统广播一类的，这些数据没啥用
-                  break;
-                case DanmakuProtocol.brotli:
-                  var offset = 0;
-                  final data =
-                      Uint8List.fromList(brotli.decode(payload.toList()));
-                  final dataBytes = ByteData.view(data.buffer);
-
-                  while (offset < data.length) {
-                    final length = dataBytes.getUint32(offset);
-                    final dataJSONString = utf8.decode(
-                        data.getRange(offset + 16, offset + length).toList());
-                    final dataJSON = jsonDecode(dataJSONString);
-                    final cmd = dataJSON['cmd'].toString().split(':')[0];
-                    switch (cmd) {
-                      case 'DANMU_MSG':
-                        for (final handler in _danmuMsg) {
-                          handler(dataJSON);
-                        }
-                      case 'SEND_GIFT':
-                        for (final handler in _sendGift) {
-                          handler(dataJSON);
-                        }
-                      case 'USER_TOAST_MSG':
-                        for (final handler in _userToastMsg) {
-                          handler(dataJSON);
-                        }
-                      case 'SUPER_CHAT_MESSAGE':
-                        for (final handler in _superChatMessage) {
-                          handler(dataJSON);
-                        }
-                      case 'INTERACT_WORD':
-                        for (final handler in _interactWord) {
-                          handler(dataJSON);
-                        }
-                      case 'LIKE_INFO_V3_CLICK':
-                        for (final handler in _likeInfoV3Click) {
-                          handler(dataJSON);
-                        }
-                      case 'WARNING':
-                        for (final handler in _warning) {
-                          handler(dataJSON);
-                        }
-                      case 'CUT_OFF':
-                        for (final handler in _cutOff) {
-                          handler(dataJSON);
-                        }
-                    }
-                    offset += length;
-                  }
-                  break;
-              }
-              break;
-          }
-        },
-      );
+    final response = await Dio().get(
+      'https://api.live.bilibili.com/xlive/web-room/v1/index/getInfoByRoom',
+      queryParameters: {'room_id': roomId},
+      options: Options(headers: headers),
+    );
+    _anchorUid = response.data['data']['uid'];
+    final roomInfoJSON = await Dio().get(
+      'https://api.live.bilibili.com/xlive/web-room/v1/index/getDanmuInfo',
+      queryParameters: {'id': response.data['data']['room_info']['room_id']},
+      options: Options(headers: headers),
+    );
+    roomId = response.data['data']['room_info']['room_id'];
+    String title = response.data['data']['room_info']['title'];
+    ws = WebSocketChannel.connect(Uri.parse(
+        'wss://${roomInfoJSON.data['data']['host_list'][0]['host']}:${roomInfoJSON.data['data']['host_list'][0]['wss_port']}/sub'));
+    final authJSONString = jsonEncode({
+      'roomid': roomId,
+      'protover': 3,
+      'platform': 'web',
+      'uid': 0,
+      'key': roomInfoJSON.data['data']['token']
     });
+    final authPacket = packetEncode(1, DanmakuType.auth, authJSONString);
+    ws?.sink.add(authPacket);
+    ws?.stream.listen(
+      (event) async {
+        final data = Uint8List.fromList(event);
+        final dataBytes = ByteData.view(data.buffer);
+        final totalLength = dataBytes.getInt32(0);
+        final protocol = dataBytes.getInt16(6);
+        final type = dataBytes.getInt32(8);
+        final payload = data.getRange(16, totalLength);
+        switch (type) {
+          case DanmakuType.authReply:
+            logger.info('认证通过，已连接到弹幕服务器 $roomId');
+            await ttsSystem('认证通过，进入直播间$roomId ，直播标题$title');
+            _heartbeatTimer =
+                Timer.periodic(const Duration(seconds: 24), (timer) {
+              if (!isclose) {
+                ws?.sink.add(packetEncode(1, 2, "[object Object]"));
+                logger.info('发送心跳包');
+              } else {
+                logger.info('心跳包发送失败');
+                timer.cancel();
+              }
+            });
+            break;
+          case DanmakuType.data:
+            // logger.info('totalLength: $totalLength, protocol: $protocol, type: $type, payload: $payload');
+            switch (protocol) {
+              case DanmakuProtocol.json:
+                // 系统广播一类的，这些数据没啥用
+                break;
+              case DanmakuProtocol.brotli:
+                var offset = 0;
+                final data =
+                    Uint8List.fromList(brotli.decode(payload.toList()));
+                final dataBytes = ByteData.view(data.buffer);
+
+                while (offset < data.length) {
+                  final length = dataBytes.getUint32(offset);
+                  final dataJSONString = utf8.decode(
+                      data.getRange(offset + 16, offset + length).toList());
+                  final dataJSON = jsonDecode(dataJSONString);
+                  final cmd = dataJSON['cmd'].toString().split(':')[0];
+                  switch (cmd) {
+                    case 'DANMU_MSG':
+                      for (final handler in _danmuMsg) {
+                        handler(dataJSON);
+                      }
+                    case 'SEND_GIFT':
+                      for (final handler in _sendGift) {
+                        handler(dataJSON);
+                      }
+                    case 'USER_TOAST_MSG':
+                      for (final handler in _userToastMsg) {
+                        handler(dataJSON);
+                      }
+                    case 'SUPER_CHAT_MESSAGE':
+                      for (final handler in _superChatMessage) {
+                        handler(dataJSON);
+                      }
+                    case 'INTERACT_WORD':
+                      for (final handler in _interactWord) {
+                        handler(dataJSON);
+                      }
+                    case 'LIKE_INFO_V3_CLICK':
+                      for (final handler in _likeInfoV3Click) {
+                        handler(dataJSON);
+                      }
+                    case 'WARNING':
+                      for (final handler in _warning) {
+                        handler(dataJSON);
+                      }
+                    case 'CUT_OFF':
+                      for (final handler in _cutOff) {
+                        handler(dataJSON);
+                      }
+                  }
+                  offset += length;
+                }
+                break;
+            }
+            break;
+        }
+      },
+    );
   }
 
   void dispose() {

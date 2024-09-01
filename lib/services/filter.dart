@@ -5,12 +5,16 @@ import '/services/config.dart';
 List<String?> lastDanmuMessages = [];
 
 bool filterDanmu(int uid, String uname, bool isFansMedalBelongToLive,
-    int fansMedalLevel, int fansMedalGuardLevel, String msg, bool isEmoji) {
+    int fansMedalLevel, int fansMedalGuardLevel, String msg, bool isEmoji,
+    {String? openId}) {
   var dynamicConfig = getConfigMap().dynamicConfig.filter.danmu;
   if (!dynamicConfig.enable) {
     return false;
   }
   if (dynamicConfig.whitelistUsers.contains(uid)) {
+    return true;
+  }
+  if (dynamicConfig.whitelistOpenUsers.contains(openId)) {
     return true;
   }
   if (dynamicConfig.whitelistKeywords.isNotEmpty) {
@@ -45,6 +49,9 @@ bool filterDanmu(int uid, String uname, bool isFansMedalBelongToLive,
   if (dynamicConfig.blacklistUsers.contains(uid)) {
     return false;
   }
+  if (dynamicConfig.blacklistOpenUsers.contains(openId)) {
+    return false;
+  }
   for (var keyword in dynamicConfig.blacklistKeywords) {
     if (msg.contains(keyword)) {
       return false;
@@ -64,14 +71,16 @@ bool filterDanmu(int uid, String uname, bool isFansMedalBelongToLive,
 }
 
 Map<String, dynamic> giftUids = {};
+Map<String, dynamic> giftOpenIds = {};
 
 Future<bool?> filterGift(int uid, String uname, double price, String giftName,
-    int num, Function(Map<String, dynamic>, String) deduplicateCallback) async {
+    int num, Function(Map<String, dynamic>, String) deduplicateCallback,
+    {String? openId}) async {
   var dynamicConfig = getConfigMap().dynamicConfig.filter.gift;
   if (!dynamicConfig.enable) {
     return false;
   }
-  if (price == 0) {
+  if (price == 0.00) {
     if (!dynamicConfig.freeGiftEnable) {
       return false;
     }
@@ -106,6 +115,28 @@ Future<bool?> filterGift(int uid, String uname, double price, String giftName,
     };
     return null;
   }
+  if (openId != null) {
+    if (dynamicConfig.deduplicateTime != 0) {
+      if (!giftOpenIds.containsKey(openId)) {
+        giftOpenIds[openId] = {'openId': openId, 'uname': uname, 'gifts': {}};
+      }
+      if (giftOpenIds[openId]['gifts'].containsKey(giftName)) {
+        giftOpenIds[openId]['gifts'][giftName]['task'].cancel();
+      }
+      Timer timer = Timer(Duration(seconds: dynamicConfig.deduplicateTime), () {
+        deduplicateCallback(giftOpenIds[openId], giftName);
+        giftOpenIds[openId]['gifts'].remove(giftName);
+      });
+      giftOpenIds[openId]['gifts'][giftName] = {
+        'count': giftOpenIds[openId]["gifts"].containsKey(giftName)
+            ? giftOpenIds[openId]["gifts"][giftName]["count"] + num
+            : num,
+        'task': timer,
+      };
+      return null;
+    }
+  }
+
   return true;
 }
 
@@ -139,8 +170,9 @@ bool filterGuardBuy(
 }
 
 Map<String, bool> likedUids = {};
+Map<String, bool> likedOpenIds = {};
 
-bool filterLike(int uid, String uname) {
+bool filterLike(int uid, String uname, {String? openId}) {
   var dynamicConfig = getConfigMap().dynamicConfig.filter.like;
   if (!dynamicConfig.enable) {
     return false;
@@ -150,6 +182,14 @@ bool filterLike(int uid, String uname) {
       return false;
     }
     likedUids[uid.toString()] = true;
+  }
+  if (openId != null) {
+    if (dynamicConfig.deduplicate) {
+      if (likedOpenIds.containsKey(openId)) {
+        return false;
+      }
+      likedOpenIds[openId] = true;
+    }
   }
   return true;
 }

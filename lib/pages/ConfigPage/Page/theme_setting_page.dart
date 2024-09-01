@@ -15,12 +15,24 @@ class ThemeSettingPage extends StatefulWidget {
 }
 
 class ThemeSettingPageState extends State<ThemeSettingPage> {
-  late int _selectedThemeIndex;
+  int? _selectedThemeIndex;
 
   @override
   void initState() {
     super.initState();
-    _selectedThemeIndex = prefs.getInt('theme') ?? 0;
+    loadSelectedThemeIndex();
+  }
+
+  /// 加载主题设置
+  Future<void> loadSelectedThemeIndex() async {
+    String? themeValue = await storage.read(key: 'theme');
+    setState(() {
+      if (themeValue == null) {
+        _selectedThemeIndex = null;
+      } else {
+        _selectedThemeIndex = int.parse(themeValue);
+      }
+    });
   }
 
   ///切换主题
@@ -45,7 +57,7 @@ class ThemeSettingPageState extends State<ThemeSettingPage> {
         break;
     }
     //保存到本地
-    await prefs.setInt('theme', themeIndex);
+    await storage.write(key: 'theme', value: themeIndex.toString());
     Get.changeTheme(themeData);
     Get.forceAppUpdate();
     setState(() {

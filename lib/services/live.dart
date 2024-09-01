@@ -3,7 +3,7 @@ import 'dart:convert';
 
 import 'package:pinyin/pinyin.dart';
 
-import '/services/blivedm.dart';
+import '/services/blivedm_web.dart';
 import '/services/config.dart';
 import '/services/logger.dart';
 import '/services/tool.dart';
@@ -186,8 +186,9 @@ class MessageHandler {
         PinyinHelper.getShortPinyin(uname); // 假设实现了pinyinConvert函数来处理拼音转换
     var giftName = command['data']['giftName'];
     var num = command['data']['num'];
-    double price = command['data']['price'] / 1000.0;
-    price = command['data']['coin_type'] == 'gold' ? price : 0;
+    double price = command['data']['coin_type'] == 'gold'
+        ? command['data']['price'] / 1000.0
+        : 0.00;
     var faceImg = command['data']['face'];
 
     logger.info(
@@ -247,7 +248,7 @@ class MessageHandler {
     var uid = command["data"]["uid"];
     var uname = command["data"]["user_info"]["uname"];
     var unamePronunciation = PinyinHelper.getShortPinyin(uname);
-    double price = command["data"]["price"] / 1.0;
+    double price = command["data"]["price"] / 1.00;
     var msg = command["data"]["message"];
     var faceImg = command["data"]["user_info"]["face"];
     logger.info("[SC] $uname bought ${price.toStringAsFixed(2)}元SC: $msg");
