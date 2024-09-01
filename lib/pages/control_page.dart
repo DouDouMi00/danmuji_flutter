@@ -436,18 +436,21 @@ class ControlPageState extends State<ControlPage>
         child: Column(
           children: [
             GestureDetector(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Text('输出队列 ${messageController.messagesQueueLength.value} 条'),
-                  Text('当前延迟 ${messageController.delay.value} 秒'),
-                  IconButton.filledTonal(
-                    icon: Icon(
-                        isExpanded1 ? Icons.expand_less : Icons.expand_more),
-                    tooltip: isExpanded1 ? '收起' : '展开',
-                    onPressed: toggleExpansion,
-                  ),
-                ],
+              child: Obx(
+                () => Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Text(
+                        '输出队列 ${messageController.messagesQueueLength.value} 条'),
+                    Text('当前延迟 ${messageController.delay.value} 秒'),
+                    IconButton.filledTonal(
+                      icon: Icon(
+                          isExpanded1 ? Icons.expand_less : Icons.expand_more),
+                      tooltip: isExpanded1 ? '收起' : '展开',
+                      onPressed: toggleExpansion,
+                    ),
+                  ],
+                ),
               ),
             ),
             if (isExpanded1)
