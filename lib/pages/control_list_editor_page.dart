@@ -62,6 +62,7 @@ class EditableListPageState extends State<EditableListPage> {
         },
       ),
       floatingActionButton: FloatingActionButton(
+        tooltip: '添加新条目',
         onPressed: () {
           // 添加一个新条目的逻辑
           setState(() {
@@ -141,6 +142,7 @@ class _EditableListState extends State<EditableList> {
           ),
           trailing: IconButton(
             icon: const Icon(Icons.delete),
+            tooltip: '删除',
             onPressed: () {
               setState(() {
                 _list.removeAt(index);

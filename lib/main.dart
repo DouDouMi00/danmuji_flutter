@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import '/controllers/home_controller.dart';
 import '/pages/ConfigPage/config_page.dart';
@@ -9,6 +10,7 @@ import '/routes.dart';
 import '/services/config.dart';
 
 // import '/services/logger.dart';
+// https://juejin.cn/post/6844904039495237639
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,6 +30,19 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      locale: Get.deviceLocale,
+      // showSemanticsDebugger: true,
+      localizationsDelegates: const [
+        // 本地化的代理类
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en', 'US'), // 美国英语
+        Locale('zh', 'CN'), // 中文简体
+        //其它Locales
+      ],
       initialRoute: '/',
       home: const MyHomePage(),
       theme: lightTheme,

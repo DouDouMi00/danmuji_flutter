@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 
-import '/pages/white_list_editor_page.dart';
+import '/pages/control_list_editor_page.dart';
 import '/services/config.dart';
 import '/widgets/obscure_text_field.dart' show InputType;
 import 'pages/ConfigPage/index.dart';
