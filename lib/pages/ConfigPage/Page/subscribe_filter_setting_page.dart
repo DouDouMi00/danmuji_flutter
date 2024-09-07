@@ -30,9 +30,7 @@ class SubscribeFilterSettingPageState
       appBar: AppBar(title: const Text('关注过滤器')),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        child: ListView(
             children: [
               SwitchListTile(
                 title: const Text('关注朗读'),
@@ -47,7 +45,7 @@ class SubscribeFilterSettingPageState
             ],
           ),
         ),
-      ),
+      
     );
   }
 }

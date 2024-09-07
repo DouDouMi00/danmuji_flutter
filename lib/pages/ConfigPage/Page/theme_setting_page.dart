@@ -26,18 +26,19 @@ class ThemeSettingPageState extends State<ThemeSettingPage> {
   /// 加载主题设置
   Future<void> loadSelectedThemeIndex() async {
     String? themeValue = await storage.read(key: 'theme');
-    setState(() {
-      if (themeValue == null) {
-        _selectedThemeIndex = null;
-      } else {
-        _selectedThemeIndex = int.parse(themeValue);
-      }
-    });
+    if (themeValue == null) {
+      _selectedThemeIndex = null;
+    } else {
+      _selectedThemeIndex = int.parse(themeValue);
+    }
+    setState(() {});
   }
 
   ///切换主题
   Future<void> changeTheme(BuildContext context, int themeIndex) async {
     ThemeData themeData;
+    _selectedThemeIndex = themeIndex;
+    setState(() {});
     switch (themeIndex) {
       case 0: //跟随系统
         themeData = MediaQuery.of(context).platformBrightness == Brightness.dark
@@ -59,10 +60,20 @@ class ThemeSettingPageState extends State<ThemeSettingPage> {
     //保存到本地
     await storage.write(key: 'theme', value: themeIndex.toString());
     Get.changeTheme(themeData);
-    Get.forceAppUpdate();
-    setState(() {
-      _selectedThemeIndex = themeIndex;
-    });
+    await Get.forceAppUpdate();
+  }
+
+  String getThemeTitle(int index) {
+    switch (index) {
+      case 0:
+        return '跟随系统';
+      case 1:
+        return '浅色模式';
+      case 2:
+        return '深色模式';
+      default:
+        return '未知';
+    }
   }
 
   @override
@@ -71,51 +82,17 @@ class ThemeSettingPageState extends State<ThemeSettingPage> {
       appBar: AppBar(title: const Text('主题设置')),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ListTile(
-                title: const Text('跟随系统'),
-                trailing: Radio(
-                  value: 0,
-                  groupValue: _selectedThemeIndex,
-                  onChanged: (value) {
-                    changeTheme(context, 0);
-                  },
-                ),
-                onTap: () async {
-                  await changeTheme(context, 0);
-                },
-              ),
-              ListTile(
-                title: const Text('浅色模式'),
-                trailing: Radio(
-                  value: 1,
-                  groupValue: _selectedThemeIndex,
-                  onChanged: (value) {
-                    changeTheme(context, 1);
-                  },
-                ),
-                onTap: () async {
-                  await changeTheme(context, 1);
-                },
-              ),
-              ListTile(
-                title: const Text('深色模式'),
-                trailing: Radio(
-                  value: 2,
-                  groupValue: _selectedThemeIndex,
-                  onChanged: (value) {
-                    changeTheme(context, 2);
-                  },
-                ),
-                onTap: () async {
-                  await changeTheme(context, 2);
-                },
-              ),
-            ],
-          ),
+        child: ListView.builder(
+          itemBuilder: (context, index) {
+            return RadioListTile<int>(
+              title: Text(getThemeTitle(index)),
+              value: index,
+              groupValue: _selectedThemeIndex,
+              onChanged: (value) async {
+                await changeTheme(context, value!);
+              },
+            );
+          },
         ),
       ),
     );

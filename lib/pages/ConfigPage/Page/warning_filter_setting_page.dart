@@ -29,22 +29,19 @@ class WarningFilterSettingPageState extends State<WarningFilterSettingPage> {
       appBar: AppBar(title: const Text('警告过滤器')),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SwitchListTile(
-                title: const Text('超管警告朗读'),
-                value: configMap.dynamicConfig.filter.warning.enable,
-                onChanged: (value) async {
-                  setState(() {
-                    configMap.dynamicConfig.filter.warning.enable = value;
-                  });
-                  await updateConfigMap(configMap);
-                },
-              ),
-            ],
-          ),
+        child: ListView(
+          children: [
+            SwitchListTile(
+              title: const Text('超管警告朗读'),
+              value: configMap.dynamicConfig.filter.warning.enable,
+              onChanged: (value) async {
+                setState(() {
+                  configMap.dynamicConfig.filter.warning.enable = value;
+                });
+                await updateConfigMap(configMap);
+              },
+            ),
+          ],
         ),
       ),
     );

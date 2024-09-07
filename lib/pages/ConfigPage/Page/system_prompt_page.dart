@@ -29,9 +29,7 @@ class SystemPromptPageState extends State<SystemPromptPage> {
       appBar: AppBar(title: const Text('系统提示')),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        child: ListView(
             children: [
               SwitchListTile(
                 title: const Text('弹幕延迟较高时自动播报'),
@@ -98,7 +96,7 @@ class SystemPromptPageState extends State<SystemPromptPage> {
             ],
           ),
         ),
-      ),
+      
     );
   }
 }

@@ -30,9 +30,7 @@ class SuperChatFilterSettingPageState
       appBar: AppBar(title: const Text('超级留言过滤器')),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        child:ListView(
             children: [
               SwitchListTile(
                 title: const Text('醒目留言朗读'),
@@ -47,7 +45,7 @@ class SuperChatFilterSettingPageState
             ],
           ),
         ),
-      ),
+      
     );
   }
 }

@@ -226,16 +226,6 @@ class TtsEnginesSettingPageState extends State<TtsEnginesSettingPage> {
         }
       });
 
-  Widget _buildSliders() {
-    return Column(
-      children: [
-        _volume(),
-        _pitch(),
-        _rate(),
-      ],
-    );
-  }
-
   Widget _volume() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -354,17 +344,16 @@ class TtsEnginesSettingPageState extends State<TtsEnginesSettingPage> {
       appBar: AppBar(title: const Text('tts 引擎配置')),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildSampleButton(),
-              _engineSection(),
-              _futureBuilder(),
-              _buildSliders(),
-              _buildResetButtons(),
-            ],
-          ),
+        child: ListView(
+          children: [
+            _buildSampleButton(),
+            _engineSection(),
+            _futureBuilder(),
+            _volume(),
+            _pitch(),
+            _rate(),
+            _buildResetButtons(),
+          ],
         ),
       ),
     );

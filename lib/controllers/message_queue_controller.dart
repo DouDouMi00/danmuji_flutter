@@ -5,12 +5,10 @@ import '/services/tts.dart';
 class MessageQueueController extends GetxController {
   // 创建一个RxList作为消息队列
   final messagesAll = <Map<String, dynamic>>[].obs;
-
   final messagesDanmu = <Map<String, dynamic>>[].obs;
   final messagesGift = <Map<String, dynamic>>[].obs;
   final messagesGuardBuy = <Map<String, dynamic>>[].obs;
   final messagesSuperChat = <Map<String, dynamic>>[].obs;
-
   // 'like' 'subscribe'  'welcome' 'warning'
   final messagesOther = <Map<String, dynamic>>[].obs;
 
@@ -25,12 +23,7 @@ class MessageQueueController extends GetxController {
   final filtrationEfficiencySuperChat = 0.0.obs;
   final filtrationEfficiencyWarning = 0.0.obs;
 
-  late Function _sendMessageAll;
-  late Function _sendMessageDanmu;
-  late Function _sendMessageGift;
-  late Function _sendMessageGuardBuy;
-  late Function _sendMessageSuperChat;
-  late Function _sendMessageOther;
+  Map<String, Function> messageHandlers = {};
 
   // 发送消息的方法
   void sendMessage(Map messages) async {
@@ -57,28 +50,33 @@ class MessageQueueController extends GetxController {
 
     for (Map<String, dynamic> msg in messages["data"]["events"]) {
       messagesAll.add({'msg': messagesToText(msg), 'filterd': msg["filterd"]});
-      _sendMessageAll();
+      _invokeMessageHandler('all');
       switch (msg['type']) {
         case 'danmu':
           messagesDanmu
               .add({'msg': messagesToText(msg), 'filterd': msg["filterd"]});
-          _sendMessageDanmu();
+          _invokeMessageHandler('danmu');
+          break;
         case 'gift':
           messagesGift
               .add({'msg': messagesToText(msg), 'filterd': msg["filterd"]});
-          _sendMessageGift();
+          _invokeMessageHandler('gift');
+          break;
         case 'guardBuy':
           messagesGuardBuy
               .add({'msg': messagesToText(msg), 'filterd': msg["filterd"]});
-          _sendMessageGuardBuy();
+          _invokeMessageHandler('guardBuy');
+          break;
         case 'superChat':
           messagesSuperChat
               .add({'msg': messagesToText(msg), 'filterd': msg["filterd"]});
-          _sendMessageSuperChat();
+          _invokeMessageHandler('superChat');
+          break;
         default:
           messagesOther
               .add({'msg': messagesToText(msg), 'filterd': msg["filterd"]});
-          _sendMessageOther();
+          _invokeMessageHandler('other');
+          break;
       }
     }
   }
@@ -96,28 +94,15 @@ class MessageQueueController extends GetxController {
   }
 
   // 新增的回调方法
-  void onMessageAllAdded(Function handler) {
-    _sendMessageAll = handler;
+  void onMessageAdded(String messageType, Function handler) {
+    messageHandlers[messageType] = handler;
   }
 
-  void onMessageDanmuAdded(Function handler) {
-    _sendMessageDanmu = handler;
-  }
-
-  void onMessageGiftAdded(Function handler) {
-    _sendMessageGift = handler;
-  }
-
-  void onMessageGuardBuyAdded(Function handler) {
-    _sendMessageGuardBuy = handler;
-  }
-
-  void onMessageSuperChatAdded(Function handler) {
-    _sendMessageSuperChat = handler;
-  }
-
-  void onMessageOtherAdded(Function handler) {
-    _sendMessageOther = handler;
+  void _invokeMessageHandler(String messageType) {
+    final handler = messageHandlers[messageType];
+    if (handler != null) {
+      handler();
+    }
   }
 
   void clearMessages() {

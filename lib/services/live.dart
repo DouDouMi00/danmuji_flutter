@@ -36,6 +36,7 @@ class MessageHandler {
   }
 
   void run() {
+    setupEventHandlers();
     receiver.run();
   }
 

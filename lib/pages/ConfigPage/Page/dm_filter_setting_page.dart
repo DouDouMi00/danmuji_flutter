@@ -36,9 +36,7 @@ class DmFilterSettingPageState extends State<DmFilterSettingPage> {
       appBar: AppBar(title: const Text('弹幕过滤器')),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        child: ListView(
             children: [
               // 弹幕朗读
               SwitchListTile(
@@ -312,7 +310,7 @@ class DmFilterSettingPageState extends State<DmFilterSettingPage> {
             ],
           ),
         ),
-      ),
+      
     );
   }
 }

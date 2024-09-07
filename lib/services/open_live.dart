@@ -8,7 +8,7 @@ import 'blivedm_open_live.dart';
 import 'live.dart' show liveEvent;
 
 class OpenMessageHandler {
-  OpenLiveDanmakuReceiver? receiver;
+  final OpenLiveDanmakuReceiver receiver = OpenLiveDanmakuReceiver();
 
   void setupEventHandlers() {
     // 获取弹幕信息 LIVE_OPEN_PLATFORM_DM
@@ -19,23 +19,22 @@ class OpenMessageHandler {
     // 点赞信息 LIVE_OPEN_PLATFORM_LIKE 对单一用户最近2秒聚合发送一次点赞次数
     // 消息推送结束通知 LIVE_OPEN_PLATFORM_INTERACTION_END
 
-    receiver?.onDanmuCallback(handleOpenDanma);
-    receiver?.onGiftCallback(handleOpenGift);
-    receiver?.onSuperChatCallback(handleOpenSC);
-    // receiver?.onSuperChatDelCallback();
-    receiver?.onGuardBuyCallback(handleOpenGuardBuy);
-    receiver?.onLikeCallback(handleOpenLike);
-    receiver?.onInteractionEndCallback(handleOpenInteractionEnd);
+    receiver.onDanmuCallback(handleOpenDanma);
+    receiver.onGiftCallback(handleOpenGift);
+    receiver.onSuperChatCallback(handleOpenSC);
+    // receiver.onSuperChatDelCallback();
+    receiver.onGuardBuyCallback(handleOpenGuardBuy);
+    receiver.onLikeCallback(handleOpenLike);
+    receiver.onInteractionEndCallback(handleOpenInteractionEnd);
   }
 
   void run() {
-    final OpenLiveDanmakuReceiver receiver = OpenLiveDanmakuReceiver();
     setupEventHandlers();
     receiver.run();
   }
 
   void stop() {
-    receiver?.stop();
+    receiver.stop();
   }
 
   Map<int, String> guardLevelMapNameRaw = {0: "", 1: "总督", 2: "提督", 3: "舰长"};

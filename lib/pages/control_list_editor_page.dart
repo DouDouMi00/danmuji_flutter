@@ -121,10 +121,9 @@ class _EditableListState extends State<EditableList> {
       inputType: widget.inputType,
       isObscured: widget.isObscured,
       onSaved: (value) {
-        setState(() {
-          _list[index] = value;
-          widget.onListChanged(_list);
-        });
+        _list[index] = value;
+        widget.onListChanged(_list);
+        setState(() {});
       },
     );
     showInputNumberDialog(params);
@@ -141,13 +140,11 @@ class _EditableListState extends State<EditableList> {
             child: Text(_list[index].toString()),
           ),
           trailing: IconButton(
-            icon: const Icon(Icons.delete),
-            tooltip: '删除',
+            icon: const Icon(Icons.delete, semanticLabel: '删除'),
             onPressed: () {
-              setState(() {
-                _list.removeAt(index);
-                widget.onListChanged(_list);
-              });
+              _list.removeAt(index);
+              widget.onListChanged(_list);
+              setState(() {});
             },
           ),
         );

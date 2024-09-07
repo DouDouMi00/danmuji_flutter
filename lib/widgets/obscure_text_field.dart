@@ -81,13 +81,17 @@ class InputNumberDialogState extends State<InputNumberDialog> {
               if (widget.params.isObscured)
                 IconButton(
                   isSelected: _isObscured,
-                  icon: const Icon(Icons.visibility),
-                  selectedIcon: const Icon(Icons.visibility_off),
-                  tooltip: _isObscured ? '显示密码' : '隐藏密码',
+                  icon: const Icon(
+                    Icons.visibility,
+                    semanticLabel: '隐藏密码',
+                  ),
+                  selectedIcon: const Icon(
+                    Icons.visibility_off,
+                    semanticLabel: '显示密码',
+                  ),
                   onPressed: () {
-                    setState(() {
-                      _isObscured = !_isObscured;
-                    });
+                    _isObscured = !_isObscured;
+                    setState(() {});
                   },
                 ),
             ],
@@ -108,17 +112,17 @@ class InputNumberDialogState extends State<InputNumberDialog> {
             if (_controller.text.isEmpty) {
               // 显示错误对话框，提示输入不能为空
               Get.dialog(
-                  AlertDialog(
-                    title: const Text('错误'),
-                    content: const Text('输入不能为空，请输入有效值。'),
-                    actions: [
-                      ElevatedButton(
-                        onPressed: () => Get.back(),
-                        child: const Text('OK'),
-                      ),
-                    ],
-                  ),
-                  barrierDismissible: false);
+                AlertDialog(
+                  title: const Text('错误'),
+                  content: const Text('输入不能为空，请输入有效值。'),
+                  actions: [
+                    ElevatedButton(
+                      onPressed: () => Get.back(),
+                      child: const Text('OK'),
+                    ),
+                  ],
+                ),
+              );
             } else {
               dynamic value;
               if (widget.params.inputType == InputType.intInputType ||
@@ -133,41 +137,9 @@ class InputNumberDialogState extends State<InputNumberDialog> {
                       parsedValue < widget.params.minValue!) {
                     // 显示错误对话框
                     Get.dialog(
-                        AlertDialog(
-                          title: const Text('错误'),
-                          content: const Text('数值小于最小值'),
-                          actions: [
-                            ElevatedButton(
-                              onPressed: () => Get.back(),
-                              child: const Text('OK'),
-                            ),
-                          ],
-                        ),
-                        barrierDismissible: false);
-                    return;
-                  }
-                  if (widget.params.maxValue != null &&
-                      parsedValue > widget.params.maxValue!) {
-                    Get.dialog(
-                        AlertDialog(
-                          title: const Text('错误'),
-                          content: const Text('数值大于最大值'),
-                          actions: [
-                            ElevatedButton(
-                              onPressed: () => Get.back(),
-                              child: const Text('OK'),
-                            ),
-                          ],
-                        ),
-                        barrierDismissible: false);
-                    return;
-                  }
-                  value = parsedValue;
-                } catch (e) {
-                  Get.dialog(
                       AlertDialog(
                         title: const Text('错误'),
-                        content: const Text('请输入有效的数字'),
+                        content: const Text('数值小于最小值'),
                         actions: [
                           ElevatedButton(
                             onPressed: () => Get.back(),
@@ -175,7 +147,39 @@ class InputNumberDialogState extends State<InputNumberDialog> {
                           ),
                         ],
                       ),
-                      barrierDismissible: false);
+                    );
+                    return;
+                  }
+                  if (widget.params.maxValue != null &&
+                      parsedValue > widget.params.maxValue!) {
+                    Get.dialog(
+                      AlertDialog(
+                        title: const Text('错误'),
+                        content: const Text('数值大于最大值'),
+                        actions: [
+                          ElevatedButton(
+                            onPressed: () => Get.back(),
+                            child: const Text('OK'),
+                          ),
+                        ],
+                      ),
+                    );
+                    return;
+                  }
+                  value = parsedValue;
+                } catch (e) {
+                  Get.dialog(
+                    AlertDialog(
+                      title: const Text('错误'),
+                      content: const Text('请输入有效的数字'),
+                      actions: [
+                        ElevatedButton(
+                          onPressed: () => Get.back(),
+                          child: const Text('OK'),
+                        ),
+                      ],
+                    ),
+                  );
                   return;
                 }
               } else {
@@ -193,7 +197,7 @@ class InputNumberDialogState extends State<InputNumberDialog> {
 }
 
 void showInputNumberDialog(InputDialogParams params) {
-  Get.dialog(InputNumberDialog(params: params), barrierDismissible: false);
+  Get.dialog(InputNumberDialog(params: params));
 }
 
 class RadioDialogParams {
@@ -274,5 +278,5 @@ class RadioDialogState extends State<RadioDialog> {
 }
 
 void showRadioDialog(RadioDialogParams params) {
-  Get.dialog(RadioDialog(params: params), barrierDismissible: false);
+  Get.dialog(RadioDialog(params: params));
 }

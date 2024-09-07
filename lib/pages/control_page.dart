@@ -42,7 +42,16 @@ class ControlPageState extends State<ControlPage>
   bool isExpanded1 = false;
   double _dividerPosition = 0.7;
 
-  List<Tab> tabs = [
+  Map<int, String> messageTypes = {
+    0: 'all',
+    1: 'danmu',
+    2: 'gift',
+    3: 'guardBuy',
+    4: 'superChat',
+    5: 'other',
+  };
+
+  final List<Tab> tabs = [
     const Tab(text: '全部'),
     const Tab(text: '弹幕'),
     const Tab(text: '礼物'),
@@ -50,31 +59,44 @@ class ControlPageState extends State<ControlPage>
     const Tab(text: '醒目留言'),
     const Tab(text: '其他'),
   ];
+
   late TabController _tabController;
-  final scrollAllController = ScrollController();
-  final scrollDanmuController = ScrollController();
-  final scrollGiftController = ScrollController();
-  final scrollGuardBuyController = ScrollController();
-  final scrollSuperChatController = ScrollController();
-  final scrollOtherController = ScrollController();
-  RxBool showAllBackToBottomButton = false.obs;
-  RxBool showDanmuBackToBottomButton = false.obs;
-  RxBool showGiftBackToBottomButton = false.obs;
-  RxBool showGuardBuyBackToBottomButton = false.obs;
-  RxBool showSuperChatBackToBottomButton = false.obs;
-  RxBool showOtherBackToBottomButton = false.obs;
-  RxInt autoAllScroll = 0.obs;
-  RxInt autoDanmuScroll = 0.obs;
-  RxInt autoGiftScroll = 0.obs;
-  RxInt autoGuardBuyScroll = 0.obs;
-  RxInt autoSuperChatScroll = 0.obs;
-  RxInt autoOtherScroll = 0.obs;
-  RxInt newAllMessages = 0.obs;
-  RxInt newDanmuMessages = 0.obs;
-  RxInt newGiftMessages = 0.obs;
-  RxInt newGuardBuyMessages = 0.obs;
-  RxInt newSuperChatMessages = 0.obs;
-  RxInt newOtherMessages = 0.obs;
+
+  final List<ScrollController> scrollControllers = [
+    ScrollController(),
+    ScrollController(),
+    ScrollController(),
+    ScrollController(),
+    ScrollController(),
+    ScrollController(),
+  ];
+
+  final List<RxBool> showBackToBottomButton = [
+    false.obs,
+    false.obs,
+    false.obs,
+    false.obs,
+    false.obs,
+    false.obs,
+  ];
+
+  final List<RxInt> autoScroll = [
+    0.obs,
+    0.obs,
+    0.obs,
+    0.obs,
+    0.obs,
+    0.obs,
+  ];
+
+  final List<RxInt> newMessages = [
+    0.obs,
+    0.obs,
+    0.obs,
+    0.obs,
+    0.obs,
+    0.obs,
+  ];
 
   void Function() onMessageAdd(RxBool showBackToBottomButton,
       ScrollController scrollController, RxInt autoScroll, RxInt newMessages) {
@@ -98,20 +120,16 @@ class ControlPageState extends State<ControlPage>
     };
   }
 
-  void Function() addList(
-    RxBool showBackToBottomButton,
-    ScrollController scrollController,
-    RxInt autoScroll,
-    RxInt newMessages,
-  ) {
+  void Function() addList(int index) {
     return () {
-      if (scrollController.offset < scrollController.position.maxScrollExtent &&
-          autoScroll.value <= 0) {
-        showBackToBottomButton.value = true;
-      } else if (scrollController.offset ==
-          scrollController.position.maxScrollExtent) {
-        newMessages.value = 0;
-        showBackToBottomButton.value = false;
+      if (scrollControllers[index].offset <
+              scrollControllers[index].position.maxScrollExtent &&
+          autoScroll[index].value <= 0) {
+        showBackToBottomButton[index].value = true;
+      } else if (scrollControllers[index].offset ==
+          scrollControllers[index].position.maxScrollExtent) {
+        newMessages[index].value = 0;
+        showBackToBottomButton[index].value = false;
       }
     };
   }
@@ -120,63 +138,18 @@ class ControlPageState extends State<ControlPage>
   void initState() {
     super.initState();
     _tabController = TabController(length: tabs.length, vsync: this);
-    messageController.onMessageAllAdded(onMessageAdd(
-      showAllBackToBottomButton,
-      scrollAllController,
-      autoAllScroll,
-      newAllMessages,
-    ));
-    messageController.onMessageDanmuAdded(onMessageAdd(
-      showDanmuBackToBottomButton,
-      scrollDanmuController,
-      autoDanmuScroll,
-      newDanmuMessages,
-    ));
-    messageController.onMessageGiftAdded(onMessageAdd(
-      showGiftBackToBottomButton,
-      scrollGiftController,
-      autoGiftScroll,
-      newGiftMessages,
-    ));
-    messageController.onMessageGuardBuyAdded(onMessageAdd(
-      showGuardBuyBackToBottomButton,
-      scrollGuardBuyController,
-      autoGuardBuyScroll,
-      newGuardBuyMessages,
-    ));
-    messageController.onMessageSuperChatAdded(onMessageAdd(
-      showSuperChatBackToBottomButton,
-      scrollSuperChatController,
-      autoSuperChatScroll,
-      newSuperChatMessages,
-    ));
-    messageController.onMessageOtherAdded(onMessageAdd(
-      showOtherBackToBottomButton,
-      scrollOtherController,
-      autoOtherScroll,
-      newOtherMessages,
-    ));
-    // 检测当前滑动距离是不是在底部
-    scrollAllController.addListener(addList(showAllBackToBottomButton,
-        scrollAllController, autoAllScroll, newAllMessages));
-    scrollDanmuController.addListener(addList(showDanmuBackToBottomButton,
-        scrollDanmuController, autoDanmuScroll, newDanmuMessages));
-    scrollGiftController.addListener(addList(showGiftBackToBottomButton,
-        scrollGiftController, autoGiftScroll, newGiftMessages));
-    scrollGuardBuyController.addListener(addList(showGuardBuyBackToBottomButton,
-        scrollGuardBuyController, autoGuardBuyScroll, newGuardBuyMessages));
-    scrollSuperChatController.addListener(addList(
-        showSuperChatBackToBottomButton,
-        scrollSuperChatController,
-        autoSuperChatScroll,
-        newSuperChatMessages));
-    scrollOtherController.addListener(addList(showOtherBackToBottomButton,
-        scrollOtherController, autoOtherScroll, newOtherMessages));
+    for (int i = 0; i < scrollControllers.length; i++) {
+      messageController.onMessageAdded(
+          messageTypes[i]!,
+          onMessageAdd(showBackToBottomButton[i], scrollControllers[i],
+              autoScroll[i], newMessages[i]));
+      scrollControllers[i].addListener(addList(i));
+    }
+
     ttsTask();
     setupLiveEventListeners();
     setupStatsEventListeners();
     statsTask();
-    messageHandler.setupEventHandlers();
   }
 
   @override
@@ -193,6 +166,104 @@ class ControlPageState extends State<ControlPage>
     super.dispose();
   }
 
+  void toggleExpansion() {
+    isExpanded1 = !isExpanded1;
+    setState(() {});
+  }
+
+// 主要的 UI 构建部分
+  Widget buildMainUI() {
+    return GestureDetector(
+      child: Obx(
+        () => Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Text('输出队列 ${messageController.messagesQueueLength.value} 条'),
+            Text('当前延迟 ${messageController.delay.value} 秒'),
+            IconButton.filledTonal(
+              icon: const Icon(Icons.expand_more, semanticLabel: '展开'),
+              selectedIcon: const Icon(Icons.expand_less, semanticLabel: '收起'),
+              onPressed: toggleExpansion,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatItem(String label, String value) {
+    return Expanded(
+      child: Text('$label\n$value', textAlign: TextAlign.center),
+    );
+  }
+
+  // 定义一个辅助函数来构建扩展内容
+  Widget _buildExpandedContent() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        const Divider(),
+        Obx(
+          () => Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildStatItem('弹幕',
+                  '${messageController.filtrationEfficiencyDanmu.value.toStringAsFixed(2)}%'),
+              _buildStatItem('礼物',
+                  '${messageController.filtrationEfficiencyGift.value.toStringAsFixed(2)}%'),
+              _buildStatItem('欢迎',
+                  '${messageController.filtrationEfficiencyWelcome.value.toStringAsFixed(2)}%'),
+              _buildStatItem('点赞',
+                  '${messageController.filtrationEfficiencyLike.value.toStringAsFixed(2)}%'),
+            ],
+          ),
+        ),
+        Obx(
+          () => Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildStatItem('舰长',
+                  '${messageController.filtrationEfficiencyGuardBuy.value.toStringAsFixed(2)}%'),
+              _buildStatItem('关注',
+                  '${messageController.filtrationEfficiencySubscribe.value.toStringAsFixed(2)}%'),
+              _buildStatItem('醒目留言',
+                  '${messageController.filtrationEfficiencySuperChat.value.toStringAsFixed(2)}%'),
+              _buildStatItem('警告',
+                  '${messageController.filtrationEfficiencyWarning.value.toStringAsFixed(2)}%'),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  List<Widget> generateMessageListWrappers() {
+    List<Widget> wrappers = [];
+
+    List<Map<String, dynamic>> wrapperMessageTypes = [
+      {'messages': messageController.messagesAll, 'index': 0},
+      {'messages': messageController.messagesDanmu, 'index': 1},
+      {'messages': messageController.messagesGift, 'index': 2},
+      {'messages': messageController.messagesGuardBuy, 'index': 3},
+      {'messages': messageController.messagesSuperChat, 'index': 4},
+      {'messages': messageController.messagesOther, 'index': 5},
+    ];
+
+    for (var messageType in wrapperMessageTypes) {
+      int index = messageType['index'];
+      wrappers.add(
+        MessageListWrapper(
+          messages: messageType['messages'],
+          showBackToBottomButton: showBackToBottomButton[index],
+          scrollController: scrollControllers[index],
+          newMessages: newMessages[index],
+        ),
+      );
+    }
+    return wrappers;
+  }
+
   void _updateDividerPosition(DragUpdateDetails details) {
     setState(() {
       _dividerPosition += details.delta.dy / context.size!.height;
@@ -200,231 +271,160 @@ class ControlPageState extends State<ControlPage>
     });
   }
 
-  // 定义一个用于显示统计信息的小部件
-  Widget _buildStatItem(String label, String value) {
+  Widget _buildTextButtonColumn(Widget firstButton, [Widget? secondButton]) {
     return Expanded(
-      child: Text('$label\n$value', textAlign: TextAlign.center),
+      child: Row(
+        children: [
+          firstButton,
+          if (secondButton != null) secondButton,
+        ],
+      ),
     );
   }
 
-  Widget _buildVerticalTwoRowButtons(
-      double iconButtonWidth, double iconButtonHeight) {
+  Widget _buildTextIconButton(String text, VoidCallback? onPressed) {
+    return Expanded(
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ButtonStyle(
+          minimumSize: WidgetStateProperty.all<Size>(
+            const Size(double.infinity, double.infinity),
+          ),
+        ),
+        child: Text(text),
+      ),
+    );
+  }
+
+  Future<void> _showConfirmDialog() async {
+    return Get.dialog(
+      AlertDialog(
+        title: const Text('确认清空？'),
+        content: const Text('这将清除未朗读的消息记录。'),
+        actions: <Widget>[
+          ElevatedButton(
+            child: const Text('取消'),
+            onPressed: () {
+              Get.back();
+            },
+          ),
+          ElevatedButton(
+            child: const Text('确定'),
+            onPressed: () async {
+              await handleFlush();
+              Get.back();
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBigButtons() {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Row(
-          children: [
-            Column(children: [
-              _buildIconButton(
-                  Icons.web,
-                  _isWebButton ? _toggleRunningStatus : null,
-                  iconButtonWidth,
-                  iconButtonHeight,
-                  'Web平台$buttonText'),
-              _buildIconButton(
-                  Icons.lock_open_outlined,
-                  _isOpenButton ? _toggleRunningStatusOpen : null,
-                  iconButtonWidth,
-                  iconButtonHeight,
-                  '开放平台$buttonText'),
-            ]),
-            _buildIconButton(Icons.clear_all, isRunning ? handleFlush : null,
-                iconButtonWidth, iconButtonHeight, '清空消息'),
-            Column(children: [
-              _buildIconButton(
-                  Icons.volume_up,
-                  isRunning ? handleTTSRatePlus : null,
-                  iconButtonWidth,
-                  iconButtonHeight,
-                  '提高语音播报语速'),
-              _buildIconButton(
-                  Icons.volume_down,
-                  isRunning ? handleTTSVolumeMinus : null,
-                  iconButtonWidth,
-                  iconButtonHeight,
-                  '降低语音播报语速'),
-            ]),
-            _buildIconButton(
-                Icons.refresh,
-                isRunning ? handleReadNewestMessages : null,
-                iconButtonWidth,
-                iconButtonHeight,
-                '回到最新弹幕'),
-            Column(children: [
-              _buildIconButton(
-                  Icons.keyboard_arrow_up,
-                  isRunning ? handleReadNextHistoryDanmu : null,
-                  iconButtonWidth,
-                  iconButtonHeight,
-                  '查看上一条弹幕'),
-              _buildIconButton(
-                  Icons.keyboard_arrow_down,
-                  isRunning ? handleReadLastHistoryDanmu : null,
-                  iconButtonWidth,
-                  iconButtonHeight,
-                  '查看下一条弹幕'),
-            ]),
-            Column(children: [
-              _buildIconButton(
-                  Icons.keyboard_arrow_up,
-                  isRunning ? handleReadNextGiftMessages : null,
-                  iconButtonWidth,
-                  iconButtonHeight,
-                  '查看上一条礼物'),
-              _buildIconButton(
-                  Icons.keyboard_arrow_down,
-                  isRunning ? handleReadLastGiftMessages : null,
-                  iconButtonWidth,
-                  iconButtonHeight,
-                  '查看下一条礼物'),
-            ]),
-          ],
+        // 启动/停止按钮和清空按钮。
+        _buildTextButtonColumn(
+          _buildTextIconButton(
+              'Web平台$buttonText', _isWebButton ? _toggleRunningStatus : null),
+          _buildTextIconButton('开放平台$buttonText',
+              _isOpenButton ? _toggleRunningStatusOpen : null),
+        ),
+        _buildTextButtonColumn(
+          _buildTextIconButton('清空', isRunning ? _showConfirmDialog : null),
+        ),
+        // TTS语速控制按钮。
+        _buildTextButtonColumn(
+          _buildTextIconButton('语速-1', isRunning ? handleTTSVolumeMinus : null),
+          _buildTextIconButton('语速+1', isRunning ? handleTTSRatePlus : null),
+        ),
+        // 弹幕和礼物控制按钮，用于浏览历史弹幕和礼物。
+        _buildTextButtonColumn(
+          _buildTextIconButton(
+              '回到最新弹幕', isRunning ? handleReadNewestMessages : null),
+        ),
+        _buildTextButtonColumn(
+          _buildTextIconButton(
+              '查看上一条弹幕', isRunning ? handleReadNextHistoryDanmu : null),
+          _buildTextIconButton(
+              '查看下一条弹幕', isRunning ? handleReadLastHistoryDanmu : null),
+        ),
+        _buildTextButtonColumn(
+          _buildTextIconButton(
+              '查看上一条礼物', isRunning ? handleReadNextGiftMessages : null),
+          _buildTextIconButton(
+              '查看下一条礼物', isRunning ? handleReadLastGiftMessages : null),
         ),
       ],
     );
   }
 
-  Widget _buildIconButton(IconData icon, VoidCallback? onPressed,
-      double iconButtonWidth, double iconButtonHeight, String semanticsLabel) {
-    return IconButton.filledTonal(
-      onPressed: onPressed,
-      icon: Icon(icon),
-      tooltip: semanticsLabel, // 添加屏幕阅读器说明
-      constraints: BoxConstraints(
-        // 设置按钮大小
-        minWidth: iconButtonWidth,
-        minHeight: iconButtonHeight,
+  Widget _buildIconButtonColumn(Widget firstButton, [Widget? secondButton]) {
+    return Expanded(
+      child: Column(
+        children: [
+          firstButton,
+          if (secondButton != null) secondButton,
+        ],
       ),
     );
   }
 
-  Widget _buildBigButtons(double buttonWidth) {
-    return Column(mainAxisSize: MainAxisSize.min, children: [
-      // 启动/停止按钮和清空按钮。
-      Expanded(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            ElevatedButton(
-              onPressed: _isWebButton
-                  ? () {
-                      _toggleRunningStatus();
-                    }
-                  : null, // 如果按钮不可用，则禁用点击事件
-              style: ButtonStyle(
-                minimumSize: WidgetStateProperty.all<Size>(
-                  Size(buttonWidth, double.infinity),
-                ),
-              ),
-              child: Text(buttonText),
-            ),
-            ElevatedButton(
-              onPressed: _isOpenButton
-                  ? () {
-                      _toggleRunningStatusOpen();
-                    }
-                  : null, // 如果按钮不可用，则禁用点击事件
-              style: ButtonStyle(
-                minimumSize: WidgetStateProperty.all<Size>(
-                  Size(buttonWidth, double.infinity),
-                ),
-              ),
-              child: Text('开放平台$buttonText'),
-            ),
-          ],
+  Widget _buildIconButton(
+      IconData icon, VoidCallback? onPressed, String semanticsLabel) {
+    return Expanded(
+      child: IconButton.filledTonal(
+        onPressed: onPressed,
+        icon: Icon(icon, semanticLabel: semanticsLabel),
+        constraints: const BoxConstraints(
+          // 设置按钮大小
+          minWidth: double.infinity,
+          minHeight: double.infinity,
         ),
       ),
-      Expanded(
-        child: ElevatedButton(
-          onPressed: isRunning ? handleFlush : null,
-          style: ButtonStyle(
-            minimumSize: WidgetStateProperty.all<Size>(
-              Size(buttonWidth, double.infinity),
-            ),
-          ),
-          child: const Text('清空'),
-        ),
-      ),
-      // TTS语速控制按钮。
-      Expanded(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Expanded(
-              child: ElevatedButton(
-                onPressed: isRunning ? handleTTSVolumeMinus : null,
-                child: const Text('语速-1'),
-              ),
-            ),
-            Expanded(
-              child: ElevatedButton(
-                onPressed: isRunning ? handleTTSRatePlus : null,
-                child: const Text('语速+1'),
-              ),
-            ),
-          ],
-        ),
-      ),
-      // 弹幕和礼物控制按钮，用于浏览历史弹幕和礼物。
-      Expanded(
-        child: ElevatedButton(
-          onPressed: isRunning ? handleReadNewestMessages : null,
-          style: ButtonStyle(
-            minimumSize: WidgetStateProperty.all<Size>(
-              Size(buttonWidth, double.infinity),
-            ),
-          ),
-          child: const Text('回到最新弹幕'),
-        ),
-      ),
-      Expanded(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Expanded(
-              child: ElevatedButton(
-                onPressed: isRunning ? handleReadNextHistoryDanmu : null,
-                child: const Text('查看上一条弹幕'),
-              ),
-            ),
-            Expanded(
-              child: ElevatedButton(
-                onPressed: isRunning ? handleReadLastHistoryDanmu : null,
-                child: const Text('查看下一条弹幕'),
-              ),
-            ),
-          ],
-        ),
-      ),
-      Expanded(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Expanded(
-              child: ElevatedButton(
-                onPressed: isRunning ? handleReadNextGiftMessages : null,
-                child: const Text('查看上一条礼物'),
-              ),
-            ),
-            Expanded(
-              child: ElevatedButton(
-                onPressed: isRunning ? handleReadLastGiftMessages : null,
-                child: const Text('查看下一条礼物'),
-              ),
-            ),
-          ],
-        ),
-      )
-    ]);
+    );
   }
 
-  void toggleExpansion() {
-    setState(() {
-      isExpanded1 = !isExpanded1;
-    });
+  Widget _buildVerticalTwoRowButtons() {
+    return Row(
+      children: [
+        _buildIconButtonColumn(
+          _buildIconButton(Icons.web,
+              _isWebButton ? _toggleRunningStatus : null, 'Web平台$buttonText'),
+          _buildIconButton(
+              Icons.lock_open_outlined,
+              _isOpenButton ? _toggleRunningStatusOpen : null,
+              '开放平台$buttonText'),
+        ),
+        _buildIconButtonColumn(
+          _buildIconButton(
+              Icons.clear_all, isRunning ? _showConfirmDialog : null, '清空消息'),
+        ),
+        _buildIconButtonColumn(
+          _buildIconButton(Icons.volume_up,
+              isRunning ? handleTTSRatePlus : null, '提高语音播报语速'),
+          _buildIconButton(Icons.volume_down,
+              isRunning ? handleTTSVolumeMinus : null, '降低语音播报语速'),
+        ),
+        _buildIconButtonColumn(
+          _buildIconButton(Icons.refresh,
+              isRunning ? handleReadNewestMessages : null, '回到最新弹幕'),
+        ),
+        _buildIconButtonColumn(
+          _buildIconButton(Icons.keyboard_arrow_up,
+              isRunning ? handleReadNextHistoryDanmu : null, '查看上一条弹幕'),
+          _buildIconButton(Icons.keyboard_arrow_down,
+              isRunning ? handleReadLastHistoryDanmu : null, '查看下一条弹幕'),
+        ),
+        _buildIconButtonColumn(
+          _buildIconButton(Icons.keyboard_arrow_up,
+              isRunning ? handleReadNextGiftMessages : null, '查看上一条礼物'),
+          _buildIconButton(Icons.keyboard_arrow_down,
+              isRunning ? handleReadLastGiftMessages : null, '查看下一条礼物'),
+        ),
+      ],
+    );
   }
 
   @override
@@ -435,62 +435,8 @@ class ControlPageState extends State<ControlPage>
         padding: EdgeInsets.fromLTRB(16.0, statusBarHeight, 16.0, 0),
         child: Column(
           children: [
-            GestureDetector(
-              child: Obx(
-                () => Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Text(
-                        '输出队列 ${messageController.messagesQueueLength.value} 条'),
-                    Text('当前延迟 ${messageController.delay.value} 秒'),
-                    IconButton.filledTonal(
-                      icon: Icon(
-                          isExpanded1 ? Icons.expand_less : Icons.expand_more),
-                      tooltip: isExpanded1 ? '收起' : '展开',
-                      onPressed: toggleExpansion,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            if (isExpanded1)
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const Divider(),
-                  Obx(
-                    () => Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        _buildStatItem('弹幕',
-                            '${messageController.filtrationEfficiencyDanmu.value.toStringAsFixed(2)}%'),
-                        _buildStatItem('礼物',
-                            '${messageController.filtrationEfficiencyGift.value.toStringAsFixed(2)}%'),
-                        _buildStatItem('欢迎',
-                            '${messageController.filtrationEfficiencyWelcome.value.toStringAsFixed(2)}%'),
-                        _buildStatItem('点赞',
-                            '${messageController.filtrationEfficiencyLike.value.toStringAsFixed(2)}%'),
-                      ],
-                    ),
-                  ),
-                  Obx(
-                    () => Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        _buildStatItem('舰长',
-                            '${messageController.filtrationEfficiencyGuardBuy.value.toStringAsFixed(2)}%'),
-                        _buildStatItem('关注',
-                            '${messageController.filtrationEfficiencySubscribe.value.toStringAsFixed(2)}%'),
-                        _buildStatItem('醒目留言',
-                            '${messageController.filtrationEfficiencySuperChat.value.toStringAsFixed(2)}%'),
-                        _buildStatItem('警告',
-                            '${messageController.filtrationEfficiencyWarning.value.toStringAsFixed(2)}%'),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+            buildMainUI(),
+            if (isExpanded1) _buildExpandedContent(),
             Expanded(
               flex: (_dividerPosition * 100).round(),
               child: Scaffold(
@@ -502,38 +448,7 @@ class ControlPageState extends State<ControlPage>
                 ),
                 body: TabBarView(
                   controller: _tabController,
-                  children: [
-                    MessageListWrapper(
-                        messages: messageController.messagesAll,
-                        showBackToBottomButton: showAllBackToBottomButton,
-                        scrollController: scrollAllController,
-                        newMessages: newAllMessages),
-                    MessageListWrapper(
-                        messages: messageController.messagesDanmu,
-                        showBackToBottomButton: showDanmuBackToBottomButton,
-                        scrollController: scrollDanmuController,
-                        newMessages: newDanmuMessages),
-                    MessageListWrapper(
-                        messages: messageController.messagesGift,
-                        showBackToBottomButton: showGiftBackToBottomButton,
-                        scrollController: scrollGiftController,
-                        newMessages: newGiftMessages),
-                    MessageListWrapper(
-                        messages: messageController.messagesGuardBuy,
-                        showBackToBottomButton: showGuardBuyBackToBottomButton,
-                        scrollController: scrollGuardBuyController,
-                        newMessages: newGuardBuyMessages),
-                    MessageListWrapper(
-                        messages: messageController.messagesSuperChat,
-                        showBackToBottomButton: showSuperChatBackToBottomButton,
-                        scrollController: scrollSuperChatController,
-                        newMessages: newSuperChatMessages),
-                    MessageListWrapper(
-                        messages: messageController.messagesOther,
-                        showBackToBottomButton: showOtherBackToBottomButton,
-                        scrollController: scrollOtherController,
-                        newMessages: newOtherMessages),
-                  ],
+                  children: generateMessageListWrappers(),
                 ),
               ),
             ),
@@ -551,15 +466,10 @@ class ControlPageState extends State<ControlPage>
               flex: ((1 - _dividerPosition) * 100).round(),
               child: LayoutBuilder(
                 builder: (BuildContext context, BoxConstraints constraints) {
-                  double buttonWidth = constraints.maxWidth / 2;
-                  double iconButtonWidth = constraints.maxWidth / 6;
-                  double iconButtonHeight = constraints.maxHeight / 2;
-
                   if (_dividerPosition < 0.85) {
-                    return _buildBigButtons(buttonWidth);
+                    return _buildBigButtons();
                   } else {
-                    return _buildVerticalTwoRowButtons(
-                        iconButtonWidth, iconButtonHeight);
+                    return _buildVerticalTwoRowButtons();
                   }
                 },
               ),
@@ -570,11 +480,50 @@ class ControlPageState extends State<ControlPage>
     );
   }
 
-  // 切换运行状态，启动或停止弹幕接收和处理。
+  Future<bool> _showStartStopConfirmDialog(
+      String platform, String action) async {
+    return await Get.dialog(
+      AlertDialog(
+        title: Text('$platform $action确认'),
+        content: Text('您确定要$platform $action吗？'),
+        actions: <Widget>[
+          ElevatedButton(
+            child: const Text('取消'),
+            onPressed: () {
+              Get.back(result: false);
+            },
+          ),
+          ElevatedButton(
+            child: const Text('确定'),
+            onPressed: () {
+              Get.back(result: true);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   void _toggleRunningStatus() async {
+    // 首先禁用按钮，防止多次点击
     _isWebButton = false;
     _isOpenButton = false;
     setState(() {});
+
+    // 显示确认对话框
+    final shouldProceed =
+        await _showStartStopConfirmDialog('Web平台', isRunning ? '停止' : '启动');
+    if (!shouldProceed) {
+      if (!isRunning) {
+        // 如果用户取消，则恢复按钮状态
+        _isWebButton = true;
+        _isOpenButton = true;
+      } else {
+        _isWebButton = true;
+      }
+      setState(() {});
+      return;
+    }
     if (!isRunning) {
       await Future.delayed(const Duration(seconds: 2));
       _isWebButton = true;
@@ -590,9 +539,24 @@ class ControlPageState extends State<ControlPage>
   }
 
   void _toggleRunningStatusOpen() async {
+    // 首先禁用按钮，防止多次点击
     _isWebButton = false;
     _isOpenButton = false;
     setState(() {});
+    // 显示确认对话框
+    final shouldProceed =
+        await _showStartStopConfirmDialog('开放平台', isRunning ? '停止' : '启动');
+    if (!shouldProceed) {
+      if (!isRunning) {
+        // 如果用户取消，则恢复按钮状态
+        _isWebButton = true;
+        _isOpenButton = true;
+      } else {
+        _isOpenButton = true;
+      }
+      setState(() {});
+      return;
+    }
     if (!isRunning) {
       await Future.delayed(const Duration(seconds: 2));
       _isOpenButton = true;

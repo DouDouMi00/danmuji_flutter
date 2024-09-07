@@ -29,22 +29,19 @@ class GuardBuyFilterSettingPageState extends State<GuardBuyFilterSettingPage> {
       appBar: AppBar(title: const Text('舰队购买过滤器')),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SwitchListTile(
-                title: const Text('舰队购买朗读'),
-                value: configMap.dynamicConfig.filter.guardBuy.enable,
-                onChanged: (value) async {
-                  setState(() {
-                    configMap.dynamicConfig.filter.guardBuy.enable = value;
-                  });
-                  await updateConfigMap(configMap);
-                },
-              ),
-            ],
-          ),
+        child: ListView(
+          children: [
+            SwitchListTile(
+              title: const Text('舰队购买朗读'),
+              value: configMap.dynamicConfig.filter.guardBuy.enable,
+              onChanged: (value) async {
+                setState(() {
+                  configMap.dynamicConfig.filter.guardBuy.enable = value;
+                });
+                await updateConfigMap(configMap);
+              },
+            ),
+          ],
         ),
       ),
     );

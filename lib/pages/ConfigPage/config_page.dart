@@ -16,17 +16,12 @@ class ConfigEditPage extends StatefulWidget {
 }
 
 class ConfigEditPageState extends State<ConfigEditPage> {
-  late Future<DefaultConfig> _configFuture;
   late DefaultConfig configMap;
 
   @override
   void initState() {
     super.initState();
-    _configFuture = loadConfig();
-  }
-
-  Future<DefaultConfig> loadConfig() async {
-    return getConfigMap();
+    configMap = getConfigMap();
   }
 
   @override
@@ -35,24 +30,7 @@ class ConfigEditPageState extends State<ConfigEditPage> {
       appBar: AppBar(title: const Text('设置')),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
-        child: FutureBuilder<DefaultConfig>(
-          future: _configFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            } else if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}');
-            } else {
-              configMap = snapshot.data as DefaultConfig;
-              return SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: _buildConfig(configMap),
-              );
-            }
-          },
-        ),
+        child: _buildConfig(configMap),
       ),
     );
   }
@@ -107,8 +85,7 @@ class ConfigEditPageState extends State<ConfigEditPage> {
   }
 
   Widget _buildConfig(DefaultConfig configMap) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return ListView(
       children: [
         ListTile(
           leading: const Icon(Icons.live_tv_outlined),
