@@ -51,6 +51,7 @@ dependencies:
   flutter_secure_storage: ^9.2.2
   flutter_localizations:
     sdk: flutter
+  flutter_emoji: ^2.5.1
   
 dev_dependencies:
   flutter_test:
