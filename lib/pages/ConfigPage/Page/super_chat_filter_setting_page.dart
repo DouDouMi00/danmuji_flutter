@@ -30,22 +30,21 @@ class SuperChatFilterSettingPageState
       appBar: AppBar(title: const Text('超级留言过滤器')),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
-        child:ListView(
-            children: [
-              SwitchListTile(
-                title: const Text('醒目留言朗读'),
-                value: configMap.dynamicConfig.filter.superChat.enable,
-                onChanged: (value) async {
-                  setState(() {
-                    configMap.dynamicConfig.filter.superChat.enable = value;
-                  });
-                  await updateConfigMap(configMap);
-                },
-              ),
-            ],
-          ),
+        child: ListView(
+          children: [
+            SwitchListTile(
+              title: const Text('醒目留言朗读'),
+              value: configMap.dynamicConfig.filter.superChat.enable,
+              onChanged: (value) async {
+                setState(() {
+                  configMap.dynamicConfig.filter.superChat.enable = value;
+                });
+                await updateConfigMap(configMap);
+              },
+            ),
+          ],
         ),
-      
+      ),
     );
   }
 }

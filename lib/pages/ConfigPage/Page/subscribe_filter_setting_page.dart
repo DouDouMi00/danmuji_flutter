@@ -31,21 +31,20 @@ class SubscribeFilterSettingPageState
       body: Padding(
         padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
         child: ListView(
-            children: [
-              SwitchListTile(
-                title: const Text('关注朗读'),
-                value: configMap.dynamicConfig.filter.subscribe.enable,
-                onChanged: (value) async {
-                  setState(() {
-                    configMap.dynamicConfig.filter.subscribe.enable = value;
-                  });
-                  await updateConfigMap(configMap);
-                },
-              ),
-            ],
-          ),
+          children: [
+            SwitchListTile(
+              title: const Text('关注朗读'),
+              value: configMap.dynamicConfig.filter.subscribe.enable,
+              onChanged: (value) async {
+                setState(() {
+                  configMap.dynamicConfig.filter.subscribe.enable = value;
+                });
+                await updateConfigMap(configMap);
+              },
+            ),
+          ],
         ),
-      
+      ),
     );
   }
 }

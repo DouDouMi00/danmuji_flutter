@@ -1,10 +1,10 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:danmuji_flutter/services/open_live.dart';
-import 'package:danmuji_flutter/services/logger.dart';
-import 'package:logging/logging.dart';
-import 'package:danmuji_flutter/services/messages_handler.dart';
-import 'package:flutter/material.dart';
 import 'package:danmuji_flutter/services/config.dart';
+import 'package:danmuji_flutter/services/logger.dart';
+import 'package:danmuji_flutter/services/messages_handler.dart';
+import 'package:danmuji_flutter/services/open_live.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:logging/logging.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -67,12 +67,15 @@ void main() async {
           "timestamp": 0, //收礼时间秒级时间戳
           "msg_id": "", //消息唯一id
           "anchor_info": {
-            "uid": 0, //收礼主播UID(即将废弃)
-            "open_id":
-                "39b8fedb-60a5-4e29-ac75-b16955f7e632", //主播唯一标识(2024-03-11后上线)
-            "uname": "", //收礼主播昵称
+            "uid": 0,
+            //收礼主播UID(即将废弃)
+            "open_id": "39b8fedb-60a5-4e29-ac75-b16955f7e632",
+            //主播唯一标识(2024-03-11后上线)
+            "uname": "",
+            //收礼主播昵称
             "uface":
-                "http://i0.hdslb.com/bfs/face/4add3acfc930fcd07d06ea5e10a3a377314141c2.jpg" //收礼主播头像
+                "http://i0.hdslb.com/bfs/face/4add3acfc930fcd07d06ea5e10a3a377314141c2.jpg"
+            //收礼主播头像
           },
           "gift_icon": "http://i1.hdslb.com/dksldksldksld.jpg", //道具icon  （新增）
           "combo_gift": true, //是否是combo道具
@@ -125,11 +128,15 @@ void main() async {
         "cmd": "LIVE_OPEN_PLATFORM_GUARD",
         "data": {
           "user_info": {
-            "uid": 0, //用户UID(已废弃，固定为0)
-            "open_id": "39b8fedb-60a5-4e29-ac75-b16955f7e632", //用户唯一标识
-            "uname": "", //用户昵称
+            "uid": 0,
+            //用户UID(已废弃，固定为0)
+            "open_id": "39b8fedb-60a5-4e29-ac75-b16955f7e632",
+            //用户唯一标识
+            "uname": "",
+            //用户昵称
             "uface":
-                "http://i0.hdslb.com/bfs/face/4add3acfc930fcd07d06ea5e10a3a377314141c2.jpg" //用户头像
+                "http://i0.hdslb.com/bfs/face/4add3acfc930fcd07d06ea5e10a3a377314141c2.jpg"
+            //用户头像
           },
           "guard_level": 3, //对应的大航海等级 1总督 2提督 3舰长
           "guard_num": 1,

@@ -1,8 +1,8 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:danmuji_flutter/main.dart';
 // import 'package:danmuji_flutter/pages/control_page.dart';
 // import 'package:flutter/material.dart';
 import 'package:danmuji_flutter/services/config.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('MyApp', () {

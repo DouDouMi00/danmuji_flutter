@@ -9,6 +9,7 @@ class MessageQueueController extends GetxController {
   final messagesGift = <Map<String, dynamic>>[].obs;
   final messagesGuardBuy = <Map<String, dynamic>>[].obs;
   final messagesSuperChat = <Map<String, dynamic>>[].obs;
+
   // 'like' 'subscribe'  'welcome' 'warning'
   final messagesOther = <Map<String, dynamic>>[].obs;
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:get/get.dart';
 
 import '/controllers/home_controller.dart';
 import '/pages/ConfigPage/config_page.dart';
@@ -20,7 +20,6 @@ void main() async {
   // 添加监听器处理日志记录
   // logger.onRecord.listen(handleLogRecord);
 }
-
 
 class MyApp extends StatelessWidget {
   final String? theme;
