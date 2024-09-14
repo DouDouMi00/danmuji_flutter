@@ -604,14 +604,162 @@ class MessageListWrapperState extends State<MessageListWrapper>
     with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true; // 设置为true以保持状态
-// 新建一个方法来根据 filterd 状态构建消息小部件
-  Widget _buildMessageWidget(RxList messages, int index) {
-    return Text(
-      messages[index]['msg'],
-      style: messages[index]['filterd']
-          ? const TextStyle(color: Colors.grey) // 当 filterd 为 true 时，文本颜色为灰色
-          : null,
+  // 辅助方法，根据等级返回对应的颜色
+  Color? _getGuardLevelColor(int level) {
+    switch (level) {
+      case 1:
+        return Colors.amber; // 等级 1 为金色
+      case 2:
+        return Colors.purple; // 等级 2 为紫色
+      case 3:
+        return Colors.blue; // 等级 3 为蓝色
+      default:
+        return null; // 默认颜色为黑色
+    }
+  }
+
+  // 定义一个方法来创建基本的消息容器
+  Widget _buildBaseMessageContainer(Widget child) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.grey.withOpacity(0.3),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        child: child,
+      ).paddingOnly(top: 4, bottom: 4),
     );
+  }
+
+  // 创建文本样式
+  TextStyle? _getTextStyle(bool filtered, int guardLevel) {
+    return filtered
+        ? const TextStyle(color: Colors.grey)
+        : TextStyle(color: _getGuardLevelColor(guardLevel));
+  }
+
+  // 封装获取字体大小的函数
+  double getFontSize(Text text) {
+    final textSpan = TextSpan(
+      text: text.data,
+      style: text.style,
+    );
+
+    final textPainter = TextPainter(
+      text: textSpan,
+      textDirection: TextDirection.ltr, // 根据实际情况选择 ltr 或 rtl
+    );
+
+    textPainter.layout();
+    return textPainter.height;
+  }
+
+  // 处理富文本内容
+  List<Widget> _buildRichContent(
+      List richContent, bool filtered, int guardLevel) {
+    double textHeight = getFontSize(Text("测试文本",
+        style: _getTextStyle(
+          filtered,
+          guardLevel,
+        )));
+    double imageHeight = textHeight * 2;
+    return richContent.map((content) {
+      if (content['type'] == 0) {
+        return Text(content['text'],
+            style: _getTextStyle(filtered, guardLevel),
+            overflow: TextOverflow.clip, // 确保文本溢出时被裁剪
+            softWrap: true, // 允许换行
+            textAlign: TextAlign.left // 左对齐
+            );
+      } else if (content['type'] == 1) {
+        return Image.network(
+          content['url'],
+          semanticLabel: content['text'],
+          height: imageHeight,
+          width: content['width'] / content['height'] * imageHeight,
+          fit: BoxFit.cover,
+        );
+      }
+      return Container(); // 默认返回空容器
+    }).toList();
+  }
+
+  // 根据消息类型构建消息小部件
+  Widget _buildMessageWidget(RxList messages, int index) {
+    final message = messages[index];
+    final filtered = message['filterd'];
+    final guardLevel = message['liveRoomGuardLevel'];
+
+    switch (message['type']) {
+      case 'danmu':
+        return _buildBaseMessageContainer(
+          Wrap(
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Text(
+                '${message['uname']}: ',
+                style: _getTextStyle(filtered, guardLevel),
+                overflow: TextOverflow.clip, // 确保文本溢出时被裁剪
+                softWrap: true, // 允许换行
+                textAlign: TextAlign.left, // 左对齐
+              ),
+              ..._buildRichContent(
+                message['richContent'],
+                filtered,
+                guardLevel,
+              ).map((widget) => Padding(
+                    padding: const EdgeInsets.only(right: 4),
+                    child: widget,
+                  ))
+            ],
+          ),
+        );
+      case 'gift':
+        return _buildBaseMessageContainer(
+          Text(
+            '${message['uname']} (${message['unamePronunciation']}) '
+            '[${message['price']}元]'
+            '\n送出${message['num']}个${message['giftName']}',
+            style: _getTextStyle(filtered, 0),
+            overflow: TextOverflow.clip, // 确保文本溢出时被裁剪
+            softWrap: true, // 允许换行
+            textAlign: TextAlign.left, // 左对齐
+          ),
+        );
+      case 'guardBuy':
+        return _buildBaseMessageContainer(
+          Text(
+            '${message['uname']} (${message['unamePronunciation']}) '
+            '\n购买${message['num']}个${message['giftName']}',
+            style: _getTextStyle(filtered, guardLevel),
+            overflow: TextOverflow.clip, // 确保文本溢出时被裁剪
+            softWrap: true, // 允许换行
+            textAlign: TextAlign.left, // 左对齐
+          ),
+        );
+      case 'superChat':
+        return _buildBaseMessageContainer(
+          Text(
+            '${message['uname']} (${message['unamePronunciation']}) '
+            '[${message['price']}元]\n醒目留言  ${message['msg']}',
+            style: _getTextStyle(filtered, 0),
+            overflow: TextOverflow.clip, // 确保文本溢出时被裁剪
+            softWrap: true, // 允许换行
+            textAlign: TextAlign.left, // 左对齐
+          ),
+        );
+      default:
+        return _buildBaseMessageContainer(
+          Text(messagesToText(message),
+              style: _getTextStyle(filtered, 0),
+              overflow: TextOverflow.clip, // 确保文本溢出时被裁剪
+              softWrap: true, // 允许换行
+              textAlign: TextAlign.left // 左对齐
+              ),
+        );
+    }
   }
 
   Widget buildBackToBottomButton(RxBool showBackToBottomButton,

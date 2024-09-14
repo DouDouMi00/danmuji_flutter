@@ -137,7 +137,6 @@ void onDanmu(dynamic command) {
     });
   } else {
     appendDanmuFilteredStats(true, args: {
-      "faceImg": command['faceImg'],
       "time": DateTime.now().millisecondsSinceEpoch,
       "uid": command['uid'],
       'openId': command['openId'],
@@ -145,6 +144,15 @@ void onDanmu(dynamic command) {
       "msg": command['msg'],
       "richContent": command['richContent'],
       "isEmoji": command['isEmoji'],
+      "fansMedalName": command['fansMedalName'],
+      "fansMedalLevel": command['fansMedalLevel'],
+      "fansMedalGuardLevelName": command['fansMedalGuardLevelName'],
+      "fansMedalGuardLevel": command['fansMedalGuardLevel'],
+      "liveRoomGuardLevelName": command['liveRoomGuardLevelName'],
+      "liveRoomGuardLevel": command['liveRoomGuardLevel'],
+      "faceImg": command['faceImg'],
+      "authorType": command['authorType'],
+      "authorTypeText": command['authorTypeText'],
     });
   }
 }
@@ -191,10 +199,10 @@ void onGift(dynamic command) async {
     });
   } else {
     appendGiftFilteredStats((result != null), args: {
+      "time": DateTime.now().millisecondsSinceEpoch,
       "uid": command['uid'],
       "uname": command['uname'],
       "unamePronunciation": command['unamePronunciation'],
-      "time": DateTime.now().millisecondsSinceEpoch,
       "price": command['price'],
       "faceImg": command['faceImg'],
       "giftName": command['giftName'],

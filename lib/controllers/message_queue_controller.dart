@@ -1,7 +1,5 @@
 import 'package:get/get.dart';
 
-import '/services/tts.dart';
-
 class MessageQueueController extends GetxController {
   // 创建一个RxList作为消息队列
   final messagesAll = <Map<String, dynamic>>[].obs;
@@ -32,50 +30,77 @@ class MessageQueueController extends GetxController {
     delay.value = lastDuration['delay'];
     messagesQueueLength.value = lastDuration['messagesQueueLength'];
 
-    calculateFiltrationEfficiency(lastDuration, 'filteredDanmu', 'rawDanmu',
-        (value) => filtrationEfficiencyDanmu.value = value);
-    calculateFiltrationEfficiency(lastDuration, 'filteredGift', 'rawGift',
-        (value) => filtrationEfficiencyGift.value = value);
-    calculateFiltrationEfficiency(lastDuration, 'filteredWelcome', 'rawWelcome',
-        (value) => filtrationEfficiencyWelcome.value = value);
-    calculateFiltrationEfficiency(lastDuration, 'filteredLike', 'rawLike',
-        (value) => filtrationEfficiencyLike.value = value);
-    calculateFiltrationEfficiency(lastDuration, 'filteredGuardBuy',
-        'rawGuardBuy', (value) => filtrationEfficiencyGuardBuy.value = value);
-    calculateFiltrationEfficiency(lastDuration, 'filteredSubscribe',
-        'rawSubscribe', (value) => filtrationEfficiencySubscribe.value = value);
-    calculateFiltrationEfficiency(lastDuration, 'filteredSuperChat',
-        'rawSuperChat', (value) => filtrationEfficiencySuperChat.value = value);
-    calculateFiltrationEfficiency(lastDuration, 'filteredWarning', 'rawWarning',
-        (value) => filtrationEfficiencyWarning.value = value);
+    calculateFiltrationEfficiency(
+      lastDuration,
+      'filteredDanmu',
+      'rawDanmu',
+      (value) => filtrationEfficiencyDanmu.value = value,
+    );
+    calculateFiltrationEfficiency(
+      lastDuration,
+      'filteredGift',
+      'rawGift',
+      (value) => filtrationEfficiencyGift.value = value,
+    );
+    calculateFiltrationEfficiency(
+      lastDuration,
+      'filteredWelcome',
+      'rawWelcome',
+      (value) => filtrationEfficiencyWelcome.value = value,
+    );
+    calculateFiltrationEfficiency(
+      lastDuration,
+      'filteredLike',
+      'rawLike',
+      (value) => filtrationEfficiencyLike.value = value,
+    );
+    calculateFiltrationEfficiency(
+      lastDuration,
+      'filteredGuardBuy',
+      'rawGuardBuy',
+      (value) => filtrationEfficiencyGuardBuy.value = value,
+    );
+    calculateFiltrationEfficiency(
+      lastDuration,
+      'filteredSubscribe',
+      'rawSubscribe',
+      (value) => filtrationEfficiencySubscribe.value = value,
+    );
+    calculateFiltrationEfficiency(
+      lastDuration,
+      'filteredSuperChat',
+      'rawSuperChat',
+      (value) => filtrationEfficiencySuperChat.value = value,
+    );
+    calculateFiltrationEfficiency(
+      lastDuration,
+      'filteredWarning',
+      'rawWarning',
+      (value) => filtrationEfficiencyWarning.value = value,
+    );
 
     for (Map<String, dynamic> msg in messages["data"]["events"]) {
-      messagesAll.add({'msg': messagesToText(msg), 'filterd': msg["filterd"]});
+      messagesAll.add(msg);
       _invokeMessageHandler('all');
       switch (msg['type']) {
         case 'danmu':
-          messagesDanmu
-              .add({'msg': messagesToText(msg), 'filterd': msg["filterd"]});
+          messagesDanmu.add(msg);
           _invokeMessageHandler('danmu');
           break;
         case 'gift':
-          messagesGift
-              .add({'msg': messagesToText(msg), 'filterd': msg["filterd"]});
+          messagesGift.add(msg);
           _invokeMessageHandler('gift');
           break;
         case 'guardBuy':
-          messagesGuardBuy
-              .add({'msg': messagesToText(msg), 'filterd': msg["filterd"]});
+          messagesGuardBuy.add(msg);
           _invokeMessageHandler('guardBuy');
           break;
         case 'superChat':
-          messagesSuperChat
-              .add({'msg': messagesToText(msg), 'filterd': msg["filterd"]});
+          messagesSuperChat.add(msg);
           _invokeMessageHandler('superChat');
           break;
         default:
-          messagesOther
-              .add({'msg': messagesToText(msg), 'filterd': msg["filterd"]});
+          messagesOther.add(msg);
           _invokeMessageHandler('other');
           break;
       }

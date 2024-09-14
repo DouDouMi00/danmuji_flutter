@@ -83,6 +83,7 @@ class ThemeSettingPageState extends State<ThemeSettingPage> {
       body: Padding(
         padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
         child: ListView.builder(
+          itemCount: 3,
           itemBuilder: (context, index) {
             return RadioListTile<int>(
               title: Text(getThemeTitle(index)),

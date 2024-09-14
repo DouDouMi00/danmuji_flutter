@@ -48,7 +48,13 @@ class MessageHandler {
       Map<String, dynamic> data, bool isEmoji) {
     List<Map<String, dynamic>> richContent = [];
     if (isEmoji) {
-      richContent.add({"type": 1, "url": data["info"][0][13]["url"]});
+      richContent.add({
+        "type": 1,
+        "text": data["info"][1],
+        "url": data["info"][0][13]["url"],
+        "width": data["info"][0][13]["width"],
+        "height": data["info"][0][13]["height"],
+      });
       return richContent;
     }
 
@@ -183,8 +189,10 @@ class MessageHandler {
     // 处理礼物逻辑
     var uid = command['data']['uid'];
     var uname = command['data']['uname'];
-    var unamePronunciation =
-        PinyinHelper.getShortPinyin(uname); // 假设实现了pinyinConvert函数来处理拼音转换
+    var unamePronunciation = PinyinHelper.getPinyin(
+      uname,
+      format: PinyinFormat.WITH_TONE_MARK,
+    ); // 假设实现了pinyinConvert函数来处理拼音转换
     var giftName = command['data']['giftName'];
     var num = command['data']['num'];
     double price = command['data']['coin_type'] == 'gold'
@@ -219,7 +227,10 @@ class MessageHandler {
     var uid = command['data']['uid'];
     var num = command['data']['num'];
     var uname = command['data']['username'];
-    var unamePronunciation = PinyinHelper.getShortPinyin(uname);
+    var unamePronunciation = PinyinHelper.getPinyin(
+      uname,
+      format: PinyinFormat.WITH_TONE_MARK,
+    );
     var giftName = command['data']['role_name'];
     var liveRoomGuardLevel = command['data']['guard_level'];
     var newGuard = command['data']['toast_msg'].endsWith('第1天');
@@ -248,7 +259,10 @@ class MessageHandler {
     // 处理醒目留言逻辑
     var uid = command["data"]["uid"];
     var uname = command["data"]["user_info"]["uname"];
-    var unamePronunciation = PinyinHelper.getShortPinyin(uname);
+    var unamePronunciation = PinyinHelper.getPinyin(
+      uname,
+      format: PinyinFormat.WITH_TONE_MARK,
+    );
     double price = command["data"]["price"] / 1.00;
     var msg = command["data"]["message"];
     var faceImg = command["data"]["user_info"]["face"];

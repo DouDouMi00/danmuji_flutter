@@ -86,8 +86,10 @@ class OpenMessageHandler {
     Map data = command['data'];
     String openId = data['open_id'];
     String uname = data['uname'];
-    String unamePronunciation =
-        PinyinHelper.getShortPinyin(uname); // 假设实现了pinyinConvert函数来处理拼音转换
+    String unamePronunciation = PinyinHelper.getPinyin(
+      uname,
+      format: PinyinFormat.WITH_TONE_MARK,
+    ); // 假设实现了pinyinConvert函数来处理拼音转换
     String giftName = data['gift_name'];
     int num = data['gift_num'];
     double price = data['paid'] ? data['price'] / 1000.00 : 0.00;
@@ -116,7 +118,10 @@ class OpenMessageHandler {
     Map data = command['data'];
     String openId = data['open_id'];
     String uname = data['uname'];
-    String unamePronunciation = PinyinHelper.getShortPinyin(uname);
+    String unamePronunciation = PinyinHelper.getPinyin(
+      uname,
+      format: PinyinFormat.WITH_TONE_MARK,
+    );
     double price = data['rmb'] / 1.00;
     String msg = data['message'];
     String faceImg = data['uface'];
@@ -144,7 +149,10 @@ class OpenMessageHandler {
 
     int num = data['guard_num'];
     String unit = data['guard_unit'];
-    String unamePronunciation = PinyinHelper.getShortPinyin(uname);
+    String unamePronunciation = PinyinHelper.getPinyin(
+      uname,
+      format: PinyinFormat.WITH_TONE_MARK,
+    );
     int liveRoomGuardLevel = data['guard_level'];
     String giftName = guardLevelMapNameRaw[liveRoomGuardLevel]!;
 
