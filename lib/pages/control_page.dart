@@ -527,7 +527,12 @@ class ControlPageState extends State<ControlPage>
     if (!isRunning) {
       await Future.delayed(const Duration(seconds: 2));
       _isWebButton = true;
-      messageHandler.run();
+      if (!await messageHandler.run()) {
+        _isWebButton = true;
+        _isOpenButton = true;
+        setState(() {});
+        return;
+      }
     } else {
       messageHandler.stop();
       await markAllMessagesInvalid();
@@ -560,7 +565,12 @@ class ControlPageState extends State<ControlPage>
     if (!isRunning) {
       await Future.delayed(const Duration(seconds: 2));
       _isOpenButton = true;
-      openmessageHandler.run();
+      if (!await openmessageHandler.run()) {
+        _isWebButton = true;
+        _isOpenButton = true;
+        setState(() {});
+        return;
+      }
     } else {
       openmessageHandler.stop();
       await markAllMessagesInvalid();
@@ -748,6 +758,16 @@ class MessageListWrapperState extends State<MessageListWrapper>
             overflow: TextOverflow.clip, // 确保文本溢出时被裁剪
             softWrap: true, // 允许换行
             textAlign: TextAlign.left, // 左对齐
+          ),
+        );
+      case 'system':
+        return _buildBaseMessageContainer(
+          Text(
+            '系统提示\n${message['msg']}',
+            style: _getTextStyle(filtered, 0),
+            overflow: TextOverflow.clip, // 确保文本溢出时被裁剪
+            softWrap: true, // 允许换行
+            textAlign: TextAlign.center, // 居中对齐
           ),
         );
       default:

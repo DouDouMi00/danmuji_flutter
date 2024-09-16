@@ -35,9 +35,9 @@ class MessageHandler {
     receiver.onCutOffCallback(_handleCutOff);
   }
 
-  void run() {
+  Future<bool> run() async {
     setupEventHandlers();
-    receiver.run();
+    return await receiver.run();
   }
 
   void stop() {

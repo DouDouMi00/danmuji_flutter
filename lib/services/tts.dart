@@ -148,6 +148,10 @@ Future<void> ttsSystem(msg) async {
   ttsSystemCallerID += 1;
   final myCallerID = ttsSystemCallerID;
   await setDisableTTSTask(true, waiting: false);
+  appendSystemFilteredStats(false, args: {
+    'type': 'system',
+    'msg': msg,
+  });
   await tts(messagesToText({'type': 'system', 'msg': msg}));
   if (ttsSystemCallerID != myCallerID) {
     return;

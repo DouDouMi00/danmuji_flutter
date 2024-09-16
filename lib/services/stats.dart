@@ -77,6 +77,8 @@ Function(bool filterd, {dynamic args}) appendSuperChatFilteredStats =
     statsFunctionGenerator('superChat');
 Function(bool filterd, {dynamic args}) appendWarningFilteredStats =
     statsFunctionGenerator('warning');
+Function(bool filterd, {dynamic args}) appendSystemFilteredStats =
+    statsFunctionGenerator('system');
 
 int getDelay() {
   if (delaysQueue.isEmpty) {

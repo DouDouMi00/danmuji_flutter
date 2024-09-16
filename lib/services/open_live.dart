@@ -28,9 +28,9 @@ class OpenMessageHandler {
     receiver.onInteractionEndCallback(handleOpenInteractionEnd);
   }
 
-  void run() {
+  Future<bool> run() async {
     setupEventHandlers();
-    receiver.run();
+    return await receiver.run();
   }
 
   void stop() {

@@ -136,13 +136,16 @@ class OpenLiveDanmakuReceiver {
     secret = openLiveBiliConfig.accessKeySecret;
   }
 
-  void run() async {
+  Future<bool> run() async {
     isclose = false;
     if (await connect()) {
       recvLoop();
       heartBeat();
       appheartBeat();
+    } else {
+      return false;
     }
+    return true;
   }
 
   // 关闭应用时调取
@@ -210,9 +213,9 @@ class OpenLiveDanmakuReceiver {
 
     final data = response.data;
     if (data['code'] != 0) {
-      logger.info('获取websocket信息失败 ${data["message"]}');
+      logger.warning('获取websocket信息失败 ${data["message"]}');
       await ttsSystem(
-          '获取websocket信息失败,返回的错误错误码${data['code']}描述${data["message"]},请检查配置文件');
+          '获取websocket信息失败,返回的错误码为${data['code']}，描述“${data["message"]}”,请检查配置文件');
       return null;
     }
     gameId = data['data']['game_info']['game_id'].toString();

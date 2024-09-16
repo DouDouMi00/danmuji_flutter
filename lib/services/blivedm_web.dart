@@ -106,7 +106,7 @@ class DanmakuReceiver {
     return packet.toBytes();
   }
 
-  Future<void> run() async {
+  Future<bool> run() async {
     logger.info('正在连接弹幕服务器');
     isclose = false;
     int roomId = getConfigMap().engine.engineBili.liveId;
@@ -120,6 +120,11 @@ class DanmakuReceiver {
       queryParameters: {'room_id': roomId},
       options: Options(headers: headers),
     );
+    if (response.data['code'] != 0) {
+      logger.warning('获取房间信息失败：${response.data['message']}');
+      await ttsSystem('获取房间信息失败：${response.data['message']}');
+      return false;
+    }
     _anchorUid = response.data['data']['uid'];
     final roomInfoJSON = await Dio().get(
       'https://api.live.bilibili.com/xlive/web-room/v1/index/getDanmuInfo',
@@ -222,6 +227,7 @@ class DanmakuReceiver {
         }
       },
     );
+    return true;
   }
 
   void dispose() {
