@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:archive/archive.dart';
+// import 'package:archive/archive.dart';
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -119,7 +119,7 @@ class OpenLiveDanmakuReceiver {
   String? uname;
   String? uface;
 
-  ZLibDecoder zlibDecoder = const ZLibDecoder();
+  // ZLibDecoder zlibDecoder = const ZLibDecoder();
 
   late String idCode; //主播身份码
   late int appId; // 应用id
@@ -319,20 +319,20 @@ class OpenLiveDanmakuReceiver {
                 Map<String, dynamic> respJSON = jsonDecode(resp.body);
                 cmdSwitch(respJSON);
                 break;
-              case OpenDanmakuProtocol.zlib:
-                var offset = 0;
-                final data = Uint8List.fromList(
-                    zlibDecoder.decodeBytes(resp.bodyUint8.toList()));
-                final dataBytes = ByteData.view(data.buffer);
-                while (offset < data.length) {
-                  final length = dataBytes.getUint32(offset);
-                  final dataJSONString = utf8.decode(
-                      data.getRange(offset + 16, offset + length).toList());
-                  final dataJSON = jsonDecode(dataJSONString);
-                  cmdSwitch(dataJSON);
-                  offset += length;
-                }
-                break;
+              // case OpenDanmakuProtocol.zlib:
+              //   var offset = 0;
+              //   final data = Uint8List.fromList(
+              //       zlibDecoder.decodeBytes(resp.bodyUint8.toList()));
+              //   final dataBytes = ByteData.view(data.buffer);
+              //   while (offset < data.length) {
+              //     final length = dataBytes.getUint32(offset);
+              //     final dataJSONString = utf8.decode(
+              //         data.getRange(offset + 16, offset + length).toList());
+              //     final dataJSON = jsonDecode(dataJSONString);
+              //     cmdSwitch(dataJSON);
+              //     offset += length;
+              //   }
+              //   break;
             }
             break;
         }
