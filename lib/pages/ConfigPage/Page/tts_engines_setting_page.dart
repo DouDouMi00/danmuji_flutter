@@ -138,10 +138,11 @@ class TtsEnginesSettingPageState extends State<TtsEnginesSettingPage> {
               initialValue: engine,
               valueOptions: getEnginesDropDownMenuItems(engines),
               onSaved: (value) async {
-                setState(() {
-                  configMap.dynamicConfig.tts.engine = value;
-                });
+                engine = value;
+                configMap.dynamicConfig.tts.engine = value;
                 await updateConfigMap(configMap);
+                await flutterTts.setEngine(value);
+                setState(() {});
               },
             ),
           );
@@ -184,11 +185,11 @@ class TtsEnginesSettingPageState extends State<TtsEnginesSettingPage> {
                 initialValue: language,
                 valueOptions: getLanguageDropDownMenuItems(languages),
                 onSaved: (value) async {
-                  await _isLanguageInstalled(language!);
-                  setState(() {
-                    configMap.dynamicConfig.tts.language = value;
-                  });
+                  await _isLanguageInstalled(value);
+                  language = value;
+                  configMap.dynamicConfig.tts.language = value;
                   await updateConfigMap(configMap);
+                  setState(() {});
                 },
               ),
             );
