@@ -41,6 +41,8 @@ class ControlPageState extends State<ControlPage>
 
   bool isExpanded1 = false;
   double _dividerPosition = 0.7;
+  bool _isFullScreenMode = false;
+  final backgroundColor = Colors.grey[400]?.withOpacity(0.2);
 
   Map<int, String> messageTypes = {
     0: 'all',
@@ -166,46 +168,25 @@ class ControlPageState extends State<ControlPage>
     super.dispose();
   }
 
-  void toggleExpansion() {
-    isExpanded1 = !isExpanded1;
-    setState(() {});
-  }
-
-// 主要的 UI 构建部分
-  Widget buildMainUI() {
-    return GestureDetector(
-      child: Obx(
-        () => Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Text('输出队列 ${messageController.messagesQueueLength.value} 条'),
-            Text('当前延迟 ${messageController.delay.value} 秒'),
-            IconButton.filledTonal(
-              icon: const Icon(Icons.expand_more, semanticLabel: '展开'),
-              selectedIcon: const Icon(Icons.expand_less, semanticLabel: '收起'),
-              onPressed: toggleExpansion,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildStatItem(String label, String value) {
     return Expanded(
       child: Text('$label\n$value', textAlign: TextAlign.center),
     );
   }
 
-  // 定义一个辅助函数来构建扩展内容
-  Widget _buildExpandedContent() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        const Divider(),
-        Obx(
-          () => Row(
+// 主要的 UI 构建部分
+  Widget buildMainUI() {
+    return Obx(
+      () => ExpansionTile(
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Text('输出队列 ${messageController.messagesQueueLength.value} 条'),
+            Text('当前延迟 ${messageController.delay.value} 秒'),
+          ],
+        ),
+        children: [
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _buildStatItem('弹幕',
@@ -218,9 +199,7 @@ class ControlPageState extends State<ControlPage>
                   '${messageController.filtrationEfficiencyLike.value.toStringAsFixed(2)}%'),
             ],
           ),
-        ),
-        Obx(
-          () => Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _buildStatItem('舰长',
@@ -233,9 +212,15 @@ class ControlPageState extends State<ControlPage>
                   '${messageController.filtrationEfficiencyWarning.value.toStringAsFixed(2)}%'),
             ],
           ),
-        ),
-      ],
+        ],
+      ),
     );
+  }
+
+  void _toggleFullScreenMode() {
+    setState(() {
+      _isFullScreenMode = !_isFullScreenMode;
+    });
   }
 
   List<Widget> generateMessageListWrappers() {
@@ -321,42 +306,50 @@ class ControlPageState extends State<ControlPage>
   }
 
   Widget _buildBigButtons() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // 启动/停止按钮和清空按钮。
-        _buildTextButtonColumn(
-          _buildTextIconButton(
-              'Web平台$buttonText', _isWebButton ? _toggleRunningStatus : null),
-          _buildTextIconButton('开放平台$buttonText',
-              _isOpenButton ? _toggleRunningStatusOpen : null),
+    return Container(
+      color: backgroundColor,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // 启动/停止按钮和清空按钮。
+            _buildTextButtonColumn(
+              _buildTextIconButton('Web平台$buttonText',
+                  _isWebButton ? _toggleRunningStatus : null),
+              _buildTextIconButton('开放平台$buttonText',
+                  _isOpenButton ? _toggleRunningStatusOpen : null),
+            ),
+            _buildTextButtonColumn(
+              _buildTextIconButton('清空', isRunning ? _showConfirmDialog : null),
+            ),
+            // TTS语速控制按钮。
+            _buildTextButtonColumn(
+              _buildTextIconButton(
+                  '语速-1', isRunning ? handleTTSVolumeMinus : null),
+              _buildTextIconButton(
+                  '语速+1', isRunning ? handleTTSRatePlus : null),
+            ),
+            // 弹幕和礼物控制按钮，用于浏览历史弹幕和礼物。
+            _buildTextButtonColumn(
+              _buildTextIconButton(
+                  '回到最新弹幕', isRunning ? handleReadNewestMessages : null),
+            ),
+            _buildTextButtonColumn(
+              _buildTextIconButton(
+                  '查看上一条弹幕', isRunning ? handleReadNextHistoryDanmu : null),
+              _buildTextIconButton(
+                  '查看下一条弹幕', isRunning ? handleReadLastHistoryDanmu : null),
+            ),
+            _buildTextButtonColumn(
+              _buildTextIconButton(
+                  '查看上一条礼物', isRunning ? handleReadNextGiftMessages : null),
+              _buildTextIconButton(
+                  '查看下一条礼物', isRunning ? handleReadLastGiftMessages : null),
+            ),
+          ],
         ),
-        _buildTextButtonColumn(
-          _buildTextIconButton('清空', isRunning ? _showConfirmDialog : null),
-        ),
-        // TTS语速控制按钮。
-        _buildTextButtonColumn(
-          _buildTextIconButton('语速-1', isRunning ? handleTTSVolumeMinus : null),
-          _buildTextIconButton('语速+1', isRunning ? handleTTSRatePlus : null),
-        ),
-        // 弹幕和礼物控制按钮，用于浏览历史弹幕和礼物。
-        _buildTextButtonColumn(
-          _buildTextIconButton(
-              '回到最新弹幕', isRunning ? handleReadNewestMessages : null),
-        ),
-        _buildTextButtonColumn(
-          _buildTextIconButton(
-              '查看上一条弹幕', isRunning ? handleReadNextHistoryDanmu : null),
-          _buildTextIconButton(
-              '查看下一条弹幕', isRunning ? handleReadLastHistoryDanmu : null),
-        ),
-        _buildTextButtonColumn(
-          _buildTextIconButton(
-              '查看上一条礼物', isRunning ? handleReadNextGiftMessages : null),
-          _buildTextIconButton(
-              '查看下一条礼物', isRunning ? handleReadLastGiftMessages : null),
-        ),
-      ],
+      ),
     );
   }
 
@@ -387,43 +380,46 @@ class ControlPageState extends State<ControlPage>
   }
 
   Widget _buildVerticalTwoRowButtons() {
-    return Row(
-      children: [
-        _buildIconButtonColumn(
-          _buildIconButton(Icons.web,
-              _isWebButton ? _toggleRunningStatus : null, 'Web平台$buttonText'),
-          _buildIconButton(
-              Icons.lock_open_outlined,
-              _isOpenButton ? _toggleRunningStatusOpen : null,
-              '开放平台$buttonText'),
-        ),
-        _buildIconButtonColumn(
-          _buildIconButton(
-              Icons.clear_all, isRunning ? _showConfirmDialog : null, '清空消息'),
-        ),
-        _buildIconButtonColumn(
-          _buildIconButton(Icons.volume_up,
-              isRunning ? handleTTSRatePlus : null, '提高语音播报语速'),
-          _buildIconButton(Icons.volume_down,
-              isRunning ? handleTTSVolumeMinus : null, '降低语音播报语速'),
-        ),
-        _buildIconButtonColumn(
-          _buildIconButton(Icons.refresh,
-              isRunning ? handleReadNewestMessages : null, '回到最新弹幕'),
-        ),
-        _buildIconButtonColumn(
-          _buildIconButton(Icons.keyboard_arrow_up,
-              isRunning ? handleReadNextHistoryDanmu : null, '查看上一条弹幕'),
-          _buildIconButton(Icons.keyboard_arrow_down,
-              isRunning ? handleReadLastHistoryDanmu : null, '查看下一条弹幕'),
-        ),
-        _buildIconButtonColumn(
-          _buildIconButton(Icons.keyboard_arrow_up,
-              isRunning ? handleReadNextGiftMessages : null, '查看上一条礼物'),
-          _buildIconButton(Icons.keyboard_arrow_down,
-              isRunning ? handleReadLastGiftMessages : null, '查看下一条礼物'),
-        ),
-      ],
+    return Container(
+      color: backgroundColor,
+      child: Row(
+        children: [
+          _buildIconButtonColumn(
+            _buildIconButton(Icons.web,
+                _isWebButton ? _toggleRunningStatus : null, 'Web平台$buttonText'),
+            _buildIconButton(
+                Icons.lock_open_outlined,
+                _isOpenButton ? _toggleRunningStatusOpen : null,
+                '开放平台$buttonText'),
+          ),
+          _buildIconButtonColumn(
+            _buildIconButton(
+                Icons.clear_all, isRunning ? _showConfirmDialog : null, '清空消息'),
+          ),
+          _buildIconButtonColumn(
+            _buildIconButton(Icons.volume_up,
+                isRunning ? handleTTSRatePlus : null, '提高语音播报语速'),
+            _buildIconButton(Icons.volume_down,
+                isRunning ? handleTTSVolumeMinus : null, '降低语音播报语速'),
+          ),
+          _buildIconButtonColumn(
+            _buildIconButton(Icons.refresh,
+                isRunning ? handleReadNewestMessages : null, '回到最新弹幕'),
+          ),
+          _buildIconButtonColumn(
+            _buildIconButton(Icons.keyboard_arrow_up,
+                isRunning ? handleReadNextHistoryDanmu : null, '查看上一条弹幕'),
+            _buildIconButton(Icons.keyboard_arrow_down,
+                isRunning ? handleReadLastHistoryDanmu : null, '查看下一条弹幕'),
+          ),
+          _buildIconButtonColumn(
+            _buildIconButton(Icons.keyboard_arrow_up,
+                isRunning ? handleReadNextGiftMessages : null, '查看上一条礼物'),
+            _buildIconButton(Icons.keyboard_arrow_down,
+                isRunning ? handleReadLastGiftMessages : null, '查看下一条礼物'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -435,45 +431,70 @@ class ControlPageState extends State<ControlPage>
         padding: EdgeInsets.fromLTRB(16.0, statusBarHeight, 16.0, 0),
         child: Column(
           children: [
-            buildMainUI(),
-            if (isExpanded1) _buildExpandedContent(),
+            if (!_isFullScreenMode) buildMainUI(),
             Expanded(
               flex: (_dividerPosition * 100).round(),
-              child: Scaffold(
-                appBar: TabBar(
-                  controller: _tabController,
-                  tabAlignment: TabAlignment.start,
-                  isScrollable: true,
-                  tabs: tabs,
-                ),
-                body: TabBarView(
-                  controller: _tabController,
-                  children: generateMessageListWrappers(),
-                ),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TabBar(
+                          controller: _tabController,
+                          tabAlignment: TabAlignment.start,
+                          isScrollable: true,
+                          tabs: tabs,
+                          // 在这里添加全屏模式切换按钮
+                        ),
+                      ),
+                      IconButton(
+                        icon: _isFullScreenMode
+                            ? const Icon(Icons.fullscreen_exit,
+                                semanticLabel: '退出全屏模式')
+                            : const Icon(Icons.fullscreen,
+                                semanticLabel: '全屏模式'),
+                        onPressed: _toggleFullScreenMode,
+                      ),
+                    ],
+                  ),
+                  Expanded(
+                    child: TabBarView(
+                      controller: _tabController,
+                      children: generateMessageListWrappers(),
+                    ),
+                  ),
+                ],
               ),
             ),
-            GestureDetector(
-              onVerticalDragUpdate: _updateDividerPosition,
-              child: Container(
-                height: 20,
-                color: Colors.grey[400]?.withOpacity(0.2),
-                child: const Center(
-                  child: Icon(Icons.drag_handle, color: Colors.grey),
+            if (!_isFullScreenMode)
+              GestureDetector(
+                onVerticalDragUpdate: _updateDividerPosition,
+                child: Container(
+                  height: 20,
+                  decoration: BoxDecoration(
+                    color: backgroundColor,
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(10), // 设置上边缘圆角半径
+                    ),
+                  ),
+                  child: const Center(
+                    child: Icon(Icons.drag_handle, color: Colors.grey),
+                  ),
                 ),
               ),
-            ),
-            Expanded(
-              flex: ((1 - _dividerPosition) * 100).round(),
-              child: LayoutBuilder(
-                builder: (BuildContext context, BoxConstraints constraints) {
-                  if (_dividerPosition < 0.85) {
-                    return _buildBigButtons();
-                  } else {
-                    return _buildVerticalTwoRowButtons();
-                  }
-                },
+            if (!_isFullScreenMode)
+              Expanded(
+                flex: ((1 - _dividerPosition) * 100).round(),
+                child: LayoutBuilder(
+                  builder: (BuildContext context, BoxConstraints constraints) {
+                    if (_dividerPosition < 0.85) {
+                      return _buildBigButtons();
+                    } else {
+                      return _buildVerticalTwoRowButtons();
+                    }
+                  },
+                ),
               ),
-            ),
           ],
         ),
       ),
@@ -814,9 +835,7 @@ class MessageListWrapperState extends State<MessageListWrapper>
   Widget build(BuildContext context) {
     super.build(context);
     return Obx(
-      () =>
-          // 使用Obx确保每次消息列表更新时都能触发UI重建
-          Stack(
+      () => Stack(
         children: [
           ListView.builder(
             padding: const EdgeInsets.only(top: 0),
