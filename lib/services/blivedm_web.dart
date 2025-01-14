@@ -113,7 +113,7 @@ class DanmakuReceiver {
     final headers = <String, String>{
       'Cookie': 'buvid3=' '; SESSDATA=' '; bili_jct=' ';',
       'User-Agent':
-          'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.64 Safari/537.36'
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0'
     };
     final response = await Dio().get(
       'https://api.live.bilibili.com/xlive/web-room/v1/index/getInfoByRoom',
