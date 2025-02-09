@@ -25,7 +25,7 @@ final Map<String, dynamic> _defaultConfig = {
     "isFirstTimeToLogin": true
   },
   "engine": {
-    "engineBili": {"liveID": 21654925}
+    "engineBili": {"liveID": 0}
   },
   "dynamicConfig": {
     "dynamicSystem": {

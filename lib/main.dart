@@ -28,6 +28,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeModeMap = {
+      '0': ThemeMode.system,
+      '1': ThemeMode.light,
+      '2': ThemeMode.dark,
+    };
     return GetMaterialApp(
       locale: Get.deviceLocale,
       // showSemanticsDebugger: true,
@@ -46,13 +51,7 @@ class MyApp extends StatelessWidget {
       home: const MyHomePage(),
       theme: lightTheme,
       darkTheme: darkTheme,
-      themeMode: theme == '0'
-          ? MediaQuery.of(context).platformBrightness == Brightness.dark
-              ? ThemeMode.dark
-              : ThemeMode.light
-          : theme == '1'
-              ? ThemeMode.light
-              : ThemeMode.dark,
+      themeMode: themeModeMap[theme] ?? ThemeMode.system,
       getPages: appRoutes,
     );
   }
@@ -78,8 +77,13 @@ class MyHomePageState extends State<MyHomePage> {
         bottomNavigationBar: BottomNavigationBar(
           items: const [
             BottomNavigationBarItem(
-                icon: Icon(Icons.control_camera), label: '主页'),
-            BottomNavigationBarItem(icon: Icon(Icons.settings), label: '设置'),
+              icon: Icon(Icons.control_camera),
+              label: '主页',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.build),
+              label: '配置',
+            ),
           ],
           currentIndex: controller.currentIndex.value,
           onTap: controller.onTabChange,
