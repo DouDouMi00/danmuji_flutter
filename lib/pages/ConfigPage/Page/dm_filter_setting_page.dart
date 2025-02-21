@@ -2,9 +2,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '/pages/control_list_editor_page.dart';
-import '/services/config.dart';
-import '/widgets/obscure_text_field.dart';
+import 'package:danmuji_flutter/pages/control_list_editor_page.dart';
+import 'package:danmuji_flutter/services/config.dart';
+import 'package:danmuji_flutter/widgets/obscure_text_field.dart';
 
 class DmFilterSettingPage extends StatefulWidget {
   final DefaultConfig configMap;

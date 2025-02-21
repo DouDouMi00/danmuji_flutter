@@ -3,10 +3,10 @@ import 'dart:convert';
 
 import 'package:pinyin/pinyin.dart';
 
-import '/services/blivedm_web.dart';
-import '/services/config.dart';
-import '/services/logger.dart';
-import '/services/tool.dart';
+import 'package:danmuji_flutter/services/blivedm_web.dart';
+import 'package:danmuji_flutter/services/config.dart';
+import 'package:danmuji_flutter/services/logger.dart';
+import 'package:danmuji_flutter/services/tool.dart';
 import 'event_emitter.dart';
 
 EventEmitter liveEvent = EventEmitter();

@@ -1,6 +1,6 @@
-import '/services/config.dart';
-import '/services/messages_handler.dart' show markAllMessagesInvalid;
-import '/services/tts.dart';
+import 'package:danmuji_flutter/services/config.dart';
+import 'package:danmuji_flutter/services/messages_handler.dart' show markAllMessagesInvalid;
+import 'package:danmuji_flutter/services/tts.dart';
 
 Future<void> handleFlush() async {
   await markAllMessagesInvalid();

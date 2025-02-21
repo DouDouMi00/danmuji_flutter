@@ -1,10 +1,10 @@
 import 'package:flutter_tts/flutter_tts.dart';
 
-import '/services/config.dart';
-import '/services/logger.dart';
-import '/services/messages_handler.dart'
+import 'package:danmuji_flutter/services/config.dart';
+import 'package:danmuji_flutter/services/logger.dart';
+import 'package:danmuji_flutter/services/messages_handler.dart'
     show popMessagesQueue, getHaveReadMessages;
-import '/services/stats.dart';
+import 'package:danmuji_flutter/services/stats.dart';
 
 late FlutterTts flutterTts;
 late Tts ttsConfig;

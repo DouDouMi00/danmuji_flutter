@@ -5,14 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:vibration/vibration.dart';
 
-import '/controllers/message_queue_controller.dart';
-import '/services/keyboard.dart';
-import '/services/live.dart';
-import '/services/messages_handler.dart';
-import '/services/open_live.dart';
-import '/services/stats.dart';
-import '/services/system_handler.dart';
-import '/services/tts.dart';
+import 'package:danmuji_flutter/controllers/message_queue_controller.dart';
+import 'package:danmuji_flutter/services/keyboard.dart';
+import 'package:danmuji_flutter/services/live.dart';
+import 'package:danmuji_flutter/services/messages_handler.dart';
+import 'package:danmuji_flutter/services/open_live.dart';
+import 'package:danmuji_flutter/services/stats.dart';
+import 'package:danmuji_flutter/services/system_handler.dart';
+import 'package:danmuji_flutter/services/tts.dart';
 
 final messageController = Get.put(MessageQueueController());
 

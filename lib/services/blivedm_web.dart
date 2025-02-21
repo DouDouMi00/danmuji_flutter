@@ -6,9 +6,9 @@ import 'package:brotli/brotli.dart';
 import 'package:dio/dio.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-import '/services/config.dart';
-import '/services/logger.dart';
-import '/services/tts.dart' show ttsSystem;
+import 'package:danmuji_flutter/services/config.dart';
+import 'package:danmuji_flutter/services/logger.dart';
+import 'package:danmuji_flutter/services/tts.dart' show ttsSystem;
 
 final buffer = Uint8List(16);
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '/widgets/obscure_text_field.dart';
+import 'package:danmuji_flutter/widgets/obscure_text_field.dart';
 
 class EditableListParams {
   final String title;

@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 
-import '/services/filter.dart';
-import '/services/logger.dart';
-import '/services/stats.dart';
+import 'package:danmuji_flutter/services/filter.dart';
+import 'package:danmuji_flutter/services/logger.dart';
+import 'package:danmuji_flutter/services/stats.dart';
 import 'live.dart' show liveEvent;
 
 List<Map<String, dynamic>> messagesQueue = [];

@@ -2,8 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '/services/config.dart';
-import '/widgets/obscure_text_field.dart';
+import 'package:danmuji_flutter/services/config.dart';
+import 'package:danmuji_flutter/widgets/obscure_text_field.dart';
 
 class SystemPromptPage extends StatefulWidget {
   const SystemPromptPage({required this.configMap, super.key});

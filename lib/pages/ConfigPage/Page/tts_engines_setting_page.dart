@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:get/get.dart';
 
-import '/services/config.dart';
-import '/widgets/obscure_text_field.dart';
+import 'package:danmuji_flutter/services/config.dart';
+import 'package:danmuji_flutter/widgets/obscure_text_field.dart';
 
 class TtsEnginesSettingPage extends StatefulWidget {
   final DefaultConfig configMap;

@@ -2,8 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '/pages/custom_theme.dart';
-import '/services/config.dart';
+import 'package:danmuji_flutter/pages/custom_theme.dart';
+import 'package:danmuji_flutter/services/config.dart';
 
 // https://cloud.tencent.com/developer/article/2421058
 

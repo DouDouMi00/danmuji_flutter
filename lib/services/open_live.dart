@@ -3,7 +3,7 @@ import 'dart:convert';
 
 import 'package:pinyin/pinyin.dart';
 
-import '/services/logger.dart';
+import 'package:danmuji_flutter/services/logger.dart';
 import 'blivedm_open_live.dart';
 import 'live.dart' show liveEvent;
 

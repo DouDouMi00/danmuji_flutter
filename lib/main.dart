@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
 
-import '/controllers/home_controller.dart';
-import '/pages/ConfigPage/config_page.dart';
-import '/pages/control_page.dart';
-import '/pages/custom_theme.dart';
-import '/routes.dart';
-import '/services/config.dart';
+import 'package:danmuji_flutter/controllers/home_controller.dart';
+import 'package:danmuji_flutter/pages/ConfigPage/config_page.dart';
+import 'package:danmuji_flutter/pages/control_page.dart';
+import 'package:danmuji_flutter/pages/custom_theme.dart';
+import 'package:danmuji_flutter/routes.dart';
+import 'package:danmuji_flutter/services/config.dart';
 
-// import '/services/logger.dart';
+// import 'package:danmuji_flutter/services/logger.dart';
 // https://juejin.cn/post/6844904039495237639
 
 void main() async {

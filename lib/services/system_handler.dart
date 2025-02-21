@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
 
-import '/pages/control_page.dart' show messageController;
-import '/services/config.dart';
-import '/services/logger.dart';
-import '/services/messages_handler.dart';
+import 'package:danmuji_flutter/pages/control_page.dart' show messageController;
+import 'package:danmuji_flutter/services/config.dart';
+import 'package:danmuji_flutter/services/logger.dart';
+import 'package:danmuji_flutter/services/messages_handler.dart';
 import 'stats.dart';
 
 // 保存 StreamSubscription 对象

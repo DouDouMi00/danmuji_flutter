@@ -5,8 +5,8 @@ import 'package:android_intent_plus/android_intent.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '/services/config.dart';
-import '/widgets/obscure_text_field.dart';
+import 'package:danmuji_flutter/services/config.dart';
+import 'package:danmuji_flutter/widgets/obscure_text_field.dart';
 
 class ConfigEditPage extends StatefulWidget {
   const ConfigEditPage({super.key});
