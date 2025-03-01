@@ -1,12 +1,13 @@
 // live.dart
 import 'dart:convert';
 
-import 'package:pinyin/pinyin.dart';
-
 import 'package:danmuji_flutter/services/blivedm_web.dart';
 import 'package:danmuji_flutter/services/config.dart';
 import 'package:danmuji_flutter/services/logger.dart';
 import 'package:danmuji_flutter/services/tool.dart';
+import 'package:get/get.dart';
+import 'package:pinyin/pinyin.dart';
+
 import 'event_emitter.dart';
 
 EventEmitter liveEvent = EventEmitter();
@@ -131,8 +132,8 @@ class MessageHandler {
     List<Map<String, dynamic>> richContent;
 
     if (command['info'][3].isNotEmpty) {
-      isFansMedalBelongToLive =
-          command['info'][3][3] == getConfigMap().engine.engineBili.liveId;
+      isFansMedalBelongToLive = command['info'][3][3] ==
+          Get.find<ConfigService>().configRx.value.engine.engineBili.liveId;
       fansMedalLevel = command['info'][3][0];
       fansMedalName = command['info'][3][1];
       fansMedalGuardLevel = guardLevelMap[command['info'][3][10]];
@@ -282,7 +283,8 @@ class MessageHandler {
 
   void _handleInteractWord(command) {
     // 处理互动词逻辑
-    if (command['data']['roomid'] != getConfigMap().engine.engineBili.liveId) {
+    if (command['data']['roomid'] !=
+        Get.find<ConfigService>().configRx.value.engine.engineBili.liveId) {
       return;
     }
     var uid = command['data']['uid'];
@@ -294,7 +296,7 @@ class MessageHandler {
 
     if (fansMedalData != null) {
       isFansMedalBelongToLive = fansMedalData['anchor_roomid'] ==
-          getConfigMap().engine.engineBili.liveId;
+          Get.find<ConfigService>().configRx.value.engine.engineBili.liveId;
       fansMedalLevel = fansMedalData['medal_level'];
       fansMedalGuardLevel = guardLevelMap[fansMedalData['guard_level']];
     }

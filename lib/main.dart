@@ -1,38 +1,33 @@
+import 'package:danmuji_flutter/common/colors/custom_theme.dart';
+import 'package:danmuji_flutter/routes/app_pages.dart';
+import 'package:danmuji_flutter/services/config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
-
-import 'package:danmuji_flutter/controllers/home_controller.dart';
-import 'package:danmuji_flutter/pages/ConfigPage/config_page.dart';
-import 'package:danmuji_flutter/pages/control_page.dart';
-import 'package:danmuji_flutter/pages/custom_theme.dart';
-import 'package:danmuji_flutter/routes.dart';
-import 'package:danmuji_flutter/services/config.dart';
 
 // import 'package:danmuji_flutter/services/logger.dart';
 // https://juejin.cn/post/6844904039495237639
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await initConfig();
-  final theme = await storage.read(key: 'theme');
-  runApp(MyApp(theme: theme));
+  await Get.putAsync<ConfigService>(() async => ConfigService().initConfig());
+  runApp(MyApp());
   // 添加监听器处理日志记录
   // logger.onRecord.listen(handleLogRecord);
 }
 
 class MyApp extends StatelessWidget {
-  final String? theme;
+  final appConfig = Get.find<ConfigService>();
+  final themeModeMap = {
+    '0': ThemeMode.system,
+    '1': ThemeMode.light,
+    '2': ThemeMode.dark,
+  };
 
-  const MyApp({super.key, required this.theme});
+  MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final themeModeMap = {
-      '0': ThemeMode.system,
-      '1': ThemeMode.light,
-      '2': ThemeMode.dark,
-    };
     return GetMaterialApp(
       locale: Get.deviceLocale,
       // showSemanticsDebugger: true,
@@ -47,54 +42,13 @@ class MyApp extends StatelessWidget {
         Locale('zh', 'CN'), // 中文简体
         //其它Locales
       ],
-      initialRoute: '/',
-      home: const MyHomePage(),
+      initialRoute: Routes.home,
       theme: lightTheme,
       darkTheme: darkTheme,
-      themeMode: themeModeMap[theme] ?? ThemeMode.system,
+      themeMode:
+          themeModeMap[appConfig.configRx.value.system.theme.toString()] ??
+              ThemeMode.system,
       getPages: appRoutes,
     );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
-
-  @override
-  MyHomePageState createState() => MyHomePageState();
-}
-
-class MyHomePageState extends State<MyHomePage> {
-  final controller = Get.put(HomeController());
-
-  @override
-  Widget build(BuildContext context) {
-    return Obx(
-      () => Scaffold(
-        body: controller.currentIndex.value == 0
-            ? const ControlPage()
-            : const ConfigEditPage(),
-        bottomNavigationBar: BottomNavigationBar(
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.control_camera),
-              label: '主页',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.build),
-              label: '配置',
-            ),
-          ],
-          currentIndex: controller.currentIndex.value,
-          onTap: controller.onTabChange,
-        ),
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    controller.dispose();
-    super.dispose();
   }
 }

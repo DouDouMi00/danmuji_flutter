@@ -1,38 +1,40 @@
 import 'package:danmuji_flutter/services/config.dart';
-import 'package:danmuji_flutter/services/messages_handler.dart' show markAllMessagesInvalid;
+import 'package:danmuji_flutter/services/messages_handler.dart'
+    show markAllMessagesInvalid;
 import 'package:danmuji_flutter/services/tts.dart';
+import 'package:get/get.dart';
 
 Future<void> handleFlush() async {
   await markAllMessagesInvalid();
 }
 
 Future<void> handleTTSRatePlus() async {
-  DefaultConfig nowJsonConfig = getConfigMap();
-  double rate = nowJsonConfig.dynamicConfig.tts.rate;
+  ConfigService nowJsonConfig = Get.find<ConfigService>();
+  double rate = nowJsonConfig.configRx.value.dynamicConfig.tts.rate;
 
   rate += 0.1;
   rate = rate.clamp(0.0, 5.0);
 
   rate = double.parse(rate.toStringAsFixed(1));
-  nowJsonConfig.dynamicConfig.tts.rate = rate;
+  nowJsonConfig.configRx.value.dynamicConfig.tts.rate = rate;
   String rateFormatted = rate.toStringAsFixed(1);
 
-  await updateConfigMap(nowJsonConfig);
+  nowJsonConfig.configRx.refresh();
   await ttsSystem('TTS语速增加到$rateFormatted');
 }
 
 Future<void> handleTTSVolumeMinus() async {
-  DefaultConfig nowJsonConfig = getConfigMap();
-  double rate = nowJsonConfig.dynamicConfig.tts.rate;
+  ConfigService nowJsonConfig = Get.find<ConfigService>();
+  double rate = nowJsonConfig.configRx.value.dynamicConfig.tts.rate;
 
   rate -= 0.1;
   rate = rate.clamp(0.0, 5.0);
 
   rate = double.parse(rate.toStringAsFixed(1));
-  nowJsonConfig.dynamicConfig.tts.rate = rate;
+  nowJsonConfig.configRx.value.dynamicConfig.tts.rate = rate;
   String rateFormatted = rate.toStringAsFixed(1);
 
-  await updateConfigMap(nowJsonConfig);
+  nowJsonConfig.configRx.refresh();
   await ttsSystem('TTS语速减少到$rateFormatted');
 }
 

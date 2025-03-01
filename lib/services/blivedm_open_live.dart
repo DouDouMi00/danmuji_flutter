@@ -5,12 +5,12 @@ import 'dart:typed_data';
 
 // import 'package:archive/archive.dart';
 import 'package:crypto/crypto.dart';
-import 'package:dio/dio.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
-
 import 'package:danmuji_flutter/services/config.dart';
 import 'package:danmuji_flutter/services/logger.dart';
 import 'package:danmuji_flutter/services/tts.dart' show ttsSystem;
+import 'package:dio/dio.dart';
+import 'package:get/get.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 class Proto {
   late int packetLen;
@@ -129,7 +129,8 @@ class OpenLiveDanmakuReceiver {
   String gameId = "";
 
   OpenLiveDanmakuReceiver() {
-    OpenLiveBili openLiveBiliConfig = getConfigMap().kvdb.openLiveBili;
+    OpenLiveBili openLiveBiliConfig =
+        Get.find<ConfigService>().configRx.value.kvdb.openLiveBili;
     idCode = openLiveBiliConfig.idCode;
     appId = openLiveBiliConfig.appId;
     key = openLiveBiliConfig.accessKey;
@@ -319,6 +320,9 @@ class OpenLiveDanmakuReceiver {
                 Map<String, dynamic> respJSON = jsonDecode(resp.body);
                 cmdSwitch(respJSON);
                 break;
+
+              /// TODO: zlib解码
+
               // case OpenDanmakuProtocol.zlib:
               //   var offset = 0;
               //   final data = Uint8List.fromList(

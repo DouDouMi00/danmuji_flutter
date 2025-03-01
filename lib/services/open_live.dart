@@ -1,9 +1,9 @@
 // live.dart
 import 'dart:convert';
 
+import 'package:danmuji_flutter/services/logger.dart';
 import 'package:pinyin/pinyin.dart';
 
-import 'package:danmuji_flutter/services/logger.dart';
 import 'blivedm_open_live.dart';
 import 'live.dart' show liveEvent;
 

@@ -1,10 +1,6 @@
 // control_page.dart
 import 'dart:math';
 
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:vibration/vibration.dart';
-
 import 'package:danmuji_flutter/controllers/message_queue_controller.dart';
 import 'package:danmuji_flutter/services/keyboard.dart';
 import 'package:danmuji_flutter/services/live.dart';
@@ -13,6 +9,9 @@ import 'package:danmuji_flutter/services/open_live.dart';
 import 'package:danmuji_flutter/services/stats.dart';
 import 'package:danmuji_flutter/services/system_handler.dart';
 import 'package:danmuji_flutter/services/tts.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:vibration/vibration.dart';
 
 final messageController = Get.put(MessageQueueController());
 
@@ -42,7 +41,7 @@ class ControlPageState extends State<ControlPage>
   bool isExpanded1 = false;
   double _dividerPosition = 0.7;
   bool _isFullScreenMode = false;
-  final backgroundColor = Colors.grey[400]?.withOpacity(0.2);
+  final backgroundColor = const Color.fromARGB(255, 224, 224, 224);
 
   Map<int, String> messageTypes = {
     0: 'all',
@@ -655,7 +654,7 @@ class MessageListWrapperState extends State<MessageListWrapper>
       alignment: Alignment.centerLeft,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.grey.withOpacity(0.3),
+          color: Colors.grey,
           borderRadius: BorderRadius.circular(8),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

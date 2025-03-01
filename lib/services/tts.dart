@@ -1,10 +1,10 @@
-import 'package:flutter_tts/flutter_tts.dart';
-
 import 'package:danmuji_flutter/services/config.dart';
 import 'package:danmuji_flutter/services/logger.dart';
 import 'package:danmuji_flutter/services/messages_handler.dart'
     show popMessagesQueue, getHaveReadMessages;
 import 'package:danmuji_flutter/services/stats.dart';
+import 'package:flutter_tts/flutter_tts.dart';
+import 'package:get/get.dart';
 
 late FlutterTts flutterTts;
 late Tts ttsConfig;
@@ -23,7 +23,8 @@ void stopTtsTask() {
 }
 
 String messagesToText(Map<String, dynamic> msg) {
-  final filterConfig = getConfigMap().dynamicConfig.filter.danmu;
+  final filterConfig =
+      Get.find<ConfigService>().configRx.value.dynamicConfig.filter.danmu;
   switch (msg['type']) {
     case 'danmu':
       String liveRoomGuardLeveltxt =
@@ -64,7 +65,7 @@ String messagesToText(Map<String, dynamic> msg) {
 }
 
 Future<void> syncWithConfig() async {
-  Tts newTtsConfig = getConfigMap().dynamicConfig.tts;
+  Tts newTtsConfig = Get.find<ConfigService>().configRx.value.dynamicConfig.tts;
   if (ttsConfig.volume != newTtsConfig.volume) {
     await flutterTts.setVolume(newTtsConfig.volume);
     logger.info('音量配置更新为${newTtsConfig.volume}');
@@ -88,7 +89,7 @@ Future<void> tts(String text, [channel = 0, config]) async {
 Future<void> init() async {
   _shouldExitTtsTask = true;
   flutterTts = FlutterTts();
-  ttsConfig = getConfigMap().dynamicConfig.tts;
+  ttsConfig = Get.find<ConfigService>().configRx.value.dynamicConfig.tts;
   // 设置引擎和语言 音量 语速 音高
   await flutterTts.setEngine(ttsConfig.engine);
   await flutterTts.setLanguage(ttsConfig.language);
@@ -213,14 +214,14 @@ Future<void> readHistoryByType(List<String> types,
       await tts(
         messagesToText({"type": "system", "msg": "已到达最后一条,继续翻页将从第一条开始"}),
         1,
-        getConfigMap().dynamicConfig.tts.history,
+        Get.find<ConfigService>().configRx.value.dynamicConfig.tts.history,
       );
     } else {
       readHistoryIndex = 0;
       await tts(
         messagesToText({"type": "system", "msg": "已到达第一条,继续翻页将从最后一条开始"}),
         1,
-        getConfigMap().dynamicConfig.tts.history,
+        Get.find<ConfigService>().configRx.value.dynamicConfig.tts.history,
       );
     }
     return;
@@ -228,12 +229,12 @@ Future<void> readHistoryByType(List<String> types,
   await tts(
     messagesToText(messages[readHistoryIndex!]),
     1,
-    getConfigMap().dynamicConfig.tts.history,
+    Get.find<ConfigService>().configRx.value.dynamicConfig.tts.history,
   );
 }
 
 Future<void> resetHistoryIndex() async {
   readHistoryIndex = getHaveReadMessages().length;
   await tts(messagesToText({"type": "system", "msg": "焦点已回到最新"}), 1,
-      getConfigMap().dynamicConfig.tts.history);
+      Get.find<ConfigService>().configRx.value.dynamicConfig.tts.history);
 }

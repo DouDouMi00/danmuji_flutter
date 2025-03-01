@@ -3,12 +3,12 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:brotli/brotli.dart';
-import 'package:dio/dio.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
-
 import 'package:danmuji_flutter/services/config.dart';
 import 'package:danmuji_flutter/services/logger.dart';
 import 'package:danmuji_flutter/services/tts.dart' show ttsSystem;
+import 'package:dio/dio.dart';
+import 'package:get/get.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 final buffer = Uint8List(16);
 
@@ -109,7 +109,8 @@ class DanmakuReceiver {
   Future<bool> run() async {
     logger.info('正在连接弹幕服务器');
     isclose = false;
-    int roomId = getConfigMap().engine.engineBili.liveId;
+    int roomId =
+        Get.find<ConfigService>().configRx.value.engine.engineBili.liveId;
     final headers = <String, String>{
       'Cookie': 'buvid3=' '; SESSDATA=' '; bili_jct=' ';',
       'User-Agent':

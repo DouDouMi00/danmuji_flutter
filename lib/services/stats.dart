@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:danmuji_flutter/services/logger.dart';
+
 import 'event_emitter.dart';
 
 EventEmitter statsEvent = EventEmitter();

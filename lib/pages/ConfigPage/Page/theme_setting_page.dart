@@ -1,99 +1,52 @@
 //system_prompt_page.dart
+import 'package:danmuji_flutter/common/colors/custom_theme.dart';
+import 'package:danmuji_flutter/services/config.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:danmuji_flutter/pages/custom_theme.dart';
-import 'package:danmuji_flutter/services/config.dart';
-
 // https://cloud.tencent.com/developer/article/2421058
 
-class ThemeSettingPage extends StatefulWidget {
-  const ThemeSettingPage({super.key});
+class ThemeSettingPage extends StatelessWidget {
+  ThemeSettingPage({super.key});
 
-  @override
-  ThemeSettingPageState createState() => ThemeSettingPageState();
-}
-
-class ThemeSettingPageState extends State<ThemeSettingPage> {
-  int? _selectedThemeIndex;
-
-  @override
-  void initState() {
-    super.initState();
-    loadSelectedThemeIndex();
-  }
-
-  /// 加载主题设置
-  Future<void> loadSelectedThemeIndex() async {
-    String? themeValue = await storage.read(key: 'theme');
-    if (themeValue == null) {
-      _selectedThemeIndex = null;
-    } else {
-      _selectedThemeIndex = int.parse(themeValue);
-    }
-    setState(() {});
-  }
-
-  ///切换主题
-  Future<void> changeTheme(BuildContext context, int themeIndex) async {
-    ThemeData themeData;
-    _selectedThemeIndex = themeIndex;
-    setState(() {});
-    switch (themeIndex) {
-      case 0: //跟随系统
-        themeData = MediaQuery.of(context).platformBrightness == Brightness.dark
-            ? darkTheme
-            : lightTheme;
-        break;
-      case 1: //浅色模式
-        themeData = lightTheme;
-        break;
-      case 2: //深色模式
-        themeData = darkTheme;
-        break;
-      default:
-        themeData = MediaQuery.of(context).platformBrightness == Brightness.dark
-            ? darkTheme
-            : lightTheme;
-        break;
-    }
-    //保存到本地
-    await storage.write(key: 'theme', value: themeIndex.toString());
-    Get.changeTheme(themeData);
-    await Get.forceAppUpdate();
-  }
-
-  String getThemeTitle(int index) {
-    switch (index) {
-      case 0:
-        return '跟随系统';
-      case 1:
-        return '浅色模式';
-      case 2:
-        return '深色模式';
-      default:
-        return '未知';
-    }
-  }
+  final configService = Get.find<ConfigService>();
+  static const themeTitles = ['跟随系统', '浅色模式', '深色模式'];
 
   @override
   Widget build(BuildContext context) {
+    Future<void> changeTheme(int index) async {
+      ThemeData theme;
+      switch (index) {
+        case 1:
+          theme = lightTheme;
+          break;
+        case 2:
+          theme = darkTheme;
+          break;
+        default:
+          // 默认使用自动模式
+          final defaultBrightness = MediaQuery.of(context).platformBrightness;
+          theme = defaultBrightness == Brightness.dark ? darkTheme : lightTheme;
+      }
+
+      configService.configRx.value.system.theme = index;
+      configService.configRx.refresh();
+      Get.changeTheme(theme);
+      await Get.forceAppUpdate();
+    }
+
     return Scaffold(
       appBar: AppBar(title: const Text('主题设置')),
       body: Padding(
-        padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         child: ListView.builder(
           itemCount: 3,
-          itemBuilder: (context, index) {
-            return RadioListTile<int>(
-              title: Text(getThemeTitle(index)),
-              value: index,
-              groupValue: _selectedThemeIndex,
-              onChanged: (value) async {
-                await changeTheme(context, value!);
-              },
-            );
-          },
+          itemBuilder: (_, index) => RadioListTile<int>(
+            title: Text(themeTitles[index]),
+            value: index,
+            groupValue: configService.configRx.value.system.theme,
+            onChanged: (value) => changeTheme(value!),
+          ),
         ),
       ),
     );

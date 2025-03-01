@@ -1,10 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:danmuji_flutter/pages/control_page.dart' show messageController;
+import 'package:danmuji_flutter/pages/ControlPage/control_page.dart'
+    show messageController;
 import 'package:danmuji_flutter/services/config.dart';
 import 'package:danmuji_flutter/services/logger.dart';
 import 'package:danmuji_flutter/services/messages_handler.dart';
+import 'package:get/get.dart';
+
 import 'stats.dart';
 
 // 保存 StreamSubscription 对象
@@ -41,8 +44,12 @@ DateTime lastAlertTime = DateTime.fromMillisecondsSinceEpoch(0);
 
 void statsHandler(stats) {
   messageController.sendMessage({'type': 'stats', 'data': stats});
-  final config =
-      getConfigMap().dynamicConfig.dynamicSystem.alertWhenMessagesQueueLonger;
+  final config = Get.find<ConfigService>()
+      .configRx
+      .value
+      .dynamicConfig
+      .dynamicSystem
+      .alertWhenMessagesQueueLonger;
   if (config.enable) {
     if (DateTime.now().difference(lastAlertTime).inSeconds > config.interval &&
         getMessagesLength() > config.threshold) {

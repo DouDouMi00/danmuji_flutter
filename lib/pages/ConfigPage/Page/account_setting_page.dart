@@ -1,27 +1,13 @@
 //account_setting_page.dart
+import 'package:danmuji_flutter/services/config.dart';
+import 'package:danmuji_flutter/widgets/obscure_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:danmuji_flutter/services/config.dart';
-import 'package:danmuji_flutter/widgets/obscure_text_field.dart';
+class AccountSettingPage extends StatelessWidget {
+  AccountSettingPage({super.key});
 
-class AccountSettingPage extends StatefulWidget {
-  final DefaultConfig configMap;
-
-  const AccountSettingPage({super.key, required this.configMap});
-
-  @override
-  AccountSettingPageState createState() => AccountSettingPageState();
-}
-
-class AccountSettingPageState extends State<AccountSettingPage> {
-  late DefaultConfig configMap;
-
-  @override
-  void initState() {
-    super.initState();
-    configMap = Get.arguments as DefaultConfig;
-  }
+  final ConfigService configService = Get.find<ConfigService>();
 
   @override
   Widget build(BuildContext context) {
@@ -29,185 +15,177 @@ class AccountSettingPageState extends State<AccountSettingPage> {
       appBar: AppBar(title: const Text('账户设置')),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
-        child: ListView(
-          children: [
-            ListTile(
-              leading: const Icon(Icons.person_outline),
-              title: Text('UID ${configMap.kvdb.kvdbBili.uid}'),
-              trailing: const Icon(Icons.edit),
-              onTap: () {
-                showInputNumberDialog(
-                  InputDialogParams(
+        child: Obx(
+          () => ListView(
+            children: [
+              const Text('Web端'),
+              ListTile(
+                leading: const Icon(Icons.person_outline),
+                title: Text(
+                    'UID:${configService.configRx.value.kvdb.kvdbBili.uid}'),
+                trailing: const Icon(Icons.edit),
+                onTap: () async {
+                  await InputDialog(
                     title: 'UID',
-                    initialValue: configMap.kvdb.kvdbBili.uid,
+                    initialValue:
+                        configService.configRx.value.kvdb.kvdbBili.uid,
                     inputType: InputType.intInputType,
                     isObscured: false,
-                    onSaved: (value) async {
-                      setState(() {
-                        configMap.kvdb.kvdbBili.uid = value;
-                      });
-                      await updateConfigMap(configMap);
+                    onChanged: (value) {
+                      configService.configRx.value.kvdb.kvdbBili.uid = value;
+                      configService.configRx.refresh();
                     },
-                  ),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.lock_outline),
-              title: Text(
-                  'Buvid3 : ${configMap.kvdb.kvdbBili.buvid3.isNotEmpty ? '****' : '未输入'}'),
-              trailing: const Icon(Icons.edit),
-              onTap: () {
-                showInputNumberDialog(
-                  InputDialogParams(
+                  ).show();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.lock_outline),
+                title: Text(
+                    'Buvid3:${configService.configRx.value.kvdb.kvdbBili.buvid3.isEmpty ? '未输入' : '****'}'),
+                trailing: const Icon(Icons.edit),
+                onTap: () async {
+                  await InputDialog(
                     title: 'Buvid3',
-                    initialValue: configMap.kvdb.kvdbBili.buvid3,
+                    initialValue:
+                        configService.configRx.value.kvdb.kvdbBili.buvid3,
                     inputType: InputType.stringInputType,
                     isObscured: true,
-                    onSaved: (value) async {
-                      setState(() {
-                        configMap.kvdb.kvdbBili.buvid3 = value;
-                      });
-                      await updateConfigMap(configMap);
+                    allowEmpty: true,
+                    onChanged: (value) {
+                      configService.configRx.value.kvdb.kvdbBili.buvid3 = value;
+                      configService.configRx.refresh();
                     },
-                  ),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.lock_outline),
-              title: Text(
-                  'Sessdata : ${configMap.kvdb.kvdbBili.sessdata.isNotEmpty ? '****' : '未输入'}'),
-              trailing: const Icon(Icons.edit),
-              onTap: () {
-                showInputNumberDialog(
-                  InputDialogParams(
+                  ).show();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.lock_outline),
+                title: Text(
+                    'Sessdata:${configService.configRx.value.kvdb.kvdbBili.sessdata.isEmpty ? '未输入' : '****'}'),
+                trailing: const Icon(Icons.edit),
+                onTap: () async {
+                  await InputDialog(
                     title: 'Sessdata',
-                    initialValue: configMap.kvdb.kvdbBili.sessdata,
+                    initialValue:
+                        configService.configRx.value.kvdb.kvdbBili.sessdata,
                     inputType: InputType.stringInputType,
                     isObscured: true,
-                    onSaved: (value) async {
-                      setState(() {
-                        configMap.kvdb.kvdbBili.sessdata = value;
-                      });
-                      await updateConfigMap(configMap);
+                    allowEmpty: true,
+                    onChanged: (value) {
+                      configService.configRx.value.kvdb.kvdbBili.sessdata =
+                          value;
+                      configService.configRx.refresh();
                     },
-                  ),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.lock_outline),
-              title: Text(
-                  'JCT : ${configMap.kvdb.kvdbBili.jct.isNotEmpty ? '****' : '未输入'}'),
-              trailing: const Icon(Icons.edit),
-              onTap: () {
-                showInputNumberDialog(
-                  InputDialogParams(
+                  ).show();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.lock_outline),
+                title: Text(
+                    'JCT:${configService.configRx.value.kvdb.kvdbBili.jct.isEmpty ? '未输入' : '****'}'),
+                trailing: const Icon(Icons.edit),
+                onTap: () async {
+                  await InputDialog(
                     title: 'JCT',
-                    initialValue: configMap.kvdb.kvdbBili.jct,
+                    initialValue:
+                        configService.configRx.value.kvdb.kvdbBili.jct,
                     inputType: InputType.stringInputType,
                     isObscured: true,
-                    onSaved: (value) async {
-                      setState(() {
-                        configMap.kvdb.kvdbBili.jct = value;
-                      });
-                      await updateConfigMap(configMap);
+                    allowEmpty: true,
+                    onChanged: (value) {
+                      configService.configRx.value.kvdb.kvdbBili.jct = value;
+                      configService.configRx.refresh();
                     },
-                  ),
-                );
-              },
-            ),
-            const Text('开放平台'),
-            ListTile(
-              leading: const Icon(Icons.person_outline),
-              title: Text(
-                  '主播身份码 : ${configMap.kvdb.openLiveBili.idCode.isNotEmpty ? '****' : '未输入'}'),
-              trailing: const Icon(Icons.edit),
-              onTap: () {
-                showInputNumberDialog(
-                  InputDialogParams(
+                  ).show();
+                },
+              ),
+              const Text('开放平台'),
+              ListTile(
+                leading: const Icon(Icons.person_outline),
+                title: Text(
+                    '主播身份码:${configService.configRx.value.kvdb.openLiveBili.idCode.isEmpty ? '未输入' : '****'}'),
+                trailing: const Icon(Icons.edit),
+                onTap: () async {
+                  await InputDialog(
                     title: '主播身份码',
-                    initialValue: configMap.kvdb.openLiveBili.idCode,
+                    initialValue:
+                        configService.configRx.value.kvdb.openLiveBili.idCode,
                     inputType: InputType.stringInputType,
                     isObscured: true,
-                    onSaved: (value) async {
-                      setState(() {
-                        configMap.kvdb.openLiveBili.idCode = value;
-                      });
-                      await updateConfigMap(configMap);
+                    allowEmpty: true,
+                    onChanged: (value) {
+                      configService.configRx.value.kvdb.openLiveBili.idCode =
+                          value;
+                      configService.configRx.refresh();
                     },
-                  ),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.lock_outline),
-              title: Text(
-                  '应用id : ${configMap.kvdb.openLiveBili.appId != 0 ? '****' : '未输入'}'),
-              trailing: const Icon(Icons.edit),
-              onTap: () {
-                showInputNumberDialog(
-                  InputDialogParams(
+                  ).show();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.lock_outline),
+                title: Text(
+                    '应用id:${configService.configRx.value.kvdb.openLiveBili.appId == 0 ? '未输入' : '****'}'),
+                trailing: const Icon(Icons.edit),
+                onTap: () async {
+                  await InputDialog(
                     title: '应用id',
-                    initialValue: configMap.kvdb.openLiveBili.appId,
+                    initialValue:
+                        configService.configRx.value.kvdb.openLiveBili.appId,
                     inputType: InputType.intInputType,
                     isObscured: true,
-                    onSaved: (value) async {
-                      setState(() {
-                        configMap.kvdb.openLiveBili.appId = value;
-                      });
-                      await updateConfigMap(configMap);
+                    allowEmpty: true,
+                    onChanged: (value) {
+                      configService.configRx.value.kvdb.openLiveBili.appId =
+                          value;
+                      configService.configRx.refresh();
                     },
-                  ),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.lock_outline),
-              title: Text(
-                  'access_key : ${configMap.kvdb.openLiveBili.accessKey.isNotEmpty ? '****' : '未输入'}'),
-              trailing: const Icon(Icons.edit),
-              onTap: () {
-                showInputNumberDialog(
-                  InputDialogParams(
+                  ).show();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.lock_outline),
+                title: Text(
+                    'access_key:${configService.configRx.value.kvdb.openLiveBili.accessKey.isEmpty ? '未输入' : '****'}'),
+                trailing: const Icon(Icons.edit),
+                onTap: () async {
+                  await InputDialog(
                     title: 'access_key',
-                    initialValue: configMap.kvdb.openLiveBili.accessKey,
+                    initialValue: configService
+                        .configRx.value.kvdb.openLiveBili.accessKey,
                     inputType: InputType.stringInputType,
                     isObscured: true,
-                    onSaved: (value) async {
-                      setState(() {
-                        configMap.kvdb.openLiveBili.accessKey = value;
-                      });
-                      await updateConfigMap(configMap);
+                    allowEmpty: true,
+                    onChanged: (value) {
+                      configService.configRx.value.kvdb.openLiveBili.accessKey =
+                          value;
+                      configService.configRx.refresh();
                     },
-                  ),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.lock_outline),
-              title: Text(
-                  'access_key_secret : ${configMap.kvdb.openLiveBili.accessKeySecret.isNotEmpty ? '****' : '未输入'}'),
-              trailing: const Icon(Icons.edit),
-              onTap: () {
-                showInputNumberDialog(
-                  InputDialogParams(
+                  ).show();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.lock_outline),
+                title: Text(
+                    'access_key_secret:${configService.configRx.value.kvdb.openLiveBili.accessKeySecret.isEmpty ? '未输入' : '****'}'),
+                trailing: const Icon(Icons.edit),
+                onTap: () async {
+                  await InputDialog(
                     title: 'access_key_secret',
-                    initialValue: configMap.kvdb.openLiveBili.accessKeySecret,
+                    initialValue: configService
+                        .configRx.value.kvdb.openLiveBili.accessKeySecret,
                     inputType: InputType.stringInputType,
                     isObscured: true,
-                    onSaved: (value) async {
-                      setState(() {
-                        configMap.kvdb.openLiveBili.accessKeySecret = value;
-                      });
-                      await updateConfigMap(configMap);
+                    allowEmpty: true,
+                    onChanged: (value) {
+                      configService.configRx.value.kvdb.openLiveBili
+                          .accessKeySecret = value;
+                      configService.configRx.refresh();
                     },
-                  ),
-                );
-              },
-            ),
-          ],
+                  ).show();
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -3,33 +3,36 @@
 
 // To parse this JSON data, do
 //
-//     final defaultConfig = defaultConfigFromJson(jsonString);
+//     final appConfig = appConfigFromJson(jsonString);
 
 import 'dart:convert';
 
-DefaultConfig defaultConfigFromJson(String str) =>
-    DefaultConfig.fromJson(json.decode(str));
+AppConfig appConfigFromJson(String str) => AppConfig.fromJson(json.decode(str));
 
-String defaultConfigToJson(DefaultConfig data) => json.encode(data.toJson());
+String appConfigToJson(AppConfig data) => json.encode(data.toJson());
 
-class DefaultConfig {
+class AppConfig {
+  System system;
   Kvdb kvdb;
   Engine engine;
   DynamicConfig dynamicConfig;
 
-  DefaultConfig({
+  AppConfig({
+    required this.system,
     required this.kvdb,
     required this.engine,
     required this.dynamicConfig,
   });
 
-  factory DefaultConfig.fromJson(Map<String, dynamic> json) => DefaultConfig(
+  factory AppConfig.fromJson(Map<String, dynamic> json) => AppConfig(
+        system: System.fromJson(json["system"]),
         kvdb: Kvdb.fromJson(json["kvdb"]),
         engine: Engine.fromJson(json["engine"]),
         dynamicConfig: DynamicConfig.fromJson(json["dynamicConfig"]),
       );
 
   Map<String, dynamic> toJson() => {
+        "system": system.toJson(),
         "kvdb": kvdb.toJson(),
         "engine": engine.toJson(),
         "dynamicConfig": dynamicConfig.toJson(),
@@ -474,8 +477,29 @@ class OpenLiveBili {
       };
 }
 
+class System {
+  int theme;
+  String language;
+
+  System({
+    required this.theme,
+    required this.language,
+  });
+
+  factory System.fromJson(Map<String, dynamic> json) => System(
+        theme: json["theme"],
+        language: json["language"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "theme": theme,
+        "language": language,
+      };
+}
+
 // // 模板
 // Map<String, Map<String, Object>> template = {
+//   "system": {"theme": 0, "language": "zh-CN"},
 //   "kvdb": {
 //     "kvdbBili": {"uid": 0, "buvid3": "", "sessdata": "", "jct": ""},
 //     "openLiveBili": {

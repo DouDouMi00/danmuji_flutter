@@ -1,47 +1,39 @@
 // tts_engines_setting_page.dart
 import 'dart:io' show Platform;
 
+import 'package:danmuji_flutter/services/config.dart';
+import 'package:danmuji_flutter/widgets/obscure_text_field.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:get/get.dart';
 
-import 'package:danmuji_flutter/services/config.dart';
-import 'package:danmuji_flutter/widgets/obscure_text_field.dart';
-
-class TtsEnginesSettingPage extends StatefulWidget {
-  final DefaultConfig configMap;
-
-  const TtsEnginesSettingPage({super.key, required this.configMap});
-
-  @override
-  TtsEnginesSettingPageState createState() => TtsEnginesSettingPageState();
-}
-
-class TtsEnginesSettingPageState extends State<TtsEnginesSettingPage> {
-  FlutterTts flutterTts = FlutterTts();
-  late double volume;
-  late double pitch;
-  late double rate;
-  bool isCurrentLanguageInstalled = false;
-
-  bool get isAndroid => !kIsWeb && Platform.isAndroid;
-  String? engine;
-  String? language;
-  late DefaultConfig configMap;
-
-  @override
-  void initState() {
-    super.initState();
-    configMap = Get.arguments as DefaultConfig;
-    volume = configMap.dynamicConfig.tts.volume;
-    pitch = configMap.dynamicConfig.tts.pitch;
-    rate = configMap.dynamicConfig.tts.rate;
+class TtsEnginesSettingPage extends StatelessWidget {
+  TtsEnginesSettingPage({super.key}) {
+    // 初始化状态
+    volume.value = configService.configRx.value.dynamicConfig.tts.volume;
+    pitch.value = configService.configRx.value.dynamicConfig.tts.pitch;
+    rate.value = configService.configRx.value.dynamicConfig.tts.rate;
+    engine.value = configService.configRx.value.dynamicConfig.tts.engine;
+    language.value = configService.configRx.value.dynamicConfig.tts.language;
     if (isAndroid) {
       _getDefaultEngine();
       _getDefaultVoice();
     }
   }
+
+  final FlutterTts flutterTts = FlutterTts();
+  final ConfigService configService = Get.find<ConfigService>();
+
+  // 使用 Rx 来管理响应式状态
+  final RxDouble volume = 0.0.obs;
+  final RxDouble pitch = 0.0.obs;
+  final RxDouble rate = 0.0.obs;
+  final RxBool isCurrentLanguageInstalled = false.obs;
+  final RxString engine = ''.obs;
+  final RxString language = ''.obs;
+
+  bool get isAndroid => !kIsWeb && Platform.isAndroid;
 
   // 添加一个方法来重置滑块到默认值
   void resetSlidersToDefaults() async {
@@ -49,34 +41,31 @@ class TtsEnginesSettingPageState extends State<TtsEnginesSettingPage> {
     if (isAndroid) {
       await _getresetEngineVoice();
     }
-    volume = 1.0; // 假设这是volume的默认值
-    pitch = 1.0; // 假设这是pitch的默认值
-    rate = 1.0; // 假设这是rate的默认值
-    setState(() {
-      if (engine != null) {
-        configMap.dynamicConfig.tts.engine = engine!;
-      }
-      if (language != null) {
-        configMap.dynamicConfig.tts.language = language!;
-      }
-      configMap.dynamicConfig.tts.volume = volume;
-      configMap.dynamicConfig.tts.pitch = pitch;
-      configMap.dynamicConfig.tts.rate = rate;
-    });
-    await updateConfigMap(configMap);
+    volume.value = 1.0; // 假设这是volume的默认值
+    pitch.value = 1.0; // 假设这是pitch的默认值
+    rate.value = 1.0; // 假设这是rate的默认值
+    if (engine.value.isNotEmpty) {
+      configService.configRx.value.dynamicConfig.tts.engine = engine.value;
+    }
+    if (language.value.isNotEmpty) {
+      configService.configRx.value.dynamicConfig.tts.language = language.value;
+    }
+    configService.configRx.value.dynamicConfig.tts.volume = volume.value;
+    configService.configRx.value.dynamicConfig.tts.pitch = pitch.value;
+    configService.configRx.value.dynamicConfig.tts.rate = rate.value;
+    configService.configRx.refresh();
   }
 
   Future _getresetEngineVoice() async {
-    engine = await flutterTts.getDefaultEngine;
+    engine.value = await flutterTts.getDefaultEngine;
     Map? voice = await flutterTts.getDefaultVoice;
     if (voice != null) {
-      language = voice["locale"];
+      language.value = voice["locale"];
     }
   }
 
-  List<Map<String, dynamic>> getEnginesDropDownMenuItems(
-      List<dynamic> engines) {
-    var items = <Map<String, dynamic>>[];
+  List<Map<String, String>> getEnginesDropDownMenuItems(List<dynamic> engines) {
+    var items = <Map<String, String>>[];
     for (dynamic type in engines) {
       if (type is String) {
         items.add({"title": type, "value": type});
@@ -85,9 +74,9 @@ class TtsEnginesSettingPageState extends State<TtsEnginesSettingPage> {
     return items;
   }
 
-  List<Map<String, dynamic>> getLanguageDropDownMenuItems(
+  List<Map<String, String>> getLanguageDropDownMenuItems(
       List<dynamic> languages) {
-    var items = <Map<String, dynamic>>[];
+    var items = <Map<String, String>>[];
     for (dynamic type in languages) {
       if (type is String) {
         items.add({"title": type, "value": type});
@@ -101,51 +90,50 @@ class TtsEnginesSettingPageState extends State<TtsEnginesSettingPage> {
   Future<dynamic> _getEngines() async => await flutterTts.getEngines;
 
   Future<String?> _getDefaultEngine() async {
-    if (configMap.dynamicConfig.tts.engine != "") {
-      engine = configMap.dynamicConfig.tts.engine;
+    if (configService.configRx.value.dynamicConfig.tts.engine.isNotEmpty) {
+      engine.value = configService.configRx.value.dynamicConfig.tts.engine;
     } else {
-      engine = await flutterTts.getDefaultEngine;
-      if (engine != null) {
-        configMap.dynamicConfig.tts.engine = engine!;
-        await updateConfigMap(configMap);
+      engine.value = await flutterTts.getDefaultEngine;
+      if (engine.value.isNotEmpty) {
+        configService.configRx.value.dynamicConfig.tts.engine = engine.value;
+        configService.configRx.refresh();
       }
     }
-    return engine;
+    return engine.value;
   }
 
   Future<String?> _getDefaultVoice() async {
-    if (configMap.dynamicConfig.tts.language != "") {
-      language = configMap.dynamicConfig.tts.language;
+    if (configService.configRx.value.dynamicConfig.tts.language.isNotEmpty) {
+      language.value = configService.configRx.value.dynamicConfig.tts.language;
     } else {
       Map? voice = await flutterTts.getDefaultVoice;
       if (voice != null) {
-        language = voice["locale"];
-        configMap.dynamicConfig.tts.language = language!;
-        await updateConfigMap(configMap);
+        language.value = voice["locale"];
+        configService.configRx.value.dynamicConfig.tts.language =
+            language.value;
+        configService.configRx.refresh();
       }
     }
-    return language;
+    return language.value;
   }
 
   Widget _enginesDropDownSection(List<dynamic> engines) => ListTile(
         leading: const Icon(Icons.anchor_outlined),
-        title: Text('TTS 引擎: ${configMap.dynamicConfig.tts.engine}'),
+        title: Obx(() => Text(
+            'TTS 引擎: ${configService.configRx.value.dynamicConfig.tts.engine}')),
         trailing: const Icon(Icons.navigate_next),
-        onTap: () {
-          showRadioDialog(
-            RadioDialogParams(
-              title: 'TTS 引擎',
-              initialValue: engine,
-              valueOptions: getEnginesDropDownMenuItems(engines),
-              onSaved: (value) async {
-                engine = value;
-                configMap.dynamicConfig.tts.engine = value;
-                await updateConfigMap(configMap);
-                await flutterTts.setEngine(value);
-                setState(() {});
-              },
-            ),
-          );
+        onTap: () async {
+          await RadioDialog(
+            title: 'TTS 引擎',
+            initialValue: engine.value,
+            valueOptions: getEnginesDropDownMenuItems(engines),
+            onChanged: (value) async {
+              engine.value = value;
+              configService.configRx.value.dynamicConfig.tts.engine = value;
+              configService.configRx.refresh();
+              await flutterTts.setEngine(value);
+            },
+          ).show();
         },
       );
 
@@ -176,23 +164,21 @@ class TtsEnginesSettingPageState extends State<TtsEnginesSettingPage> {
       Column(mainAxisAlignment: MainAxisAlignment.center, children: [
         ListTile(
           leading: const Icon(Icons.anchor_outlined),
-          title: Text('TTS 语言: ${configMap.dynamicConfig.tts.language}'),
+          title: Obx(() => Text(
+              'TTS 语言: ${configService.configRx.value.dynamicConfig.tts.language}')),
           trailing: const Icon(Icons.navigate_next),
-          onTap: () {
-            showRadioDialog(
-              RadioDialogParams(
-                title: 'TTS 语言',
-                initialValue: language,
-                valueOptions: getLanguageDropDownMenuItems(languages),
-                onSaved: (value) async {
-                  await _isLanguageInstalled(value);
-                  language = value;
-                  configMap.dynamicConfig.tts.language = value;
-                  await updateConfigMap(configMap);
-                  setState(() {});
-                },
-              ),
-            );
+          onTap: () async {
+            await RadioDialog(
+              title: 'TTS 语言',
+              initialValue: language.value,
+              valueOptions: getLanguageDropDownMenuItems(languages),
+              onChanged: (value) async {
+                await _isLanguageInstalled(value);
+                language.value = value;
+                configService.configRx.value.dynamicConfig.tts.language = value;
+                configService.configRx.refresh();
+              },
+            ).show();
           },
         ),
       ]);
@@ -232,20 +218,19 @@ class TtsEnginesSettingPageState extends State<TtsEnginesSettingPage> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const Text('音量调节'),
-        Slider(
-          value: volume,
-          onChanged: (newVolume) async {
-            setState(() {
-              volume = newVolume;
-              configMap.dynamicConfig.tts.volume = volume;
-            });
-            await updateConfigMap(configMap);
-          },
-          min: 0.0,
-          max: 1.0,
-          divisions: 10,
-          label: '音量: ${volume.toStringAsFixed(1)}',
-        ),
+        Obx(() => Slider(
+              value: volume.value,
+              onChanged: (newVolume) async {
+                volume.value = newVolume;
+                configService.configRx.value.dynamicConfig.tts.volume =
+                    volume.value;
+                configService.configRx.refresh();
+              },
+              min: 0.0,
+              max: 1.0,
+              divisions: 10,
+              label: '音量: ${volume.value.toStringAsFixed(1)}',
+            )),
       ],
     );
   }
@@ -255,21 +240,20 @@ class TtsEnginesSettingPageState extends State<TtsEnginesSettingPage> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const Text('音调调节'),
-        Slider(
-          value: pitch,
-          onChanged: (newPitch) async {
-            setState(() {
-              pitch = newPitch;
-              configMap.dynamicConfig.tts.pitch = pitch;
-            });
-            await updateConfigMap(configMap);
-          },
-          min: 0.5,
-          max: 2.0,
-          divisions: 15,
-          label: '音调: ${pitch.toStringAsFixed(1)}',
-          activeColor: Colors.red,
-        ),
+        Obx(() => Slider(
+              value: pitch.value,
+              onChanged: (newPitch) async {
+                pitch.value = newPitch;
+                configService.configRx.value.dynamicConfig.tts.pitch =
+                    pitch.value;
+                configService.configRx.refresh();
+              },
+              min: 0.5,
+              max: 2.0,
+              divisions: 15,
+              label: '音调: ${pitch.value.toStringAsFixed(1)}',
+              activeColor: Colors.red,
+            )),
       ],
     );
   }
@@ -279,21 +263,20 @@ class TtsEnginesSettingPageState extends State<TtsEnginesSettingPage> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const Text('语速调节'),
-        Slider(
-          value: rate,
-          onChanged: (newRate) async {
-            setState(() {
-              rate = newRate;
-              configMap.dynamicConfig.tts.rate = rate;
-            });
-            await updateConfigMap(configMap);
-          },
-          min: 0.0,
-          max: 5.0,
-          divisions: 25,
-          label: '语速: ${rate.toStringAsFixed(1)}',
-          activeColor: Colors.green,
-        ),
+        Obx(() => Slider(
+              value: rate.value,
+              onChanged: (newRate) async {
+                rate.value = newRate;
+                configService.configRx.value.dynamicConfig.tts.rate =
+                    rate.value;
+                configService.configRx.refresh();
+              },
+              min: 0.0,
+              max: 5.0,
+              divisions: 25,
+              label: '语速: ${rate.value.toStringAsFixed(1)}',
+              activeColor: Colors.green,
+            )),
       ],
     );
   }
@@ -301,16 +284,16 @@ class TtsEnginesSettingPageState extends State<TtsEnginesSettingPage> {
   // 新增试听功能
   void _playSampleText() async {
     await flutterTts.stop();
-    if (language != null) {
-      await flutterTts.setLanguage(language!);
+    if (language.value.isNotEmpty) {
+      await flutterTts.setLanguage(language.value);
     }
-    if (engine != null) {
-      await flutterTts.setEngine(engine!);
+    if (engine.value.isNotEmpty) {
+      await flutterTts.setEngine(engine.value);
     }
     // 使用当前设置的参数播放一段文本
-    await flutterTts.setPitch(pitch);
-    await flutterTts.setSpeechRate(rate);
-    await flutterTts.setVolume(volume);
+    await flutterTts.setPitch(pitch.value);
+    await flutterTts.setSpeechRate(rate.value);
+    await flutterTts.setVolume(volume.value);
     await flutterTts.awaitSpeakCompletion(true);
     await flutterTts.speak('这是一个试听文本，用于测试当前的语音设置。');
   }

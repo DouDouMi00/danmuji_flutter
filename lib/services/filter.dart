@@ -1,13 +1,15 @@
 import 'dart:async';
 
 import 'package:danmuji_flutter/services/config.dart';
+import 'package:get/get.dart';
 
 List<String?> lastDanmuMessages = [];
 
 bool filterDanmu(int uid, String uname, bool isFansMedalBelongToLive,
     int fansMedalLevel, int fansMedalGuardLevel, String msg, bool isEmoji,
     {String? openId}) {
-  var dynamicConfig = getConfigMap().dynamicConfig.filter.danmu;
+  var dynamicConfig =
+      Get.find<ConfigService>().configRx.value.dynamicConfig.filter.danmu;
   if (!dynamicConfig.enable) {
     return false;
   }
@@ -76,7 +78,8 @@ Map<String, dynamic> giftOpenIds = {};
 Future<bool?> filterGift(int uid, String uname, double price, String giftName,
     int num, Function(Map<String, dynamic>, String) deduplicateCallback,
     {String? openId}) async {
-  var dynamicConfig = getConfigMap().dynamicConfig.filter.gift;
+  var dynamicConfig =
+      Get.find<ConfigService>().configRx.value.dynamicConfig.filter.gift;
   if (!dynamicConfig.enable) {
     return false;
   }
@@ -142,7 +145,8 @@ Future<bool?> filterGift(int uid, String uname, double price, String giftName,
 
 bool filterWelcome(int uid, String uname, bool isFansMedalBelongToLive,
     int fansMedalLevel, int fansMedalGuardLevel) {
-  var dynamicConfig = getConfigMap().dynamicConfig.filter.welcome;
+  var dynamicConfig =
+      Get.find<ConfigService>().configRx.value.dynamicConfig.filter.welcome;
   if (!dynamicConfig.enable) {
     return false;
   }
@@ -162,7 +166,8 @@ bool filterWelcome(int uid, String uname, bool isFansMedalBelongToLive,
 
 bool filterGuardBuy(
     int uid, String uname, bool newGuard, String giftName, int num) {
-  var dynamicConfig = getConfigMap().dynamicConfig.filter.guardBuy;
+  var dynamicConfig =
+      Get.find<ConfigService>().configRx.value.dynamicConfig.filter.guardBuy;
   if (!dynamicConfig.enable) {
     return false;
   }
@@ -173,7 +178,8 @@ Map<String, bool> likedUids = {};
 Map<String, bool> likedOpenIds = {};
 
 bool filterLike(int uid, String uname, {String? openId}) {
-  var dynamicConfig = getConfigMap().dynamicConfig.filter.like;
+  var dynamicConfig =
+      Get.find<ConfigService>().configRx.value.dynamicConfig.filter.like;
   if (!dynamicConfig.enable) {
     return false;
   }
@@ -196,7 +202,8 @@ bool filterLike(int uid, String uname, {String? openId}) {
 
 bool filterSubscribe(int uid, String uname, bool isFansMedalBelongToLive,
     int fansMedalLevel, int fansMedalGuardLevel) {
-  var dynamicConfig = getConfigMap().dynamicConfig.filter.subscribe;
+  var dynamicConfig =
+      Get.find<ConfigService>().configRx.value.dynamicConfig.filter.subscribe;
   if (!dynamicConfig.enable) {
     return false;
   }
@@ -204,7 +211,8 @@ bool filterSubscribe(int uid, String uname, bool isFansMedalBelongToLive,
 }
 
 bool filterSuperChat(int uid, String uname, double price, String msg) {
-  var dynamicConfig = getConfigMap().dynamicConfig.filter.superChat;
+  var dynamicConfig =
+      Get.find<ConfigService>().configRx.value.dynamicConfig.filter.superChat;
   if (!dynamicConfig.enable) {
     return false;
   }
@@ -212,7 +220,8 @@ bool filterSuperChat(int uid, String uname, double price, String msg) {
 }
 
 bool filterWarning(String msg, bool isCutOff) {
-  var dynamicConfig = getConfigMap().dynamicConfig.filter.warning;
+  var dynamicConfig =
+      Get.find<ConfigService>().configRx.value.dynamicConfig.filter.warning;
   if (!dynamicConfig.enable) {
     return false;
   }

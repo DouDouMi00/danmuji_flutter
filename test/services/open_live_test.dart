@@ -2,14 +2,12 @@ import 'package:danmuji_flutter/services/config.dart';
 import 'package:danmuji_flutter/services/logger.dart';
 import 'package:danmuji_flutter/services/messages_handler.dart';
 import 'package:danmuji_flutter/services/open_live.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get/get.dart';
 import 'package:logging/logging.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await initConfig(test: true);
-
+  await Get.putAsync(() => ConfigService().initConfig(test: true));
   final handler = OpenMessageHandler();
   final capturedLogs = <String>[];
   void handleLogRecord(LogRecord record) {

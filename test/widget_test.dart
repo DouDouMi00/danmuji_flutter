@@ -3,14 +3,15 @@ import 'package:danmuji_flutter/main.dart';
 // import 'package:flutter/material.dart';
 import 'package:danmuji_flutter/services/config.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get/get.dart';
 
 void main() {
   group('MyApp', () {
     testWidgets('HomePage meets androidTapTargetGuideline',
         (WidgetTester tester) async {
-      await initConfig(test: true);
+      await Get.putAsync(() => ConfigService().initConfig(test: true));
       final SemanticsHandle handle = tester.ensureSemantics();
-      await tester.pumpWidget(const MyApp(theme: '0'));
+      await tester.pumpWidget(MyApp());
       // Checks that tappable nodes have a minimum size of 48 by 48 pixels
       // for Android.
       await expectLater(tester, meetsGuideline(androidTapTargetGuideline));

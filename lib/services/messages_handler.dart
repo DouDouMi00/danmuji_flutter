@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:danmuji_flutter/services/filter.dart';
 import 'package:danmuji_flutter/services/logger.dart';
 import 'package:danmuji_flutter/services/stats.dart';
+
 import 'live.dart' show liveEvent;
 
 List<Map<String, dynamic>> messagesQueue = [];
