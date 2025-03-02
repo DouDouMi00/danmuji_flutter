@@ -118,12 +118,13 @@ class ConfigService extends GetxService {
 
   // 初始化配置
   Future<ConfigService> initConfig({bool test = false}) async {
-    await GetStorage.init();
-    _storage = GetStorage();
     if (test) {
       _configMap = _defaultConfig;
+      configRx = AppConfig.fromJson(_configMap).obs;
       return this;
     }
+    await GetStorage.init();
+    _storage = GetStorage();
     final jsonString = _storage.read(_configKey);
     if (jsonString != null) {
       _configMap = jsonDecode(jsonString);
