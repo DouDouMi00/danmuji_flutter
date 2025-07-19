@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
       ],
       supportedLocales: const [
         Locale('en', 'US'), // 美国英语
-        Locale('zh', 'CN'), // 中文简体
+        Locale('zh', 'Hans'), // 中文简体
         //其它Locales
       ],
       initialRoute: Routes.home,
